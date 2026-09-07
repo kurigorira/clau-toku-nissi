@@ -59,6 +59,15 @@ docs/
 
 ## セットアップ
 
+まず稼働サーバが要件を満たすか確認する。
+
+```bash
+php tools/check_env.php
+```
+
+PHPのバージョン・拡張モジュール・utf8mb4の可否・テーブルの作成状況をまとめて判定する。
+このスクリプト自体は古いPHPでも動くので、「PHPが古すぎる」場合もその旨が表示される。
+
 ```bash
 # 1. データベースを作る
 mysql -u root -p -e "CREATE DATABASE nissi DEFAULT CHARACTER SET utf8mb4;"
@@ -129,7 +138,10 @@ gunzip -c /backup/nissi_YYYYMMDD.sql.gz | mysql -u nissi -p nissi
 
 ## 保守する人へ
 
-- 依存ライブラリなし・ビルド工程なし。PHPファイルを置けば動く（PHP 7.0以降）
+- 依存ライブラリなし・ビルド工程なし。PHPファイルを置けば動く（**PHP 7.4 以上**）
+  - 7.4 が必要なのはアロー関数を12か所で使っているため。7.1〜7.3 の場合は
+    通常のクロージャに書き換えれば動く（`src/calc.php` `public/zaiin.php` `public/nissi.php` ほか）
+  - サーバが要件を満たすかは `php tools/check_env.php` で確認できる
 - SQLは必ず `src/db.php` のプリペアドステートメント経由で書く
 - 画面に文字を出すときは必ず `h()` を通す（特記事項に患者氏名が入るため）
 - 導出値は **保存しない**。現行Excelは導出値を各シートに転記していたため参照ズレが起き、
