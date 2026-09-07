@@ -1,0 +1,136 @@
+# 病院日誌・医事統計表 入力システム
+
+長崎北徳洲会病院。各部署が電子カルテ端末から患者数・業務数を **一度だけ** 入力し、
+病院日誌と医事統計表の両方をそこから自動生成する。入力者と入力時刻を自動で記録し、
+未入力の部署が一目で分かるようにする。
+
+## 何を解決するか
+
+現行は、同じ数字を **病院日誌（PHP）** と **医事統計表（Excel月ブック）** の両方に書いている。
+病院日誌の数値項目のうち約8割は医事統計表にも存在する。
+
+このシステムでは、粒度の細かいほうを1回だけ入力し、粗いほうは計算で出す。
+
+| 手入力する項目 | 自動で出る項目 |
+|---|---|
+| CT 入院 / CT 外来 | 病院日誌の「ＣＴ ○件」 |
+| 外来患者数 午前・午後・夜間・時間外×2 | 医事統計表の「外来患者数 当日」 |
+| 訪問看護 介護30分以上・30分以内・医療 | 病院日誌の「訪問看護 ○件」 |
+| 病棟別の在院患者数 3階・4階・5階 | 日誌の「計」、統計表の「現入院」 |
+
+日誌側にCT・訪問看護・在院患者数計の入力欄は作らない。二度書きが構造的に消える。
+
+## 構成
+
+```
+db/
+  schema.sql            テーブル定義（MySQL・正本）
+  schema.sqlite.sql     ↑から自動生成（開発時のSQLite動作確認用）
+  seed_master.sql       ↓のCSVから自動生成
+  master/               ★ここを直す
+    depts.csv           部署マスタ（19部署）
+    items.csv           項目マスタ（277項目）
+    config.csv          定床などの設定値
+  tools/
+    build_seed.php      master/*.csv → seed_master.sql と対応表を生成
+    mysql_to_sqlite.php schema.sql → SQLite用DDL
+    dev_setup.php       開発用SQLite DBを作り直す
+    import_daily_csv.php 過去データの取り込み
+src/
+  db.php          PDO接続。SQLは必ずプリペアドステートメント
+  auth.php        利用者の特定。電子カルテからのID引き継ぎ／予備ログイン
+  master.php      マスタ読み込み
+  repository.php  日次値の保存、入力者・時刻の記録、変更履歴、提出状態
+  calc.php        導出項目の算出（Excelの数式に相当）
+  view.php        エスケープ・CSRF・共通ヘッダ
+public/
+  index.php       入力状況ボード（トップ）
+  entry.php       部署別入力（項目マスタから自動生成）
+  nissi.php       病院日誌（?print=1 で印刷用）
+  soukatsu.php    各種業務量他総括（月次）
+  zaiin.php       平均在院日数統計
+  qq_report.php   救急搬入受入統計（８時会・朝礼報告）
+  login.php       予備ログイン
+tools/
+  extract_excel.py  現行Excelブックから値をCSVに取り出す（移行・検証用）
+docs/
+  項目マスタ対応表.md  旧列名・Excel位置と項目コードの対応（自動生成）
+```
+
+## セットアップ
+
+```bash
+# 1. データベースを作る
+mysql -u root -p -e "CREATE DATABASE nissi DEFAULT CHARACTER SET utf8mb4;"
+mysql -u root -p -e "CREATE USER 'nissi'@'localhost' IDENTIFIED BY '＜パスワード＞';
+                     GRANT SELECT,INSERT,UPDATE,DELETE ON nissi.* TO 'nissi'@'localhost';"
+
+# 2. スキーマとマスタを流し込む
+mysql -u nissi -p nissi < db/schema.sql
+php db/tools/build_seed.php
+mysql -u nissi -p nissi < db/seed_master.sql
+
+# 3. 設定ファイルを作る（config.php はリポジトリに入れない）
+cp config/config.sample.php config/config.php
+vi config/config.php
+
+# 4. 職員マスタを登録する（電子カルテの職員IDをそのまま user_id にする）
+```
+
+Apache/nginx のドキュメントルートは **`public/` を指す**。`src/` `config/` `db/` を
+Web から直接開けないようにするため。
+
+### 開発機で動かす（MySQLが無くても確認できる）
+
+```bash
+php db/tools/mysql_to_sqlite.php > db/schema.sqlite.sql
+php db/tools/build_seed.php
+php db/tools/dev_setup.php          # db/dev.sqlite を作る
+# config/config.php の dsn を sqlite に、auth.mode を local にする
+php -S 127.0.0.1:8080 -t public     # kurihara / test1234
+```
+
+## よくある変更
+
+**集計項目を増やす／減らす**
+`db/master/items.csv` に1行足して `php db/tools/build_seed.php`、生成されたSQLを流す。
+入力画面は項目マスタから自動生成されるので、PHPは触らない。
+
+- `calc_type=input` … 現場が手入力する
+- `calc_type=sum` … `calc_source` に並べた項目コードを合算する
+- `calc_type=func` … `src/calc.php` の名前付き関数で算出する（稼働率・回転率など）
+- `agg_type=sum` … 月計は期間内を合算（新入院・検査件数などフロー）
+- `agg_type=last` … 月計は最終日の値（登録人数などストック）
+
+**病床数が変わった**
+`db/master/config.csv` に `valid_from` 付きで新しい行を足す。古い行は消さない。
+過去の帳票は当時の定床で再現される。
+
+**部署を増やす**
+`db/master/depts.csv` に1行足す。`entry_days` で入力対象曜日、`deadline_time` で入力期限を指定する。
+
+## バックアップと復旧
+
+```bash
+# 毎日 深夜に取得（cron）
+mysqldump -u nissi -p --single-transaction nissi | gzip > /backup/nissi_$(date +\%Y\%m\%d).sql.gz
+
+# 復旧
+gunzip -c /backup/nissi_YYYYMMDD.sql.gz | mysql -u nissi -p nissi
+```
+
+> **バックアップを取るだけでは足りない。** 年に一度は実際に別DBへ復旧してみて、
+> 手順が通ることを確認する。取れていても戻せない事例が最も多い。
+
+## システムが止まったとき
+
+現行の紙の日誌様式を1か月ぶん印刷して医事課に置いておく。停止中は紙で運用し、
+復旧後にまとめて入力する。日付を指定して過去日を入力できるので、後追いで埋められる。
+
+## 保守する人へ
+
+- 依存ライブラリなし・ビルド工程なし。PHPファイルを置けば動く（PHP 7.0以降）
+- SQLは必ず `src/db.php` のプリペアドステートメント経由で書く
+- 画面に文字を出すときは必ず `h()` を通す（特記事項に患者氏名が入るため）
+- 導出値は **保存しない**。現行Excelは導出値を各シートに転記していたため参照ズレが起き、
+  同じ項目が集計シートと帳票シートで違う数字になっていた。数字の出どころを1つに保つこと

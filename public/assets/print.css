@@ -1,0 +1,14 @@
+/* 病院日誌の印刷用。A3横1枚に収める。
+   現行はtFPDFでPDFを作っていたが、SJIS依存とフォント同梱の保守負担が大きいため、
+   ブラウザの印刷機能に置き換えた。PDFが必要な場合は「PDFとして保存」を使う。 */
+@page { size: A3 landscape; margin: 8mm; }
+
+body { background: #fff; font-size: 10px; }
+.app-header, .app-nav, .app-footer, .datebar, .noprint { display: none !important; }
+main { padding: 0; }
+h1 { font-size: 15px; margin: 0 0 6px; }
+.nissi { font-size: 9px; width: 100%; }
+.nissi th, .nissi td { padding: 1px 3px; }
+.nissi-grid { gap: 4px; }
+table { page-break-inside: avoid; }
+a { color: #000; text-decoration: none; }
