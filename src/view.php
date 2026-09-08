@@ -92,8 +92,20 @@ function page_header(string $title, ?array $user = null): void
   <nav class="app-nav">
     <a href="index.php">入力状況</a>
     <a href="nissi.php">病院日誌</a>
-    <a href="soukatsu.php">総括</a>
     <a href="qq_report.php">救急搬入</a>
+    <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
+      <a href="soukatsu.php">総括</a>
+      <a href="zaiin.php">平均在院日数</a>
+      <a href="toukei.php">患者数統計表</a>
+      <a href="byoin_houkoku.php">病院報告</a>
+      <a href="audit.php">変更履歴</a>
+    <?php elseif ($user && $user['dept_id'] === 'byoto'): ?>
+      <a href="zaiin.php">平均在院日数</a>
+    <?php endif; ?>
+    <?php if ($user && $user['role'] === 'admin'): ?>
+      <a href="admin_master.php">マスタ</a>
+      <a href="admin_user.php">職員</a>
+    <?php endif; ?>
   </nav>
   <?php if ($user): ?>
   <div class="app-user"><?= h($user['user_name']) ?>（<?= h($user['dept_name'] ?? $user['dept_id']) ?>）</div>

@@ -1,144 +1,145 @@
 item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,unit,sort_no,required,min_value,max_value,legacy_column,excel_ref,note,agg_type
-gairai_am,"午前 患者数",gairai,gairai_cnt,外来患者数,input,,int,名,10,1,0,2000,g1,,病院日誌は時間帯別。Excel①の外来患者数はこの合計,sum
-gairai_pm,"午後 患者数",gairai,gairai_cnt,外来患者数,input,,int,名,20,1,0,2000,g2,,,sum
-gairai_night,"夜間 患者数",gairai,gairai_cnt,外来患者数,input,,int,名,30,1,0,2000,g3,,,sum
-gairai_ex1,"時間外１ 患者数",gairai,gairai_cnt,外来患者数,input,,int,名,40,1,0,2000,g4,,現行gairai.phpで「時間外」が2行あるため暫定で1/2とした。名称は要確認,sum
-gairai_ex2,"時間外２ 患者数",gairai,gairai_cnt,外来患者数,input,,int,名,50,1,0,2000,g5,,同上,sum
-gairai_am_new,"午前 新患",gairai,gairai_cnt,外来患者数,input,,int,名,60,1,0,500,g1n,,,sum
-gairai_pm_new,"午後 新患",gairai,gairai_cnt,外来患者数,input,,int,名,70,1,0,500,g2n,,,sum
-gairai_night_new,"夜間 新患",gairai,gairai_cnt,外来患者数,input,,int,名,80,1,0,500,g3n,,,sum
-gairai_ex1_new,"時間外１ 新患",gairai,gairai_cnt,外来患者数,input,,int,名,90,1,0,500,g4n,,,sum
-gairai_ex2_new,"時間外２ 新患",gairai,gairai_cnt,外来患者数,input,,int,名,100,1,0,500,g5n,,,sum
-gairai_total,"外来患者数 計",gairai,gairai_cnt,外来患者数,sum,"gairai_am,gairai_pm,gairai_night,gairai_ex1,gairai_ex2",int,名,110,0,,,,①!C,,sum
-gairai_new_total,"新患 計",gairai,gairai_cnt,外来患者数,sum,"gairai_am_new,gairai_pm_new,gairai_night_new,gairai_ex1_new,gairai_ex2_new",int,名,120,0,,,,①!E,,sum
+gairai_am,午前 患者数,gairai,gairai_cnt,外来患者数,input,,int,名,10,1,0,2000,g1,,病院日誌は時間帯別。Excel①の外来患者数はこの合計,sum
+gairai_pm,午後 患者数,gairai,gairai_cnt,外来患者数,input,,int,名,20,1,0,2000,g2,,,sum
+gairai_night,夜間 患者数,gairai,gairai_cnt,外来患者数,input,,int,名,30,1,0,2000,g3,,,sum
+gairai_ex1,時間外１ 患者数,gairai,gairai_cnt,外来患者数,input,,int,名,40,1,0,2000,g4,,現行gairai.phpで「時間外」が2行あるため暫定で1/2とした。名称は要確認,sum
+gairai_ex2,時間外２ 患者数,gairai,gairai_cnt,外来患者数,input,,int,名,50,1,0,2000,g5,,同上,sum
+gairai_am_new,午前 新患,gairai,gairai_cnt,外来患者数,input,,int,名,60,1,0,500,g1n,,,sum
+gairai_pm_new,午後 新患,gairai,gairai_cnt,外来患者数,input,,int,名,70,1,0,500,g2n,,,sum
+gairai_night_new,夜間 新患,gairai,gairai_cnt,外来患者数,input,,int,名,80,1,0,500,g3n,,,sum
+gairai_ex1_new,時間外１ 新患,gairai,gairai_cnt,外来患者数,input,,int,名,90,1,0,500,g4n,,,sum
+gairai_ex2_new,時間外２ 新患,gairai,gairai_cnt,外来患者数,input,,int,名,100,1,0,500,g5n,,,sum
+gairai_total,外来患者数 計,gairai,gairai_cnt,外来患者数,sum,"gairai_am,gairai_pm,gairai_night,gairai_ex1,gairai_ex2",int,名,110,0,,,,①!C,,sum
+gairai_new_total,新患 計,gairai,gairai_cnt,外来患者数,sum,"gairai_am_new,gairai_pm_new,gairai_night_new,gairai_ex1_new,gairai_ex2_new",int,名,120,0,,,,①!E,,sum
 gairai_ganchemo,外来癌化学療法,gairai,gairai_cnt,外来患者数,input,,int,件,130,0,0,100,k16,①!S,,sum
-byoto3_zaiin,"3階 在院患者数",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,200,1,0,60,n3,H!I,"病院日誌のn3とExcel H!I（延患者数）は同一",sum
-byoto4_zaiin,"4階 在院患者数",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,210,1,0,60,n4,H!S,,sum
-byoto5_zaiin,"5階 在院患者数",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,220,1,0,60,n5,H!AC,,sum
-byoto3_nyuin,"3階 新入院",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,230,1,0,60,,H!C,,sum
-byoto4_nyuin,"4階 新入院",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,240,1,0,60,,H!M,,sum
-byoto5_nyuin,"5階 新入院",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,250,1,0,60,,H!W,,sum
-byoto3_taiin,"3階 退院",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,260,1,0,60,,H!E,,sum
-byoto4_taiin,"4階 退院",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,270,1,0,60,,H!O,,sum
-byoto5_taiin,"5階 退院",byoto,byoto_zaiin,"病棟別 在院・異動",input,,int,名,280,1,0,60,,H!Y,,sum
-byoto3_tennyu,"3階 転入",byoto,byoto_idou,"病棟別 在院・異動",input,,int,名,290,0,0,60,,H!D,転入・転出は新規のみ計上（同一患者の再転入は数えない）,sum
-byoto4_tennyu,"4階 転入",byoto,byoto_idou,"病棟別 在院・異動",input,,int,名,300,0,0,60,,H!N,,sum
-byoto5_tennyu,"5階 転入",byoto,byoto_idou,"病棟別 在院・異動",input,,int,名,310,0,0,60,,H!X,,sum
-byoto3_tenshutsu,"3階 転出",byoto,byoto_idou,"病棟別 在院・異動",input,,int,名,320,0,0,60,,H!F,,sum
-byoto4_tenshutsu,"4階 転出",byoto,byoto_idou,"病棟別 在院・異動",input,,int,名,330,0,0,60,,H!P,,sum
-byoto5_tenshutsu,"5階 転出",byoto,byoto_idou,"病棟別 在院・異動",input,,int,名,340,0,0,60,,H!Z,,sum
-byoto3_touhi,"3階 当日退院 在院日数",byoto,byoto_idou,"病棟別 在院・異動",input,,int,日,350,0,0,60,,H!H,当日入院しその日のうちに退院した患者（実日数1日）,sum
-byoto4_touhi,"4階 当日退院 在院日数",byoto,byoto_idou,"病棟別 在院・異動",input,,int,日,360,0,0,60,,H!R,,sum
-byoto5_touhi,"5階 当日退院 在院日数",byoto,byoto_idou,"病棟別 在院・異動",input,,int,日,370,0,0,60,,H!AB,,sum
-byoto3_tenshutsu_zaiin,"3階 転出 在院日数",byoto,byoto_idou,"病棟別 在院・異動",input,,int,日,380,0,0,999,,H!G,,sum
-byoto4_tenshutsu_zaiin,"4階 転出 在院日数",byoto,byoto_idou,"病棟別 在院・異動",input,,int,日,390,0,0,999,,H!Q,,sum
-byoto5_tenshutsu_zaiin,"5階 転出 在院日数",byoto,byoto_idou,"病棟別 在院・異動",input,,int,日,400,0,0,999,,H!AA,,sum
-byoto3_zaiin_total,"3階 延患者数合計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_zaiin,byoto3_touhi,byoto3_tenshutsu_zaiin",int,名,410,0,,,,H!J,,sum
-byoto4_zaiin_total,"4階 延患者数合計",byoto,byoto_calc,"病棟 集計",sum,"byoto4_zaiin,byoto4_touhi,byoto4_tenshutsu_zaiin",int,名,420,0,,,,H!T,,sum
-byoto5_zaiin_total,"5階 延患者数合計",byoto,byoto_calc,"病棟 集計",sum,"byoto5_zaiin,byoto5_touhi,byoto5_tenshutsu_zaiin",int,名,430,0,,,,H!AD,,sum
-byoto_zaiin_all,"在院患者数 計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_zaiin,byoto4_zaiin,byoto5_zaiin",int,名,440,0,,,,"②!O / H!AM",,sum
-byoto_zaiin_total_all,"延患者数合計 計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_zaiin_total,byoto4_zaiin_total,byoto5_zaiin_total",int,名,450,0,,,,H!AN,,sum
-byoto_nyuin_all,"新入院 計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_nyuin,byoto4_nyuin,byoto5_nyuin",int,名,460,0,,,new,"②!K / H!AG",,sum
-byoto_taiin_all,"退院 計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_taiin,byoto4_taiin,byoto5_taiin",int,名,470,0,,,tai,"②!M / H!AI",,sum
-byoto_tennyu_all,"転入 計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_tennyu,byoto4_tennyu,byoto5_tennyu",int,名,480,0,,,,H!AH,,sum
-byoto_tenshutsu_all,"転出 計",byoto,byoto_calc,"病棟 集計",sum,"byoto3_tenshutsu,byoto4_tenshutsu,byoto5_tenshutsu",int,名,490,0,,,,H!AJ,,sum
-qq_kensu,"救急搬入 件数",kyukyu,qq,救急搬入,input,,int,件,500,1,0,100,qq4,②!R,,sum
-qq_kanja,"救急搬入 患者数",kyukyu,qq,救急搬入,input,,int,名,510,1,0,100,,②!T,,sum
-qq_nyuin,"救急搬入 入院数",kyukyu,qq,救急搬入,input,,int,名,520,1,0,100,qq1,②!V,,sum
-qq_gairai,"救急搬入 外来",kyukyu,qq,救急搬入,input,,int,名,530,0,0,100,qq2,,病院日誌のみの項目,sum
-qq_tensou,"救急搬入 転送",kyukyu,qq,救急搬入,input,,int,名,540,0,0,100,qq3,,病院日誌のみの項目,sum
-qq_kotowari,"救急搬入 断り件数",kyukyu,qq,救急搬入,input,,int,件,550,1,0,100,,②!Y,,sum
-qq_irai,搬入依頼数,kyukyu,qq,救急搬入,sum,"qq_kanja,qq_kotowari",int,件,560,0,,,,救急搬入受入統計表!K,"受入率の分母。Excelでは K8=D8+I8 の導出値",sum
+byoto3_zaiin,3階 在院患者数,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,200,1,0,60,n3,H!I,病院日誌のn3とExcel H!I（延患者数）は同一,sum
+byoto4_zaiin,4階 在院患者数,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,210,1,0,60,n4,H!S,,sum
+byoto5_zaiin,5階 在院患者数,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,220,1,0,60,n5,H!AC,,sum
+byoto3_nyuin,3階 新入院,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,230,1,0,60,,H!C,,sum
+byoto4_nyuin,4階 新入院,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,240,1,0,60,,H!M,,sum
+byoto5_nyuin,5階 新入院,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,250,1,0,60,,H!W,,sum
+byoto3_taiin,3階 退院,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,260,1,0,60,,H!E,,sum
+byoto4_taiin,4階 退院,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,270,1,0,60,,H!O,,sum
+byoto5_taiin,5階 退院,byoto,byoto_zaiin,病棟別 在院・異動,input,,int,名,280,1,0,60,,H!Y,,sum
+byoto3_tennyu,3階 転入,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,290,0,0,60,,H!D,転入・転出は新規のみ計上（同一患者の再転入は数えない）,sum
+byoto4_tennyu,4階 転入,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,300,0,0,60,,H!N,,sum
+byoto5_tennyu,5階 転入,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,310,0,0,60,,H!X,,sum
+byoto3_tenshutsu,3階 転出,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,320,0,0,60,,H!F,,sum
+byoto4_tenshutsu,4階 転出,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,330,0,0,60,,H!P,,sum
+byoto5_tenshutsu,5階 転出,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,340,0,0,60,,H!Z,,sum
+byoto3_touhi,3階 当日退院 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,日,350,0,0,60,,H!H,当日入院しその日のうちに退院した患者（実日数1日）,sum
+byoto4_touhi,4階 当日退院 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,日,360,0,0,60,,H!R,,sum
+byoto5_touhi,5階 当日退院 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,日,370,0,0,60,,H!AB,,sum
+byoto3_tenshutsu_zaiin,3階 転出 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,日,380,0,0,999,,H!G,,sum
+byoto4_tenshutsu_zaiin,4階 転出 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,日,390,0,0,999,,H!Q,,sum
+byoto5_tenshutsu_zaiin,5階 転出 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,日,400,0,0,999,,H!AA,,sum
+byoto3_zaiin_total,3階 延患者数合計,byoto,byoto_calc,病棟 集計,sum,"byoto3_zaiin,byoto3_touhi,byoto3_tenshutsu_zaiin",int,名,410,0,,,,H!J,,sum
+byoto4_zaiin_total,4階 延患者数合計,byoto,byoto_calc,病棟 集計,sum,"byoto4_zaiin,byoto4_touhi,byoto4_tenshutsu_zaiin",int,名,420,0,,,,H!T,,sum
+byoto5_zaiin_total,5階 延患者数合計,byoto,byoto_calc,病棟 集計,sum,"byoto5_zaiin,byoto5_touhi,byoto5_tenshutsu_zaiin",int,名,430,0,,,,H!AD,,sum
+byoto_zaiin_all,在院患者数 計,byoto,byoto_calc,病棟 集計,sum,"byoto3_zaiin,byoto4_zaiin,byoto5_zaiin",int,名,440,0,,,,②!O / H!AM,,sum
+byoto_zaiin_total_all,延患者数合計 計,byoto,byoto_calc,病棟 集計,sum,"byoto3_zaiin_total,byoto4_zaiin_total,byoto5_zaiin_total",int,名,450,0,,,,H!AN,,sum
+byoto_nyuin_all,新入院 計,byoto,byoto_calc,病棟 集計,sum,"byoto3_nyuin,byoto4_nyuin,byoto5_nyuin",int,名,460,0,,,new,②!K / H!AG,,sum
+byoto_taiin_all,退院 計,byoto,byoto_calc,病棟 集計,sum,"byoto3_taiin,byoto4_taiin,byoto5_taiin",int,名,470,0,,,tai,②!M / H!AI,,sum
+byoto_tennyu_all,転入 計,byoto,byoto_calc,病棟 集計,sum,"byoto3_tennyu,byoto4_tennyu,byoto5_tennyu",int,名,480,0,,,,H!AH,,sum
+byoto_tenshutsu_all,転出 計,byoto,byoto_calc,病棟 集計,sum,"byoto3_tenshutsu,byoto4_tenshutsu,byoto5_tenshutsu",int,名,490,0,,,,H!AJ,,sum
+qq_kensu,救急搬入 件数,kyukyu,qq,救急搬入,input,,int,件,500,1,0,100,qq4,②!R,,sum
+qq_kanja,救急搬入 患者数,kyukyu,qq,救急搬入,input,,int,名,510,1,0,100,,②!T,,sum
+qq_nyuin,救急搬入 入院数,kyukyu,qq,救急搬入,input,,int,名,520,1,0,100,qq1,②!V,,sum
+qq_gairai,救急搬入 外来,kyukyu,qq,救急搬入,input,,int,名,530,0,0,100,qq2,,病院日誌のみの項目,sum
+qq_tensou,救急搬入 転送,kyukyu,qq,救急搬入,input,,int,名,540,0,0,100,qq3,,病院日誌のみの項目,sum
+qq_kotowari,救急搬入 断り件数,kyukyu,qq,救急搬入,input,,int,件,550,1,0,100,,②!Y,,sum
+qq_irai,搬入依頼数,kyukyu,qq,救急搬入,sum,"qq_kanja,qq_kotowari",int,件,560,0,,,,救急搬入受入統計表!K,受入率の分母。Excelでは K8=D8+I8 の導出値,sum
 qq_jibyoin,自病院救急（再掲）,kyukyu,qq,救急搬入,input,,int,件,570,0,0,100,,救急搬入受入統計表!N,,sum
-qq_nyuin_gairai_total,"救急搬入 入院＋外来",kyukyu,qq,救急搬入,sum,"qq_nyuin,qq_gairai",int,名,580,0,,,,,,sum
-walkin1,"時間外ウォークイン 区分1",kyukyu,walkin,時間外ウォークイン,input,,int,名,600,0,0,200,,⑨!C,区分1〜4の定義は要確認,sum
-walkin1_nyuin,"時間外ウォークイン 区分1 うち入院",kyukyu,walkin,時間外ウォークイン,input,,int,名,610,0,0,200,,⑨!E,,sum
-walkin2,"時間外ウォークイン 区分2",kyukyu,walkin,時間外ウォークイン,input,,int,名,620,0,0,200,,⑨!G,,sum
-walkin2_nyuin,"時間外ウォークイン 区分2 うち入院",kyukyu,walkin,時間外ウォークイン,input,,int,名,630,0,0,200,,⑨!I,,sum
-walkin3,"時間外ウォークイン 区分3",kyukyu,walkin,時間外ウォークイン,input,,int,名,640,0,0,200,,⑨!K,,sum
-walkin3_nyuin,"時間外ウォークイン 区分3 うち入院",kyukyu,walkin,時間外ウォークイン,input,,int,名,650,0,0,200,,⑨!M,,sum
-walkin4,"時間外ウォークイン 区分4",kyukyu,walkin,時間外ウォークイン,input,,int,名,660,0,0,200,,⑨!O,,sum
-walkin4_nyuin,"時間外ウォークイン 区分4 うち入院",kyukyu,walkin,時間外ウォークイン,input,,int,名,670,0,0,200,,⑨!Q,,sum
-walkin_total,"時間外ウォークイン 合計",kyukyu,walkin,時間外ウォークイン,sum,"walkin1,walkin2,walkin3,walkin4",int,名,680,0,,,,⑨!S,,sum
-walkin_nyuin_total,"時間外ウォークイン うち入院 合計",kyukyu,walkin,時間外ウォークイン,sum,"walkin1_nyuin,walkin2_nyuin,walkin3_nyuin,walkin4_nyuin",int,名,690,0,,,,⑨!U,,sum
-dock_ninzu,"人間ドック 人数",dock,dock,人間ドック・健康診断,input,,int,人,700,1,0,100,,③!C,,sum
-dock_kensu,"人間ドック 件数",dock,dock,人間ドック・健康診断,input,,int,件,710,1,0,300,s11,③!E,,sum
-kenshin_ninzu,"健康診断 人数",dock,dock,人間ドック・健康診断,input,,int,人,720,1,0,300,,③!G,,sum
-kenshin_kensu,"健康診断 件数",dock,dock,人間ドック・健康診断,input,,int,件,730,1,0,500,s12,③!I,,sum
-egd_nyuin,"EGD 入院",naishikyo,naishikyo,内視鏡,input,,int,件,800,1,0,100,,③!K,,sum
-egd_gairai,"EGD 外来",naishikyo,naishikyo,内視鏡,input,,int,件,810,1,0,100,,③!L,,sum
-egd_total,"EGD 入＋外",naishikyo,naishikyo,内視鏡,sum,"egd_nyuin,egd_gairai",int,件,820,0,,,k14,③!M,病院日誌のＥＧＤはこの合計,sum
-cf_nyuin,"CF（CS） 入院",naishikyo,naishikyo,内視鏡,input,,int,件,830,1,0,100,,③!O,,sum
-cf_gairai,"CF（CS） 外来",naishikyo,naishikyo,内視鏡,input,,int,件,840,1,0,100,,③!P,,sum
-cf_total,"CF（CS） 入＋外",naishikyo,naishikyo,内視鏡,sum,"cf_nyuin,cf_gairai",int,件,850,0,,,k15,③!Q,,sum
-ercp_nyuin,"ERCP 入院",naishikyo,naishikyo,内視鏡,input,,int,件,860,0,0,100,,③!S,,sum
-ercp_gairai,"ERCP 外来",naishikyo,naishikyo,内視鏡,input,,int,件,870,0,0,100,,③!T,,sum
-ercp_total,"ERCP 入＋外",naishikyo,naishikyo,内視鏡,sum,"ercp_nyuin,ercp_gairai",int,件,880,0,,,,③!U,,sum
-naishikyo_other_nyuin,"その他（BF等） 入院",naishikyo,naishikyo,内視鏡,input,,int,件,890,0,0,100,,③!W,,sum
-naishikyo_other_gairai,"その他（BF等） 外来",naishikyo,naishikyo,内視鏡,input,,int,件,900,0,0,100,,③!X,,sum
-naishikyo_other_total,"その他（BF等） 入＋外",naishikyo,naishikyo,内視鏡,sum,"naishikyo_other_nyuin,naishikyo_other_gairai",int,件,910,0,,,,,,sum
-ct_nyuin,"CT 入院",housha,housha,放射線科,input,,int,件,1000,1,0,200,,④!C,,sum
-ct_gairai,"CT 外来",housha,housha,放射線科,input,,int,件,1010,1,0,200,,④!D,,sum
-ct_total,"CT 入＋外",housha,housha,放射線科,sum,"ct_nyuin,ct_gairai",int,件,1020,0,,,k1,④!E,病院日誌のＣＴはこの合計,sum
-mri_nyuin,"MRI 入院",housha,housha,放射線科,input,,int,件,1030,1,0,200,,④!G,,sum
-mri_gairai,"MRI 外来",housha,housha,放射線科,input,,int,件,1040,1,0,200,,④!H,,sum
-mri_total,"MRI 入＋外",housha,housha,放射線科,sum,"mri_nyuin,mri_gairai",int,件,1050,0,,,k2,④!I,,sum
-itoushi_nyuin,"胃透視 入院",housha,housha,放射線科,input,,int,件,1060,0,0,100,,④!K,,sum
-itoushi_gairai,"胃透視 外来",housha,housha,放射線科,input,,int,件,1070,0,0,100,,④!L,,sum
-itoushi_total,"胃透視 入＋外",housha,housha,放射線科,sum,"itoushi_nyuin,itoushi_gairai",int,件,1080,0,,,k5,④!M,,sum
-zouei_nyuin,"その他造影 入院",housha,housha,放射線科,input,,int,件,1090,0,0,100,,④!O,胃・頭以外,sum
-zouei_gairai,"その他造影 外来",housha,housha,放射線科,input,,int,件,1100,0,0,100,,④!P,,sum
-zouei_total,"その他造影 入＋外",housha,housha,放射線科,sum,"zouei_nyuin,zouei_gairai",int,件,1110,0,,,k6,④!Q,,sum
-cag_nyuin,"血管造影 入院",housha,housha,放射線科,input,,int,件,1120,0,0,100,,④!S,頭部CAG,sum
-cag_gairai,"血管造影 外来",housha,housha,放射線科,input,,int,件,1130,0,0,100,,④!T,,sum
-cag_total,"血管造影 入＋外",housha,housha,放射線科,sum,"cag_nyuin,cag_gairai",int,件,1140,0,,,k7,④!U,,sum
+qq_nyuin_gairai_total,救急搬入 入院＋外来,kyukyu,qq,救急搬入,sum,"qq_nyuin,qq_gairai",int,名,580,0,,,,,,sum
+walkin1,時間外ウォークイン 区分1,kyukyu,walkin,時間外ウォークイン,input,,int,名,600,0,0,200,,⑨!C,区分1〜4の定義は要確認,sum
+walkin1_nyuin,時間外ウォークイン 区分1 うち入院,kyukyu,walkin,時間外ウォークイン,input,,int,名,610,0,0,200,,⑨!E,,sum
+walkin2,時間外ウォークイン 区分2,kyukyu,walkin,時間外ウォークイン,input,,int,名,620,0,0,200,,⑨!G,,sum
+walkin2_nyuin,時間外ウォークイン 区分2 うち入院,kyukyu,walkin,時間外ウォークイン,input,,int,名,630,0,0,200,,⑨!I,,sum
+walkin3,時間外ウォークイン 区分3,kyukyu,walkin,時間外ウォークイン,input,,int,名,640,0,0,200,,⑨!K,,sum
+walkin3_nyuin,時間外ウォークイン 区分3 うち入院,kyukyu,walkin,時間外ウォークイン,input,,int,名,650,0,0,200,,⑨!M,,sum
+walkin4,時間外ウォークイン 区分4,kyukyu,walkin,時間外ウォークイン,input,,int,名,660,0,0,200,,⑨!O,,sum
+walkin4_nyuin,時間外ウォークイン 区分4 うち入院,kyukyu,walkin,時間外ウォークイン,input,,int,名,670,0,0,200,,⑨!Q,,sum
+walkin_total,時間外ウォークイン 合計,kyukyu,walkin,時間外ウォークイン,sum,"walkin1,walkin2,walkin3,walkin4",int,名,680,0,,,,⑨!S,,sum
+walkin_nyuin_total,時間外ウォークイン うち入院 合計,kyukyu,walkin,時間外ウォークイン,sum,"walkin1_nyuin,walkin2_nyuin,walkin3_nyuin,walkin4_nyuin",int,名,690,0,,,,⑨!U,,sum
+dock_ninzu,人間ドック 人数,dock,dock,人間ドック・健康診断,input,,int,人,700,1,0,100,,③!C,,sum
+dock_kensu,人間ドック 件数,dock,dock,人間ドック・健康診断,input,,int,件,710,1,0,300,s11,③!E,,sum
+kenshin_ninzu,健康診断 人数,dock,dock,人間ドック・健康診断,input,,int,人,720,1,0,300,,③!G,,sum
+kenshin_kensu,健康診断 件数,dock,dock,人間ドック・健康診断,input,,int,件,730,1,0,500,s12,③!I,,sum
+egd_nyuin,EGD 入院,naishikyo,naishikyo,内視鏡,input,,int,件,800,1,0,100,,③!K,,sum
+egd_gairai,EGD 外来,naishikyo,naishikyo,内視鏡,input,,int,件,810,1,0,100,,③!L,,sum
+egd_total,EGD 入＋外,naishikyo,naishikyo,内視鏡,sum,"egd_nyuin,egd_gairai",int,件,820,0,,,k14,③!M,病院日誌のＥＧＤはこの合計,sum
+cf_nyuin,CF（CS） 入院,naishikyo,naishikyo,内視鏡,input,,int,件,830,1,0,100,,③!O,,sum
+cf_gairai,CF（CS） 外来,naishikyo,naishikyo,内視鏡,input,,int,件,840,1,0,100,,③!P,,sum
+cf_total,CF（CS） 入＋外,naishikyo,naishikyo,内視鏡,sum,"cf_nyuin,cf_gairai",int,件,850,0,,,k15,③!Q,,sum
+ercp_nyuin,ERCP 入院,naishikyo,naishikyo,内視鏡,input,,int,件,860,0,0,100,,③!S,,sum
+ercp_gairai,ERCP 外来,naishikyo,naishikyo,内視鏡,input,,int,件,870,0,0,100,,③!T,,sum
+ercp_total,ERCP 入＋外,naishikyo,naishikyo,内視鏡,sum,"ercp_nyuin,ercp_gairai",int,件,880,0,,,,③!U,,sum
+naishikyo_other_nyuin,その他（BF等） 入院,naishikyo,naishikyo,内視鏡,input,,int,件,890,0,0,100,,③!W,,sum
+naishikyo_other_gairai,その他（BF等） 外来,naishikyo,naishikyo,内視鏡,input,,int,件,900,0,0,100,,③!X,,sum
+naishikyo_other_total,その他（BF等） 入＋外,naishikyo,naishikyo,内視鏡,sum,"naishikyo_other_nyuin,naishikyo_other_gairai",int,件,910,0,,,,,,sum
+ct_nyuin,CT 入院,housha,housha,放射線科,input,,int,件,1000,1,0,200,,④!C,,sum
+ct_gairai,CT 外来,housha,housha,放射線科,input,,int,件,1010,1,0,200,,④!D,,sum
+ct_total,CT 入＋外,housha,housha,放射線科,sum,"ct_nyuin,ct_gairai",int,件,1020,0,,,k1,④!E,病院日誌のＣＴはこの合計,sum
+mri_nyuin,MRI 入院,housha,housha,放射線科,input,,int,件,1030,1,0,200,,④!G,,sum
+mri_gairai,MRI 外来,housha,housha,放射線科,input,,int,件,1040,1,0,200,,④!H,,sum
+mri_total,MRI 入＋外,housha,housha,放射線科,sum,"mri_nyuin,mri_gairai",int,件,1050,0,,,k2,④!I,,sum
+itoushi_nyuin,胃透視 入院,housha,housha,放射線科,input,,int,件,1060,0,0,100,,④!K,,sum
+itoushi_gairai,胃透視 外来,housha,housha,放射線科,input,,int,件,1070,0,0,100,,④!L,,sum
+itoushi_total,胃透視 入＋外,housha,housha,放射線科,sum,"itoushi_nyuin,itoushi_gairai",int,件,1080,0,,,k5,④!M,,sum
+zouei_nyuin,その他造影 入院,housha,housha,放射線科,input,,int,件,1090,0,0,100,,④!O,胃・頭以外,sum
+zouei_gairai,その他造影 外来,housha,housha,放射線科,input,,int,件,1100,0,0,100,,④!P,,sum
+zouei_total,その他造影 入＋外,housha,housha,放射線科,sum,"zouei_nyuin,zouei_gairai",int,件,1110,0,,,k6,④!Q,,sum
+cag_nyuin,血管造影 入院,housha,housha,放射線科,input,,int,件,1120,0,0,100,,④!S,頭部CAG,sum
+cag_gairai,血管造影 外来,housha,housha,放射線科,input,,int,件,1130,0,0,100,,④!T,,sum
+cag_total,血管造影 入＋外,housha,housha,放射線科,sum,"cag_nyuin,cag_gairai",int,件,1140,0,,,k7,④!U,,sum
 cag_ope,血管造影手術,housha,housha,放射線科,input,,int,件,1150,0,0,100,k8,④!W,,sum
-mammo_nyuin,"マンモグラフィ 入院",housha,housha,放射線科,input,,int,件,1160,0,0,100,,⑤!C,,sum
-mammo_gairai,"マンモグラフィ 外来",housha,housha,放射線科,input,,int,件,1170,0,0,100,,⑤!D,,sum
-mammo_total,"マンモグラフィ 入＋外",housha,housha,放射線科,sum,"mammo_nyuin,mammo_gairai",int,件,1180,0,,,k3,⑤!E,,sum
-ippan_nyuin,"一般単純撮影 入院",housha,housha,放射線科,input,,int,件,1190,1,0,500,,⑤!G,,sum
-ippan_gairai,"一般単純撮影 外来",housha,housha,放射線科,input,,int,件,1200,1,0,500,,⑤!H,,sum
-ippan_total,"一般単純撮影 入＋外",housha,housha,放射線科,sum,"ippan_nyuin,ippan_gairai",int,件,1210,0,,,k4,⑤!I,,sum
+mammo_nyuin,マンモグラフィ 入院,housha,housha,放射線科,input,,int,件,1160,0,0,100,,⑤!C,,sum
+mammo_gairai,マンモグラフィ 外来,housha,housha,放射線科,input,,int,件,1170,0,0,100,,⑤!D,,sum
+mammo_total,マンモグラフィ 入＋外,housha,housha,放射線科,sum,"mammo_nyuin,mammo_gairai",int,件,1180,0,,,k3,⑤!E,,sum
+ippan_nyuin,一般単純撮影 入院,housha,housha,放射線科,input,,int,件,1190,1,0,500,,⑤!G,,sum
+ippan_gairai,一般単純撮影 外来,housha,housha,放射線科,input,,int,件,1200,1,0,500,,⑤!H,,sum
+ippan_total,一般単純撮影 入＋外,housha,housha,放射線科,sum,"ippan_nyuin,ippan_gairai",int,件,1210,0,,,k4,⑤!I,,sum
 gan_touroku,癌新登録数,kensa,kensa,検査科,input,,int,件,1300,0,0,50,k25,⑤!K,,sum
-shin_echo_nyuin,"心エコー 入院",kensa,kensa,検査科,input,,int,件,1310,1,0,100,,⑤!M,,sum
-shin_echo_gairai,"心エコー 外来",kensa,kensa,検査科,input,,int,件,1320,1,0,100,,⑤!N,,sum
-shin_echo_total,"心エコー 入＋外",kensa,kensa,検査科,sum,"shin_echo_nyuin,shin_echo_gairai",int,件,1330,0,,,k9,⑤!O,,sum
-fuku_echo_nyuin,"胸・腹部エコー 入院",kensa,kensa,検査科,input,,int,件,1340,1,0,200,,⑤!Q,,sum
-fuku_echo_gairai,"胸・腹部エコー 外来",kensa,kensa,検査科,input,,int,件,1350,1,0,300,,⑤!R,,sum
-fuku_echo_total,"胸・腹部エコー 入＋外",kensa,kensa,検査科,sum,"fuku_echo_nyuin,fuku_echo_gairai",int,件,1360,0,,,k10,⑤!S,,sum
-ishi_echo_nyuin,"医師エコー 入院",kensa,kensa,検査科,input,,int,件,1370,0,0,100,,⑤!U,,sum
-ishi_echo_gairai,"医師エコー 外来",kensa,kensa,検査科,input,,int,件,1380,0,0,100,,⑤!V,,sum
-ishi_echo_total,"医師エコー 入＋外",kensa,kensa,検査科,sum,"ishi_echo_nyuin,ishi_echo_gairai",int,件,1390,0,,,k11,,,sum
-kentai_nyuin,"検体検査 入院",kensa,kensa,検査科,input,,int,件,1400,1,0,500,,⑤!W,,sum
-kentai_gairai,"検体検査 外来",kensa,kensa,検査科,input,,int,件,1410,1,0,500,,⑤!X,,sum
-kentai_total,"検体検査 入＋外",kensa,kensa,検査科,sum,"kentai_nyuin,kentai_gairai",int,件,1420,0,,,k12,⑤!Y,,sum
+shin_echo_nyuin,心エコー 入院,kensa,kensa,検査科,input,,int,件,1310,1,0,100,,⑤!M,,sum
+shin_echo_gairai,心エコー 外来,kensa,kensa,検査科,input,,int,件,1320,1,0,100,,⑤!N,,sum
+shin_echo_total,心エコー 入＋外,kensa,kensa,検査科,sum,"shin_echo_nyuin,shin_echo_gairai",int,件,1330,0,,,k9,⑤!O,,sum
+fuku_echo_nyuin,胸・腹部エコー 入院,kensa,kensa,検査科,input,,int,件,1340,1,0,200,,⑤!Q,,sum
+fuku_echo_gairai,胸・腹部エコー 外来,kensa,kensa,検査科,input,,int,件,1350,1,0,300,,⑤!R,,sum
+fuku_echo_total,胸・腹部エコー 入＋外,kensa,kensa,検査科,sum,"fuku_echo_nyuin,fuku_echo_gairai",int,件,1360,0,,,k10,⑤!S,,sum
+ishi_echo_nyuin,医師エコー 入院,kensa,kensa,検査科,input,,int,件,1370,0,0,100,,⑤!U,,sum
+ishi_echo_gairai,医師エコー 外来,kensa,kensa,検査科,input,,int,件,1380,0,0,100,,⑤!V,,sum
+ishi_echo_total,医師エコー 入＋外,kensa,kensa,検査科,sum,"ishi_echo_nyuin,ishi_echo_gairai",int,件,1390,0,,,k11,,,sum
+kentai_nyuin,検体検査 入院,kensa,kensa,検査科,input,,int,件,1400,1,0,500,,⑤!W,,sum
+kentai_gairai,検体検査 外来,kensa,kensa,検査科,input,,int,件,1410,1,0,500,,⑤!X,,sum
+kentai_total,検体検査 入＋外,kensa,kensa,検査科,sum,"kentai_nyuin,kentai_gairai",int,件,1420,0,,,k12,⑤!Y,,sum
 sas,SAS,kensa,kensa,検査科,input,,int,件,1430,0,0,50,k13,⑤!AA,,sum
 fukuyaku,服薬指導,yakuzai,yakuzai,薬剤科,input,,int,件,1500,1,0,200,k17,⑥!C,,sum
 chouzai_nyuin,調剤件数（入院）,yakuzai,yakuzai,薬剤科,input,,int,件,1510,1,0,500,k18,⑥!E,,sum
 chouzai_gairai,調剤件数（外来）,yakuzai,yakuzai,薬剤科,input,,int,件,1520,1,0,500,k19,⑥!G,,sum
-eiyou_nyuin,"栄養指導 ①入院",eiyou,eiyou,栄養科,input,,int,件,1600,0,0,100,,⑥!I,その他含まず,sum
-eiyou_gairai,"栄養指導 ②外来",eiyou,eiyou,栄養科,input,,int,件,1610,0,0,100,,⑥!J,その他含まず,sum
-eiyou_other,"栄養指導 ④その他",eiyou,eiyou,栄養科,input,,int,件,1620,0,0,100,,⑥!L,ドック等,sum
-eiyou_sum12,"栄養指導 ③（①＋②）",eiyou,eiyou,栄養科,sum,"eiyou_nyuin,eiyou_gairai",int,件,1630,0,,,k20,⑥!K,病院日誌の栄養指導はこの値,sum
-eiyou_sum34,"栄養指導 ⑤本部報告（③＋④）",eiyou,eiyou,栄養科,sum,"eiyou_nyuin,eiyou_gairai,eiyou_other",int,件,1640,0,,,,⑥!M,,sum
-pt_nyuin,"理学療法 入院",rehab,rehab,リハビリ単位数,input,,int,単位,1700,1,0,1000,,⑥!O,,sum
-pt_gairai,"理学療法 外来",rehab,rehab,リハビリ単位数,input,,int,単位,1710,1,0,1000,,⑥!P,,sum
-pt_total,"理学療法 入＋外",rehab,rehab,リハビリ単位数,sum,"pt_nyuin,pt_gairai",int,単位,1720,0,,,k21,⑥!Q,,sum
-ot_nyuin,"作業療法 入院",rehab,rehab,リハビリ単位数,input,,int,単位,1730,1,0,1000,,⑥!S,,sum
-ot_gairai,"作業療法 外来",rehab,rehab,リハビリ単位数,input,,int,単位,1740,1,0,1000,,⑥!T,,sum
-ot_total,"作業療法 入＋外",rehab,rehab,リハビリ単位数,sum,"ot_nyuin,ot_gairai",int,単位,1750,0,,,k22,⑥!U,,sum
-st_nyuin,"言語療法 入院",rehab,rehab,リハビリ単位数,input,,int,単位,1760,1,0,1000,,⑥!W,,sum
-st_gairai,"言語療法 外来",rehab,rehab,リハビリ単位数,input,,int,単位,1770,1,0,1000,,⑥!X,,sum
-st_total,"言語療法 入＋外",rehab,rehab,リハビリ単位数,sum,"st_nyuin,st_gairai",int,単位,1780,0,,,k23,⑥!Y,,sum
+eiyou_nyuin,栄養指導 ①入院,eiyou,eiyou,栄養科,input,,int,件,1600,0,0,100,,⑥!I,その他含まず,sum
+eiyou_gairai,栄養指導 ②外来,eiyou,eiyou,栄養科,input,,int,件,1610,0,0,100,,⑥!J,その他含まず,sum
+eiyou_other,栄養指導 ④その他,eiyou,eiyou,栄養科,input,,int,件,1620,0,0,100,,⑥!L,ドック等,sum
+eiyou_sum12,栄養指導 ③（①＋②）,eiyou,eiyou,栄養科,sum,"eiyou_nyuin,eiyou_gairai",int,件,1630,0,,,k20,⑥!K,病院日誌の栄養指導はこの値,sum
+eiyou_sum34,栄養指導 ⑤本部報告（③＋④）,eiyou,eiyou,栄養科,sum,"eiyou_nyuin,eiyou_gairai,eiyou_other",int,件,1640,0,,,,⑥!M,,sum
+pt_nyuin,理学療法 入院,rehab,rehab,リハビリ単位数,input,,int,単位,1700,1,0,1000,,⑥!O,,sum
+pt_gairai,理学療法 外来,rehab,rehab,リハビリ単位数,input,,int,単位,1710,1,0,1000,,⑥!P,,sum
+pt_total,理学療法 入＋外,rehab,rehab,リハビリ単位数,sum,"pt_nyuin,pt_gairai",int,単位,1720,0,,,k21,⑥!Q,,sum
+ot_nyuin,作業療法 入院,rehab,rehab,リハビリ単位数,input,,int,単位,1730,1,0,1000,,⑥!S,,sum
+ot_gairai,作業療法 外来,rehab,rehab,リハビリ単位数,input,,int,単位,1740,1,0,1000,,⑥!T,,sum
+ot_total,作業療法 入＋外,rehab,rehab,リハビリ単位数,sum,"ot_nyuin,ot_gairai",int,単位,1750,0,,,k22,⑥!U,,sum
+st_nyuin,言語療法 入院,rehab,rehab,リハビリ単位数,input,,int,単位,1760,1,0,1000,,⑥!W,,sum
+st_gairai,言語療法 外来,rehab,rehab,リハビリ単位数,input,,int,単位,1770,1,0,1000,,⑥!X,,sum
+st_total,言語療法 入＋外,rehab,rehab,リハビリ単位数,sum,"st_nyuin,st_gairai",int,単位,1780,0,,,k23,⑥!Y,,sum
+shidou_other,指導 その他,rehab,rehab,リハビリ単位数,input,,int,件,1795,0,0,500,k24,,病院日誌の特殊検査欄「そ の 他」。Excelに対応列がなく、入力する部署も要確認,sum
 rehab_gairai_kensu,リハビリ（外来再掲）,rehab,rehab,リハビリ単位数,input,,int,件,1790,0,0,500,s1,,病院日誌の外来再掲欄。単位数ではなく件数のため別項目。Excel側に対応列がなく定義の確認が必要,sum
-ope_geka,"手術 外科",ope,ope,手術室,input,,int,件,1800,1,0,50,op1,⑦!C,,sum
-ope_seikei,"手術 整形",ope,ope,手術室,input,,int,件,1810,1,0,50,op2,⑦!E,,sum
-ope_noge,"手術 脳外科",ope,ope,手術室,input,,int,件,1820,1,0,50,op3,⑦!G,,sum
-ope_keisei,"手術 形成",ope,ope,手術室,input,,int,件,1830,0,0,50,op4,,病院日誌のみの区分。Excel⑦の「その他」はこれとope_otherの合計,sum
-ope_other,"手術 その他",ope,ope,手術室,input,,int,件,1840,0,0,50,op5,,,sum
-ope_other_name,"手術 その他 科名",ope,ope,手術室,input,,text,,1850,0,,,op5n,,,sum
-ope_excel_other,"手術 その他（Excel⑦相当）",ope,ope,手術室,sum,"ope_keisei,ope_other",int,件,1860,0,,,,⑦!I,,sum
-ope_total,"手術 合計",ope,ope,手術室,sum,"ope_geka,ope_seikei,ope_noge,ope_keisei,ope_other",int,件,1870,0,,,,⑦!K,,sum
+ope_geka,手術 外科,ope,ope,手術室,input,,int,件,1800,1,0,50,op1,⑦!C,,sum
+ope_seikei,手術 整形,ope,ope,手術室,input,,int,件,1810,1,0,50,op2,⑦!E,,sum
+ope_noge,手術 脳外科,ope,ope,手術室,input,,int,件,1820,1,0,50,op3,⑦!G,,sum
+ope_keisei,手術 形成,ope,ope,手術室,input,,int,件,1830,0,0,50,op4,,病院日誌のみの区分。Excel⑦の「その他」はこれとope_otherの合計,sum
+ope_other,手術 その他,ope,ope,手術室,input,,int,件,1840,0,0,50,op5,,,sum
+ope_other_name,手術 その他 科名,ope,ope,手術室,input,,text,,1850,0,,,op5n,,,sum
+ope_excel_other,手術 その他（Excel⑦相当）,ope,ope,手術室,sum,"ope_keisei,ope_other",int,件,1860,0,,,,⑦!I,,sum
+ope_total,手術 合計,ope,ope,手術室,sum,"ope_geka,ope_seikei,ope_noge,ope_keisei,ope_other",int,件,1870,0,,,,⑦!K,,sum
 ope_zenma,全身麻酔,ope,ope,手術室,input,,int,件,1880,0,0,50,zenma,⑦!M,,sum
 ope_kyoushika,鏡視下手術,ope,ope,手術室,input,,int,件,1890,0,0,50,,⑦!N,,sum
 ope_naishikyo,内視鏡術,ope,ope,手術室,input,,int,件,1900,0,0,50,,⑦!O,,sum
@@ -156,123 +157,123 @@ renkei_other,その他訪問,renkei,renkei,紹介・医療連携,input,,int,件,
 renkei_kouza,健康講座,renkei,renkei,紹介・医療連携,input,,int,件,2050,0,0,50,i3,,,sum
 renkei_soudan,相談件数,renkei,renkei,紹介・医療連携,input,,int,件,2060,0,0,100,i4,,,sum
 zaitaku_ninzu,在宅登録人数,zaitaku,zaitaku_reg,在宅登録,input,,int,人,2100,1,0,500,z1,在宅①!C,,last
-zaitaku_shinki,"在宅登録 新規人数",zaitaku,zaitaku_reg,在宅登録,input,,int,人,2110,0,0,100,z2,在宅①!D,,sum
-zaitaku_masshou,"在宅登録 抹消人数",zaitaku,zaitaku_reg,在宅登録,input,,int,人,2120,0,0,100,,在宅①!E,,sum
-reg_houkan_kaigo,"訪問看護（介護） 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2130,0,0,300,,在宅①!F,,last
-reg_houkan_kaigo_new,"訪問看護（介護） 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2140,0,0,100,,在宅①!G,,sum
-reg_houkan_kaigo_del,"訪問看護（介護） 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2150,0,0,100,,在宅①!H,,sum
-reg_houkan_iryou,"訪問看護（医療） 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2160,0,0,300,,在宅①!I,,last
-reg_houkan_iryou_new,"訪問看護（医療） 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2170,0,0,100,,在宅①!J,,sum
-reg_houkan_iryou_del,"訪問看護（医療） 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2180,0,0,100,,在宅①!K,,sum
-reg_houshin_kaigo,"訪問診療（介護） 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2190,0,0,300,,在宅①!L,,last
-reg_houshin_kaigo_new,"訪問診療（介護） 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2200,0,0,100,,在宅①!M,,sum
-reg_houshin_kaigo_del,"訪問診療（介護） 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2210,0,0,100,,在宅①!N,,sum
-reg_houshin_iryou,"訪問診療（医療） 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2220,0,0,300,,在宅①!O,,last
-reg_houshin_iryou_new,"訪問診療（医療） 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2230,0,0,100,,在宅①!P,,sum
-reg_houshin_iryou_del,"訪問診療（医療） 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2240,0,0,100,,在宅①!Q,,sum
-reg_houkai,"訪問介護 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2250,0,0,300,,在宅①!R,,last
-reg_houkai_new,"訪問介護 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2260,0,0,100,,在宅①!S,,sum
-reg_houkai_del,"訪問介護 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2270,0,0,100,,在宅①!T,,sum
-reg_hourehab_kaigo,"訪問リハ（介護） 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2280,0,0,300,,在宅①!U,,last
-reg_hourehab_kaigo_new,"訪問リハ（介護） 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2290,0,0,100,,在宅①!V,,sum
-reg_hourehab_kaigo_del,"訪問リハ（介護） 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2300,0,0,100,,在宅①!W,,sum
-reg_hourehab_iryou,"訪問リハ（医療） 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2310,0,0,300,,在宅①!X,,last
-reg_hourehab_iryou_new,"訪問リハ（医療） 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2320,0,0,100,,在宅①!Y,,sum
-reg_hourehab_iryou_del,"訪問リハ（医療） 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2330,0,0,100,,在宅①!Z,,sum
-reg_houyaku,"訪問薬剤 登録数",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2340,0,0,300,,在宅①!AA,,last
-reg_houyaku_new,"訪問薬剤 新規",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2350,0,0,100,,在宅①!AB,,sum
-reg_houyaku_del,"訪問薬剤 抹消",zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2360,0,0,100,,在宅①!AC,,sum
-reg_total,"在宅サービス登録 合計",zaitaku,zaitaku_svc,在宅サービス登録件数,sum,"reg_houkan_kaigo,reg_houkan_iryou,reg_houshin_kaigo,reg_houshin_iryou,reg_houkai,reg_hourehab_kaigo,reg_hourehab_iryou,reg_houyaku",int,件,2370,0,,,z3,在宅①!AD,病院日誌の登録件数はこの合計,last
+zaitaku_shinki,在宅登録 新規人数,zaitaku,zaitaku_reg,在宅登録,input,,int,人,2110,0,0,100,z2,在宅①!D,,sum
+zaitaku_masshou,在宅登録 抹消人数,zaitaku,zaitaku_reg,在宅登録,input,,int,人,2120,0,0,100,,在宅①!E,,sum
+reg_houkan_kaigo,訪問看護（介護） 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2130,0,0,300,,在宅①!F,,last
+reg_houkan_kaigo_new,訪問看護（介護） 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2140,0,0,100,,在宅①!G,,sum
+reg_houkan_kaigo_del,訪問看護（介護） 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2150,0,0,100,,在宅①!H,,sum
+reg_houkan_iryou,訪問看護（医療） 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2160,0,0,300,,在宅①!I,,last
+reg_houkan_iryou_new,訪問看護（医療） 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2170,0,0,100,,在宅①!J,,sum
+reg_houkan_iryou_del,訪問看護（医療） 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2180,0,0,100,,在宅①!K,,sum
+reg_houshin_kaigo,訪問診療（介護） 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2190,0,0,300,,在宅①!L,,last
+reg_houshin_kaigo_new,訪問診療（介護） 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2200,0,0,100,,在宅①!M,,sum
+reg_houshin_kaigo_del,訪問診療（介護） 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2210,0,0,100,,在宅①!N,,sum
+reg_houshin_iryou,訪問診療（医療） 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2220,0,0,300,,在宅①!O,,last
+reg_houshin_iryou_new,訪問診療（医療） 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2230,0,0,100,,在宅①!P,,sum
+reg_houshin_iryou_del,訪問診療（医療） 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2240,0,0,100,,在宅①!Q,,sum
+reg_houkai,訪問介護 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2250,0,0,300,,在宅①!R,,last
+reg_houkai_new,訪問介護 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2260,0,0,100,,在宅①!S,,sum
+reg_houkai_del,訪問介護 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2270,0,0,100,,在宅①!T,,sum
+reg_hourehab_kaigo,訪問リハ（介護） 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2280,0,0,300,,在宅①!U,,last
+reg_hourehab_kaigo_new,訪問リハ（介護） 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2290,0,0,100,,在宅①!V,,sum
+reg_hourehab_kaigo_del,訪問リハ（介護） 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2300,0,0,100,,在宅①!W,,sum
+reg_hourehab_iryou,訪問リハ（医療） 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2310,0,0,300,,在宅①!X,,last
+reg_hourehab_iryou_new,訪問リハ（医療） 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2320,0,0,100,,在宅①!Y,,sum
+reg_hourehab_iryou_del,訪問リハ（医療） 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2330,0,0,100,,在宅①!Z,,sum
+reg_houyaku,訪問薬剤 登録数,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2340,0,0,300,,在宅①!AA,,last
+reg_houyaku_new,訪問薬剤 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2350,0,0,100,,在宅①!AB,,sum
+reg_houyaku_del,訪問薬剤 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2360,0,0,100,,在宅①!AC,,sum
+reg_total,在宅サービス登録 合計,zaitaku,zaitaku_svc,在宅サービス登録件数,sum,"reg_houkan_kaigo,reg_houkan_iryou,reg_houshin_kaigo,reg_houshin_iryou,reg_houkai,reg_hourehab_kaigo,reg_hourehab_iryou,reg_houyaku",int,件,2370,0,,,z3,在宅①!AD,病院日誌の登録件数はこの合計,last
 tsusho,通所リハ,toutyoku,kaigo,介護保険,input,,int,名,2400,1,0,100,s2,在宅②!C,Excel①の通所リハビリ列は同じ値の転記,sum
-kaigo_houkan_over30,"訪問看護（介護） 30分以上",toutyoku,kaigo,介護保険,input,,int,件,2410,0,0,100,,在宅②!E,,sum
-kaigo_houkan_under30,"訪問看護（介護） 30分以内",toutyoku,kaigo,介護保険,input,,int,件,2420,0,0,100,,在宅②!F,,sum
-kaigo_houkai_over30,"訪問介護 30分以上",toutyoku,kaigo,介護保険,input,,int,件,2430,0,0,100,,在宅②!G,,sum
-kaigo_houkai_under30,"訪問介護 30分以内",toutyoku,kaigo,介護保険,input,,int,件,2440,0,0,100,,在宅②!H,,sum
+kaigo_houkan_over30,訪問看護（介護） 30分以上,toutyoku,kaigo,介護保険,input,,int,件,2410,0,0,100,,在宅②!E,,sum
+kaigo_houkan_under30,訪問看護（介護） 30分以内,toutyoku,kaigo,介護保険,input,,int,件,2420,0,0,100,,在宅②!F,,sum
+kaigo_houkai_over30,訪問介護 30分以上,toutyoku,kaigo,介護保険,input,,int,件,2430,0,0,100,,在宅②!G,,sum
+kaigo_houkai_under30,訪問介護 30分以内,toutyoku,kaigo,介護保険,input,,int,件,2440,0,0,100,,在宅②!H,,sum
 kaigo_kyotaku,居宅指導,toutyoku,kaigo,介護保険,input,,int,件,2450,0,0,100,s5,在宅②!I,,sum
 kaigo_houeiyou,訪問栄養（介護）,toutyoku,kaigo,介護保険,input,,int,件,2460,0,0,100,,在宅②!J,,sum
 kaigo_hourehab,訪問リハ（介護）,toutyoku,kaigo,介護保険,input,,int,件,2470,0,0,100,,在宅②!K,,sum
 kaigo_houyaku,訪問薬剤（介護）,toutyoku,kaigo,介護保険,input,,int,件,2480,0,0,100,,在宅②!L,,sum
-kaigo_shoukei,"介護保険 小計",toutyoku,kaigo,介護保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,kaigo_houkai_over30,kaigo_houkai_under30,kaigo_kyotaku,kaigo_houeiyou,kaigo_hourehab,kaigo_houyaku",int,件,2490,0,,,,在宅②!M,,sum
+kaigo_shoukei,介護保険 小計,toutyoku,kaigo,介護保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,kaigo_houkai_over30,kaigo_houkai_under30,kaigo_kyotaku,kaigo_houeiyou,kaigo_hourehab,kaigo_houyaku",int,件,2490,0,,,,在宅②!M,,sum
 iryou_houkan,訪問看護（医療）,toutyoku,iryou,医療保険,input,,int,件,2500,0,0,100,,在宅②!O,,sum
 iryou_houshin,訪問診療,toutyoku,iryou,医療保険,input,,int,件,2510,0,0,100,s3,在宅②!P,,sum
 iryou_oushin,往診,toutyoku,iryou,医療保険,input,,int,件,2520,0,0,100,s4,在宅②!Q,,sum
 iryou_houeiyou,訪問栄養（医療）,toutyoku,iryou,医療保険,input,,int,件,2530,0,0,100,,在宅②!R,,sum
-iryou_hourehab_jin,"訪問リハ（医療） 実人数",toutyoku,iryou,医療保険,input,,int,人,2540,0,0,100,,在宅②!S,,sum
-iryou_hourehab_tani,"訪問リハ（医療） 単位数",toutyoku,iryou,医療保険,input,,int,単位,2550,0,0,500,,在宅②!T,,sum
+iryou_hourehab_jin,訪問リハ（医療） 実人数,toutyoku,iryou,医療保険,input,,int,人,2540,0,0,100,,在宅②!S,,sum
+iryou_hourehab_tani,訪問リハ（医療） 単位数,toutyoku,iryou,医療保険,input,,int,単位,2550,0,0,500,,在宅②!T,,sum
 iryou_houyaku,訪問薬剤（医療）,toutyoku,iryou,医療保険,input,,int,件,2560,0,0,100,,在宅②!U,,sum
-iryou_shoukei,"医療保険 小計",toutyoku,iryou,医療保険,sum,"iryou_houkan,iryou_houshin,iryou_oushin,iryou_houeiyou,iryou_hourehab_jin,iryou_houyaku",int,件,2570,0,,,,在宅②!V,,sum
-houkan_total,"訪問看護 計",toutyoku,iryou,医療保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,iryou_houkan",int,件,2580,0,,,s6,,病院日誌の訪問看護はこの合計,sum
-houkai_total,"訪問介護 計",toutyoku,iryou,医療保険,sum,"kaigo_houkai_over30,kaigo_houkai_under30",int,件,2590,0,,,s7,,,sum
-hourehab_total,"訪問リハ 計",toutyoku,iryou,医療保険,sum,"kaigo_hourehab,iryou_hourehab_jin",int,件,2600,0,,,s8,,,sum
-houeiyou_total,"訪問栄養 計",toutyoku,iryou,医療保険,sum,"kaigo_houeiyou,iryou_houeiyou",int,件,2610,0,,,s9,,,sum
-houyaku_total,"訪問薬剤 計",toutyoku,iryou,医療保険,sum,"kaigo_houyaku,iryou_houyaku",int,件,2620,0,,,s10,,,sum
-touseki_nyuin,"透析件数 入院",touseki,touseki,透析,input,,int,件,2700,1,0,100,,在宅②!X,,sum
-touseki_gairai,"透析件数 外来",touseki,touseki,透析,input,,int,件,2710,1,0,100,,在宅②!Y,,sum
+iryou_shoukei,医療保険 小計,toutyoku,iryou,医療保険,sum,"iryou_houkan,iryou_houshin,iryou_oushin,iryou_houeiyou,iryou_hourehab_jin,iryou_houyaku",int,件,2570,0,,,,在宅②!V,,sum
+houkan_total,訪問看護 計,toutyoku,iryou,医療保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,iryou_houkan",int,件,2580,0,,,s6,,病院日誌の訪問看護はこの合計,sum
+houkai_total,訪問介護 計,toutyoku,iryou,医療保険,sum,"kaigo_houkai_over30,kaigo_houkai_under30",int,件,2590,0,,,s7,,,sum
+hourehab_total,訪問リハ 計,toutyoku,iryou,医療保険,sum,"kaigo_hourehab,iryou_hourehab_jin",int,件,2600,0,,,s8,,,sum
+houeiyou_total,訪問栄養 計,toutyoku,iryou,医療保険,sum,"kaigo_houeiyou,iryou_houeiyou",int,件,2610,0,,,s9,,,sum
+houyaku_total,訪問薬剤 計,toutyoku,iryou,医療保険,sum,"kaigo_houyaku,iryou_houyaku",int,件,2620,0,,,s10,,,sum
+touseki_nyuin,透析件数 入院,touseki,touseki,透析,input,,int,件,2700,1,0,100,,在宅②!X,,sum
+touseki_gairai,透析件数 外来,touseki,touseki,透析,input,,int,件,2710,1,0,100,,在宅②!Y,,sum
 touseki_total,透析実施数,touseki,touseki,透析,sum,"touseki_nyuin,touseki_gairai",int,件,2720,0,,,s14,在宅②!Z,,sum
 touseki_touroku,透析登録人数,touseki,touseki,透析,input,,int,人,2730,1,0,100,s13,在宅②!AB,,last
-touseki_shinki,"透析登録 新規",touseki,touseki,透析,input,,int,人,2740,0,0,50,,在宅②!AC,,sum
-touseki_masshou,"透析登録 抹消",touseki,touseki,透析,input,,int,人,2750,0,0,50,,在宅②!AD,,sum
+touseki_shinki,透析登録 新規,touseki,touseki,透析,input,,int,人,2740,0,0,50,,在宅②!AC,,sum
+touseki_masshou,透析登録 抹消,touseki,touseki,透析,input,,int,人,2750,0,0,50,,在宅②!AD,,sum
 corona_hatsunetsu,発熱外来患者数,kansen,corona,コロナ対策,input,,int,名,2800,0,0,200,,⑧!C,,sum
-corona_pcr_gairai_in,"外来PCR検査依頼数 院内",kansen,corona,コロナ対策,input,,int,件,2810,0,0,200,,⑧!D,,sum
-corona_pcr_gairai_out,"外来PCR検査依頼数 院外",kansen,corona,コロナ対策,input,,int,件,2820,0,0,200,,⑧!E,,sum
-corona_pcr_nyuin_in,"入院PCR検査依頼数 院内",kansen,corona,コロナ対策,input,,int,件,2830,0,0,200,,⑧!F,,sum
-corona_pcr_nyuin_out,"入院PCR検査依頼数 院外",kansen,corona,コロナ対策,input,,int,件,2840,0,0,200,,⑧!G,,sum
-corona_kougen_gairai,"抗原検査依頼数 外来",kansen,corona,コロナ対策,input,,int,件,2850,0,0,200,,⑧!H,,sum
-corona_kougen_nyuin,"抗原検査依頼数 入院",kansen,corona,コロナ対策,input,,int,件,2860,0,0,200,,⑧!I,,sum
+corona_pcr_gairai_in,外来PCR検査依頼数 院内,kansen,corona,コロナ対策,input,,int,件,2810,0,0,200,,⑧!D,,sum
+corona_pcr_gairai_out,外来PCR検査依頼数 院外,kansen,corona,コロナ対策,input,,int,件,2820,0,0,200,,⑧!E,,sum
+corona_pcr_nyuin_in,入院PCR検査依頼数 院内,kansen,corona,コロナ対策,input,,int,件,2830,0,0,200,,⑧!F,,sum
+corona_pcr_nyuin_out,入院PCR検査依頼数 院外,kansen,corona,コロナ対策,input,,int,件,2840,0,0,200,,⑧!G,,sum
+corona_kougen_gairai,抗原検査依頼数 外来,kansen,corona,コロナ対策,input,,int,件,2850,0,0,200,,⑧!H,,sum
+corona_kougen_nyuin,抗原検査依頼数 入院,kansen,corona,コロナ対策,input,,int,件,2860,0,0,200,,⑧!I,,sum
 corona_yousei_new,新規陽性患者,kansen,corona,コロナ対策,input,,int,名,2870,0,0,100,,⑧!J,,sum
 corona_giji_nyuin,疑似症入院数,kansen,corona,コロナ対策,input,,int,名,2880,0,0,100,,⑧!K,,sum
 corona_yousei_nyuin,陽性者入院数,kansen,corona,コロナ対策,input,,int,名,2890,0,0,100,,⑧!L,,sum
 corona_ecmo,ECMO使用者,kansen,corona,コロナ対策,input,,int,名,2900,0,0,20,,⑧!M,,sum
 corona_ventilator,人工呼吸器使用者,kansen,corona,コロナ対策,input,,int,名,2910,0,0,20,,⑧!N,,sum
 corona_yousei_shin_nyuin,陽性者新入院,kansen,corona,コロナ対策,input,,int,名,2920,0,0,50,,⑧!O,,sum
-corona_taiin_keikai,"陽性者退院 軽快",kansen,corona,コロナ対策,input,,int,名,2930,0,0,50,,⑧!P,,sum
-corona_taiin_tenin,"陽性者退院 転院",kansen,corona,コロナ対策,input,,int,名,2940,0,0,50,,⑧!Q,,sum
-corona_taiin_shibou,"陽性者退院 死亡",kansen,corona,コロナ対策,input,,int,名,2950,0,0,50,,⑧!R,,sum
-den_shiyou,"電気 使用量",shisetsu,netu,水道光熱費,input,,decimal,Kw,3000,1,0,,den1,,,sum
-den_ryoukin,"電気 料金",shisetsu,netu,水道光熱費,input,,decimal,円,3010,1,0,,den2,,,sum
-den_mokuhyou,"電気 当月目標額",shisetsu,netu,水道光熱費,input,,decimal,円,3020,0,0,,den3,,現行nissi.sqlに列が無いまま画面が参照していた項目,sum
-gas_shiyou,"ガス 使用量",shisetsu,netu,水道光熱費,input,,decimal,m3,3030,1,0,,gas1,,,sum
-gas_ryoukin,"ガス 料金",shisetsu,netu,水道光熱費,input,,decimal,円,3040,1,0,,gas2,,,sum
-gas_mokuhyou,"ガス 当月目標額",shisetsu,netu,水道光熱費,input,,decimal,円,3050,0,0,,gas3,,同上,sum
-sui_shiyou,"水道 使用量",shisetsu,netu,水道光熱費,input,,decimal,m3,3060,1,0,,sui1,,上水＋下水,sum
-sui_ryoukin,"水道 料金",shisetsu,netu,水道光熱費,input,,decimal,円,3070,1,0,,sui2,,,sum
-sui_mokuhyou,"水道 当月目標額",shisetsu,netu,水道光熱費,input,,decimal,円,3080,0,0,,sui3,,同上,sum
-netu_ryoukin_total,"水道光熱費 1日合計",shisetsu,netu,水道光熱費,sum,"den_ryoukin,gas_ryoukin,sui_ryoukin",decimal,円,3090,0,,,,,,sum
-tenkou,天候,jimu,jimu,"日誌 事務欄",input,,text,,3100,1,,,tenkou,,,sum
-toutyoku_ishi1,"当直者 医師１",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3110,1,,,t1,,,sum
-toutyoku_ishi2,"当直者 医師２",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3120,0,,,t2,,,sum
-toutyoku_kango,"当直者 看護",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3130,1,,,t3,,,sum
-toutyoku_housha,"当直者 放射線",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3140,0,,,t4,,,sum
-toutyoku_jimu,"当直者 事務",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3150,0,,,t5,,,sum
-yobidashi_ishi,"呼び出し 医師",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3160,0,,,y1,,,sum
-yobidashi_ope,"呼び出し 手術室",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3170,0,,,y2,,,sum
-yobidashi_zaitaku,"呼び出し 在宅",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3180,0,,,y3,,,sum
-yobidashi_kensa,"呼び出し 検査",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3190,0,,,y4,,,sum
-yobidashi_housha,"呼び出し 放射線",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3200,0,,,y5,,,sum
-yobidashi_yakkyoku,"呼び出し 薬局",jimu,toutyoku_list,当直者・呼び出し,input,,text,,3210,0,,,y6,,,sum
-kaigi_jikoku1,"会議 時刻（左）",jimu,kaigi,会議・行事・人事,input,,multiline,,3220,0,,,jikoku1,,,sum
+corona_taiin_keikai,陽性者退院 軽快,kansen,corona,コロナ対策,input,,int,名,2930,0,0,50,,⑧!P,,sum
+corona_taiin_tenin,陽性者退院 転院,kansen,corona,コロナ対策,input,,int,名,2940,0,0,50,,⑧!Q,,sum
+corona_taiin_shibou,陽性者退院 死亡,kansen,corona,コロナ対策,input,,int,名,2950,0,0,50,,⑧!R,,sum
+den_shiyou,電気 使用量,shisetsu,netu,水道光熱費,input,,decimal,Kw,3000,1,0,,den1,,,sum
+den_ryoukin,電気 料金,shisetsu,netu,水道光熱費,input,,decimal,円,3010,1,0,,den2,,,sum
+den_mokuhyou,電気 当月目標額,shisetsu,netu,水道光熱費,input,,decimal,円,3020,0,0,,den3,,現行nissi.sqlに列が無いまま画面が参照していた項目,sum
+gas_shiyou,ガス 使用量,shisetsu,netu,水道光熱費,input,,decimal,m3,3030,1,0,,gas1,,,sum
+gas_ryoukin,ガス 料金,shisetsu,netu,水道光熱費,input,,decimal,円,3040,1,0,,gas2,,,sum
+gas_mokuhyou,ガス 当月目標額,shisetsu,netu,水道光熱費,input,,decimal,円,3050,0,0,,gas3,,同上,sum
+sui_shiyou,水道 使用量,shisetsu,netu,水道光熱費,input,,decimal,m3,3060,1,0,,sui1,,上水＋下水,sum
+sui_ryoukin,水道 料金,shisetsu,netu,水道光熱費,input,,decimal,円,3070,1,0,,sui2,,,sum
+sui_mokuhyou,水道 当月目標額,shisetsu,netu,水道光熱費,input,,decimal,円,3080,0,0,,sui3,,同上,sum
+netu_ryoukin_total,水道光熱費 1日合計,shisetsu,netu,水道光熱費,sum,"den_ryoukin,gas_ryoukin,sui_ryoukin",decimal,円,3090,0,,,,,,sum
+tenkou,天候,jimu,jimu,日誌 事務欄,input,,text,,3100,1,,,tenkou,,,sum
+toutyoku_ishi1,当直者 医師１,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3110,1,,,t1,,,sum
+toutyoku_ishi2,当直者 医師２,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3120,0,,,t2,,,sum
+toutyoku_kango,当直者 看護,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3130,1,,,t3,,,sum
+toutyoku_housha,当直者 放射線,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3140,0,,,t4,,,sum
+toutyoku_jimu,当直者 事務,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3150,0,,,t5,,,sum
+yobidashi_ishi,呼び出し 医師,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3160,0,,,y1,,,sum
+yobidashi_ope,呼び出し 手術室,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3170,0,,,y2,,,sum
+yobidashi_zaitaku,呼び出し 在宅,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3180,0,,,y3,,,sum
+yobidashi_kensa,呼び出し 検査,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3190,0,,,y4,,,sum
+yobidashi_housha,呼び出し 放射線,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3200,0,,,y5,,,sum
+yobidashi_yakkyoku,呼び出し 薬局,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3210,0,,,y6,,,sum
+kaigi_jikoku1,会議 時刻（左）,jimu,kaigi,会議・行事・人事,input,,multiline,,3220,0,,,jikoku1,,,sum
 kaigi_name1,会議・委員会名（左）,jimu,kaigi,会議・行事・人事,input,,multiline,,3230,0,,,kaigi1,,,sum
-kaigi_jikoku2,"会議 時刻（右）",jimu,kaigi,会議・行事・人事,input,,multiline,,3240,0,,,jikoku2,,,sum
+kaigi_jikoku2,会議 時刻（右）,jimu,kaigi,会議・行事・人事,input,,multiline,,3240,0,,,jikoku2,,,sum
 kaigi_name2,会議・委員会名（右）,jimu,kaigi,会議・行事・人事,input,,multiline,,3250,0,,,kaigi2,,,sum
 gyoji,行事,jimu,kaigi,会議・行事・人事,input,,multiline,,3260,0,,,gyoji,,,sum
 jinji,人事,jimu,kaigi,会議・行事・人事,input,,multiline,,3270,0,,,jinji,,,sum
-byoto3_zaiin_avg,"3階 1日平均患者数",byoto,byoto_calc,"病棟 集計",func,nichi_avg:3,decimal,名,3300,0,,,,総括!N6,"延患者数 ÷ 実日数",sum
-byoto4_zaiin_avg,"4階 1日平均患者数",byoto,byoto_calc,"病棟 集計",func,nichi_avg:4,decimal,名,3310,0,,,,総括!N8,,sum
-byoto5_zaiin_avg,"5階 1日平均患者数",byoto,byoto_calc,"病棟 集計",func,nichi_avg:5,decimal,名,3320,0,,,,総括!N10,,sum
-byoto_zaiin_avg_all,"合計 1日平均患者数",byoto,byoto_calc,"病棟 集計",func,nichi_avg:all,decimal,名,3330,0,,,,総括!N12,,sum
-byoto3_avg_days,"3階 平均在院日数",byoto,byoto_calc,"病棟 集計",func,avg_days:3,decimal,日,3340,0,,,,"総括!O6 / H!K","延患者数合計 ÷ ((新入院＋転入＋退院＋転出)÷2)",sum
-byoto4_avg_days,"4階 平均在院日数",byoto,byoto_calc,"病棟 集計",func,avg_days:4,decimal,日,3350,0,,,,"総括!O8 / H!U",,sum
-byoto5_avg_days,"5階 平均在院日数",byoto,byoto_calc,"病棟 集計",func,avg_days:5,decimal,日,3360,0,,,,"総括!O10 / H!AE",,sum
-byoto_avg_days_all,"合計 平均在院日数",byoto,byoto_calc,"病棟 集計",func,avg_days:all,decimal,日,3370,0,,,,"総括!O12 / H!AO",,sum
-byoto3_kadou,"3階 病床稼働率",byoto,byoto_calc,"病棟 集計",func,kadou:3,decimal,%,3380,0,,,,総括!P6,"(延患者数＋退院)×100 ÷ (実日数×定床)",sum
-byoto4_kadou,"4階 病床稼働率",byoto,byoto_calc,"病棟 集計",func,kadou:4,decimal,%,3390,0,,,,総括!P8,,sum
-byoto5_kadou,"5階 病床稼働率",byoto,byoto_calc,"病棟 集計",func,kadou:5,decimal,%,3400,0,,,,総括!P10,,sum
-byoto_kadou_all,"合計 病床稼働率",byoto,byoto_calc,"病棟 集計",func,kadou:all,decimal,%,3410,0,,,,総括!P12,,sum
-byoto3_kaiten,"3階 病床回転率",byoto,byoto_calc,"病棟 集計",func,kaiten:3,decimal,%,3420,0,,,,"総括!Q6 / H!L","実日数 ÷ 平均在院日数 × 100",sum
-byoto4_kaiten,"4階 病床回転率",byoto,byoto_calc,"病棟 集計",func,kaiten:4,decimal,%,3430,0,,,,"総括!Q8 / H!V",,sum
-byoto5_kaiten,"5階 病床回転率",byoto,byoto_calc,"病棟 集計",func,kaiten:5,decimal,%,3440,0,,,,"総括!Q10 / H!AF",,sum
-byoto_kaiten_all,"合計 病床回転率",byoto,byoto_calc,"病棟 集計",func,kaiten:all,decimal,%,3450,0,,,,"総括!Q12 / H!AP",,sum
-byoto_genzai_check,現入院（前日繰越＋新入院−退院）,byoto,byoto_calc,"病棟 集計",func,genzai_balance,decimal,名,3460,0,,,,②!O,"検算用。byoto_zaiin_all と食い違う日は入力誤りの可能性がある",sum
-qq_nyuinritsu,"救急搬入 入院率",kyukyu,qq,救急搬入,func,ratio:qq_nyuin/qq_kanja,decimal,%,3470,0,,,,救急搬入受入統計表!H,"入院数 ÷ 患者数 × 100",sum
-qq_ukeireritsu,"救急搬入 受入率",kyukyu,qq,救急搬入,func,ratio:qq_kanja/qq_irai,decimal,%,3480,0,,,,救急搬入受入統計表!M,"患者数 ÷ 搬入依頼数 × 100",sum
-shoukairitsu,紹介率,renkei,renkei,紹介・医療連携,func,shoukairitsu,decimal,%,3490,0,,,,"⑦!X / 総括!V12","(紹介患者数＋救急搬入患者数) ÷ (初診−外休深6歳未満) × 100",sum
+byoto3_zaiin_avg,3階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:3,decimal,名,3300,0,,,,総括!N6,延患者数 ÷ 実日数,sum
+byoto4_zaiin_avg,4階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:4,decimal,名,3310,0,,,,総括!N8,,sum
+byoto5_zaiin_avg,5階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:5,decimal,名,3320,0,,,,総括!N10,,sum
+byoto_zaiin_avg_all,合計 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:all,decimal,名,3330,0,,,,総括!N12,,sum
+byoto3_avg_days,3階 平均在院日数,byoto,byoto_calc,病棟 集計,func,avg_days:3,decimal,日,3340,0,,,,総括!O6 / H!K,延患者数合計 ÷ ((新入院＋転入＋退院＋転出)÷2),sum
+byoto4_avg_days,4階 平均在院日数,byoto,byoto_calc,病棟 集計,func,avg_days:4,decimal,日,3350,0,,,,総括!O8 / H!U,,sum
+byoto5_avg_days,5階 平均在院日数,byoto,byoto_calc,病棟 集計,func,avg_days:5,decimal,日,3360,0,,,,総括!O10 / H!AE,,sum
+byoto_avg_days_all,合計 平均在院日数,byoto,byoto_calc,病棟 集計,func,avg_days:all,decimal,日,3370,0,,,,総括!O12 / H!AO,,sum
+byoto3_kadou,3階 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:3,decimal,%,3380,0,,,,総括!P6,(延患者数＋退院)×100 ÷ (実日数×定床),sum
+byoto4_kadou,4階 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:4,decimal,%,3390,0,,,,総括!P8,,sum
+byoto5_kadou,5階 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:5,decimal,%,3400,0,,,,総括!P10,,sum
+byoto_kadou_all,合計 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:all,decimal,%,3410,0,,,,総括!P12,,sum
+byoto3_kaiten,3階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:3,decimal,%,3420,0,,,,総括!Q6 / H!L,実日数 ÷ 平均在院日数 × 100,sum
+byoto4_kaiten,4階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:4,decimal,%,3430,0,,,,総括!Q8 / H!V,,sum
+byoto5_kaiten,5階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:5,decimal,%,3440,0,,,,総括!Q10 / H!AF,,sum
+byoto_kaiten_all,合計 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:all,decimal,%,3450,0,,,,総括!Q12 / H!AP,,sum
+byoto_genzai_check,現入院（前日繰越＋新入院−退院）,byoto,byoto_calc,病棟 集計,func,genzai_balance,decimal,名,3460,0,,,,②!O,検算用。byoto_zaiin_all と食い違う日は入力誤りの可能性がある,sum
+qq_nyuinritsu,救急搬入 入院率,kyukyu,qq,救急搬入,func,ratio:qq_nyuin/qq_kanja,decimal,%,3470,0,,,,救急搬入受入統計表!H,入院数 ÷ 患者数 × 100,sum
+qq_ukeireritsu,救急搬入 受入率,kyukyu,qq,救急搬入,func,ratio:qq_kanja/qq_irai,decimal,%,3480,0,,,,救急搬入受入統計表!M,患者数 ÷ 搬入依頼数 × 100,sum
+shoukairitsu,紹介率,renkei,renkei,紹介・医療連携,func,shoukairitsu,decimal,%,3490,0,,,,⑦!X / 総括!V12,(紹介患者数＋救急搬入患者数) ÷ (初診−外休深6歳未満) × 100,sum

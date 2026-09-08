@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-09-07 20:40:23
+-- 生成日時: 2026-09-08 00:40:44
 
 DELETE FROM m_item;
 DELETE FROM m_config;
@@ -157,6 +157,7 @@ INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('st_nyuin','言語療法 入院','rehab','rehab','リハビリ単位数','input',NULL,'int','sum','単位',1760,1,0,1000,'2000-01-01',NULL,NULL,'⑥!W','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('st_gairai','言語療法 外来','rehab','rehab','リハビリ単位数','input',NULL,'int','sum','単位',1770,1,0,1000,'2000-01-01',NULL,NULL,'⑥!X','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('st_total','言語療法 入＋外','rehab','rehab','リハビリ単位数','sum','st_nyuin,st_gairai','int','sum','単位',1780,0,NULL,NULL,'2000-01-01',NULL,'k23','⑥!Y','');
+INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('shidou_other','指導 その他','rehab','rehab','リハビリ単位数','input',NULL,'int','sum','件',1795,0,0,500,'2000-01-01',NULL,'k24',NULL,'病院日誌の特殊検査欄「そ の 他」。Excelに対応列がなく、入力する部署も要確認');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('rehab_gairai_kensu','リハビリ（外来再掲）','rehab','rehab','リハビリ単位数','input',NULL,'int','sum','件',1790,0,0,500,'2000-01-01',NULL,'s1',NULL,'病院日誌の外来再掲欄。単位数ではなく件数のため別項目。Excel側に対応列がなく定義の確認が必要');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('ope_geka','手術 外科','ope','ope','手術室','input',NULL,'int','sum','件',1800,1,0,50,'2000-01-01',NULL,'op1','⑦!C','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('ope_seikei','手術 整形','ope','ope','手術室','input',NULL,'int','sum','件',1810,1,0,50,'2000-01-01',NULL,'op2','⑦!E','');

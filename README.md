@@ -35,24 +35,33 @@ db/
     build_seed.php      master/*.csv → seed_master.sql と対応表を生成
     mysql_to_sqlite.php schema.sql → SQLite用DDL
     dev_setup.php       開発用SQLite DBを作り直す
-    import_daily_csv.php 過去データの取り込み
+    import_daily_csv.php 日次実績のCSV取り込み
+    migrate_from_legacy.php 旧 nissi テーブル（sjis）→ 縦持ちへ移行
 src/
   db.php          PDO接続。SQLは必ずプリペアドステートメント
   auth.php        利用者の特定。電子カルテからのID引き継ぎ／予備ログイン
   master.php      マスタ読み込み
   repository.php  日次値の保存、入力者・時刻の記録、変更履歴、提出状態
   calc.php        導出項目の算出（Excelの数式に相当）
+  report.php      日別クロス表の共通描画（列仕様を配列で渡す）
   view.php        エスケープ・CSRF・共通ヘッダ
 public/
-  index.php       入力状況ボード（トップ）
-  entry.php       部署別入力（項目マスタから自動生成）
-  nissi.php       病院日誌（?print=1 で印刷用）
-  soukatsu.php    各種業務量他総括（月次）
-  zaiin.php       平均在院日数統計
-  qq_report.php   救急搬入受入統計（８時会・朝礼報告）
-  login.php       予備ログイン
+  index.php          入力状況ボード（トップ）        全員
+  entry.php          部署別入力（項目マスタから自動生成）自部署のみ
+  nissi.php          病院日誌（?print=1 で印刷用）    全員
+  qq_report.php      救急搬入受入統計（８時会・朝礼報告）全員
+  soukatsu.php       各種業務量他総括（月次）        医事課・管理者
+  zaiin.php          平均在院日数統計                医事課・病棟
+  toukei.php         患者数統計表①〜⑤（月報）      医事課・管理者
+  byoin_houkoku.php  病院報告（患者票・保健所提出）  医事課・管理者
+  audit.php          変更履歴の閲覧                  医事課・管理者
+  export.php         CSV出力（UTF-8 BOM付き）        医事課・管理者
+  admin_master.php   目標値・部署・設定値の保守      管理者
+  admin_user.php     職員マスタの保守                管理者
+  login.php          予備ログイン
 tools/
   extract_excel.py  現行Excelブックから値をCSVに取り出す（移行・検証用）
+  check_env.php     稼働サーバが要件を満たすか確認する
 docs/
   項目マスタ対応表.md  旧列名・Excel位置と項目コードの対応（自動生成）
 ```
@@ -117,6 +126,27 @@ php -S 127.0.0.1:8080 -t public     # kurihara / test1234
 
 **部署を増やす**
 `db/master/depts.csv` に1行足す。`entry_days` で入力対象曜日、`deadline_time` で入力期限を指定する。
+
+## 旧データの移行
+
+```bash
+# まず下見（書き込まない）。どの列が移行できるか・できないかを表示する
+php db/tools/migrate_from_legacy.php \
+    --dsn="mysql:host=localhost;dbname=nissi_old" --user=... --pass=... --dry-run
+
+# 問題なければ実行
+php db/tools/migrate_from_legacy.php --dsn="..." --user=... --pass=...
+```
+
+**移行できない列がある。** 新システムは同じ項目を入院・外来などに分けて持つのに対し、
+旧日誌は「ＣＴ 11件」のように合計しか持っていないため、内訳に分解できない。
+該当するのは 26 列（`k1`〜`k23` の検査系、`new`/`tai`、`s6`〜`s10`、`s14`、`z3`）で、
+移行後これらは空欄になる。新しく入力した日以降は自動で算出される。
+
+下見の出力に、移行できない列とその理由が一覧で出るので、実行前に必ず確認すること。
+
+文字コードは既定が `sjis`。移行後、天候・術名・会議名・行事・人事が正しく表示されるか
+必ず目視で確認する（下見の最後にサンプルが表示される）。
 
 ## バックアップと復旧
 
