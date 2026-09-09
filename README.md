@@ -158,6 +158,69 @@ C:\xampp\php\php db\tools\build_seed.php
 職員をCSVで一括登録するときは、Excelで「CSV UTF-8（コンマ区切り）」で保存するのが確実。
 通常の「CSV（コンマ区切り）」で保存した Shift_JIS のファイルも読めるようにしてある。
 
+### Apacheの設定（Windows / Apache24 の場合）
+
+> **アプリ一式を `htdocs` の中に置いてはいけない。**
+> 置くと `config/config.php`（DB接続パスワード）・`db/*.sql`・`db/master/*.csv`、
+> さらに `db/dev.sqlite` を作った場合はデータベースの実体まで、
+> ブラウザから直接ダウンロードできてしまう。
+> `php tools/check_env.php` がこの状態を検出して NG を出す。
+
+**置き場所**：公開フォルダの外に置く。例 `C:\nissi`
+
+```
+C:\nissi\            ← ここにREADME.md、db、src、public …
+C:\Apache24\htdocs\  ← ここには何も置かない
+```
+
+**httpd.conf に次を追記する**（`C:\Apache24\conf\httpd.conf`）。
+
+```apache
+# 病院日誌・医事統計表
+Alias /nissi "C:/nissi/public"
+<Directory "C:/nissi/public">
+    Options -Indexes +FollowSymLinks
+    AllowOverride None
+    Require all granted
+    DirectoryIndex index.php
+</Directory>
+```
+
+パスの区切りは `/`（スラッシュ）で書く。`\` でも動くが `/` が確実。
+書いたら Apache を再起動し、`http://＜サーバ名＞/nissi/` で開く。
+
+**PHPが有効になっているか**も確認する。httpd.conf に次のような記述が必要。
+
+```apache
+LoadModule php_module "C:/php/php8apache2_4.dll"
+AddHandler application/x-httpd-php .php
+PHPIniDir "C:/php"
+```
+
+`http://＜サーバ名＞/nissi/` を開いてPHPのソースがそのまま表示される場合は、
+この設定が入っていない。**その状態でアプリを置くとパスワードが漏れる**ので、
+先にPHPを動かせるようにすること。
+
+#### すでに htdocs の中に置いてしまった場合
+
+フォルダごと `C:\nissi` へ移動し、上の Alias を設定するのが本筋。
+どうしても移動できない場合は、httpd.conf に次を追記して塞ぐ。
+
+```apache
+<Directory "C:/Apache24/htdocs/nissi">
+    Require all denied
+</Directory>
+<Directory "C:/Apache24/htdocs/nissi/public">
+    Require all granted
+    DirectoryIndex index.php
+</Directory>
+```
+
+この場合のURLは `http://＜サーバ名＞/nissi/public/` になる。
+`config` `db` `src` `tools` `docs` には保険として `.htaccess` を置いてあるが、
+Apacheの既定は `AllowOverride None` で `.htaccess` を読まないため、
+**上の httpd.conf の設定が実質的な防御になる**。
+
 Apache/nginx のドキュメントルートは **`public/` を指す**。`src/` `config/` `db/` を
 Web から直接開けないようにするため。
 

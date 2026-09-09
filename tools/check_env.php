@@ -121,11 +121,41 @@ echo $nl . "ファイル配置" . $nl;
 $root = dirname(dirname(__FILE__));
 line(is_dir($root . '/public') ? 'OK' : 'NG', 'public/ ディレクトリ',
      is_dir($root . '/public') ? 'あり（Webの公開先はここを指すこと）' : 'なし');
+
+// アプリ全体が公開フォルダの中に置かれていないか。
+// 中に置くと config/config.php（DB接続情報）や db/*.sql、db/*.sqlite が
+// ブラウザから直接ダウンロードできてしまう。
+$path = str_replace('\\', '/', realpath($root));
+$inDocRoot = false;
+foreach (array('/htdocs/', '/www/', '/public_html/', '/wwwroot/', '/webroot/') as $marker) {
+    if (stripos($path . '/', $marker) !== false) {
+        $inDocRoot = true;
+        break;
+    }
+}
 $docroot = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : '';
 if (!$isCli && $docroot !== '') {
-    $exposed = (strpos(realpath($root . '/src'), realpath($docroot)) === 0);
-    line($exposed ? 'NG' : 'OK', 'src/ の公開状態',
-         $exposed ? 'Webから見える位置にあります … 公開先を public/ に変えてください' : '公開領域の外');
+    $rs = realpath($root . '/src');
+    $rd = realpath($docroot);
+    if ($rs && $rd && strpos(str_replace('\\', '/', $rs), str_replace('\\', '/', $rd)) === 0) {
+        $inDocRoot = true;
+    }
+}
+if ($inDocRoot) {
+    line('NG', 'アプリの置き場所',
+        '公開フォルダの中にあります（' . $path . '）');
+    echo '         config/config.php・db/*.sql・db/*.sqlite がブラウザから'
+       . '直接読める状態です。' . $nl;
+    echo '         公開フォルダの外へ移し、Apacheの Alias で public/ だけを'
+       . '公開してください（READMEの「Apacheの設定」参照）。' . $nl;
+} else {
+    line('OK', 'アプリの置き場所', '公開フォルダの外（' . $path . '）');
+}
+
+// 開発用SQLiteが残っていないか。本番に置くと丸ごとダウンロードされうる
+if (is_file($root . '/db/dev.sqlite')) {
+    line($inDocRoot ? 'NG' : '注意', 'db/dev.sqlite',
+        '開発用のデータベース実体が残っています。本番サーバでは削除してください');
 }
 
 echo $nl . str_repeat("=", 68) . $nl;
