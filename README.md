@@ -1,5 +1,8 @@
 # 病院日誌・医事統計表 入力システム
 
+> **はじめて読む方へ** … `docs/システムレポート.pdf`（通読用）と
+> `docs/導入手順書.pdf`（サーバ導入の1枚もの）から読むと早い。
+
 長崎北徳洲会病院。各部署が電子カルテ端末から患者数・業務数を **一度だけ** 入力し、
 病院日誌と医事統計表の両方をそこから自動生成する。入力者と入力時刻を自動で記録し、
 未入力の部署が一目で分かるようにする。
@@ -29,7 +32,7 @@ db/
   seed_master.sql       ↓のCSVから自動生成
   master/               ★ここを直す
     depts.csv           部署マスタ（19部署）
-    items.csv           項目マスタ（277項目）
+    items.csv           項目マスタ（278項目。入力211 / 合算47 / 計算20）
     config.csv          定床などの設定値
   tools/
     build_seed.php      master/*.csv → seed_master.sql と対応表を生成
@@ -63,8 +66,12 @@ public/
 tools/
   extract_excel.py  現行Excelブックから値をCSVに取り出す（移行・検証用）
   check_env.php     稼働サーバが要件を満たすか確認する
+  build_pdf.py      下の2つのPDFを生成する（文章の正本はこのスクリプト）
 docs/
+  導入手順書.pdf       サーバの前で見ながら作業するための1枚。印刷して使う
+  システムレポート.pdf 何を作ったか・何が分かったかの通読用。医事課への回覧に使う
   項目マスタ対応表.md  旧列名・Excel位置と項目コードの対応（自動生成）
+  現行資産の調査結果.md 現行Excel・旧日誌の調査記録と、医事課への確認事項
 ```
 
 ## セットアップ
@@ -114,8 +121,10 @@ php tools/check_env.php
 が並んでいるフォルダ）で実行する。まずそこへ移動する。
 
 ```
-cd /d C:\nissi
+cd /d C:\Apache24\htdocs\nissi
 ```
+
+（長崎北徳洲会病院のサーバ 10.20.103.125 での設置先。別の場所に置いた場合はそのパスに読み替える）
 
 `/d` はドライブをまたいで移動するために必要（`D:` に置いた場合など）。
 `dir` と打って `README.md` `db` `public` `src` が見えていればその場所で合っている。
@@ -136,19 +145,20 @@ mysql --version
 ```
 
 「内部コマンドまたは外部コマンド〜として認識されていません」と出る場合は、
-フルパスで打つか、環境変数 PATH に追加する。XAMPP なら通常は次の場所にある。
+フルパスで打つか、環境変数 PATH に追加する。
 
-```
-C:\xampp\php\php.exe
-C:\xampp\mysql\bin\mysql.exe
-```
+長崎北徳洲会病院のサーバでは PHP は `C:\php\php.exe`（PATH済み）。
+MySQL は他アプリ（レセプト統計・空きベット情報）が使っているものを共用するため、
+`mysql.exe` はそのインストール先の `bin` にある。
 
 フルパスで打つ例：
 
 ```
-C:\xampp\mysql\bin\mysql -u nissi -p nissi < db\schema.sql
-C:\xampp\php\php db\tools\build_seed.php
+C:\php\php db\tools\build_seed.php
+"C:\Program Files\MariaDB\bin\mysql" -u nissi -p nissi < db\schema.sql
 ```
+
+XAMPP を使っている環境なら `C:\xampp\php\php.exe` と `C:\xampp\mysql\bin\mysql.exe`。
 
 **日本語を入力するとき。** コマンドプロンプトの既定の文字コードは Shift_JIS のため、
 `--name=栗原` のように日本語を渡すと文字化けの原因になる。
