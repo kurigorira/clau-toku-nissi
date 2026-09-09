@@ -53,6 +53,11 @@ $need = array(
 foreach ($need as $ext => $why) {
     line(extension_loaded($ext) ? 'OK' : 'NG', $ext, extension_loaded($ext) ? $why : '未導入 … ' . $why);
 }
+// 必須ではないが、あるとDBサーバを立てずにSQLiteで動かす選択肢が取れる
+line(extension_loaded('pdo_sqlite') ? 'OK' : '注意', 'pdo_sqlite',
+     extension_loaded('pdo_sqlite')
+        ? 'あり（MySQLを立てない場合はSQLiteでも動かせる）'
+        : 'なし（MySQL/MariaDBが必要）');
 
 // ---- 設定 ----
 echo $nl . "PHPの設定" . $nl;

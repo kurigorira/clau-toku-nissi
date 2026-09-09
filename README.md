@@ -201,22 +201,42 @@ PHPIniDir "C:/php"
 この設定が入っていない。**その状態でアプリを置くとパスワードが漏れる**ので、
 先にPHPを動かせるようにすること。
 
-#### すでに htdocs の中に置いてしまった場合
+#### htdocs の中に置いたまま使う場合
 
-フォルダごと `C:\nissi` へ移動し、上の Alias を設定するのが本筋。
-どうしても移動できない場合は、httpd.conf に次を追記して塞ぐ。
+フォルダを移動せずに塞ぐこともできる。httpd.conf に次を追記する。
 
 ```apache
+# /nissi を public フォルダに割り当てる。
+# これで /nissi/db/... のようなURLは public の下を探しにいくため、
+# db や config には URL で到達できなくなる。
+Alias /nissi "C:/Apache24/htdocs/nissi/public"
+
+# 念のため、フォルダ単位でも塞いでおく
 <Directory "C:/Apache24/htdocs/nissi">
     Require all denied
 </Directory>
 <Directory "C:/Apache24/htdocs/nissi/public">
+    Options -Indexes +FollowSymLinks
     Require all granted
     DirectoryIndex index.php
 </Directory>
 ```
 
-この場合のURLは `http://＜サーバ名＞/nissi/public/` になる。
+**URLは `http://＜サーバ名＞/nissi/` のまま変わらない。**
+
+設定してApacheを再起動したら、次のURLを開いて確認する。
+
+| URL | 期待する結果 |
+|---|---|
+| `http://＜サーバ名＞/nissi/` | ログイン画面が出る |
+| `http://＜サーバ名＞/nissi/db/schema.sql` | 404 または 403（中身が見えないこと） |
+| `http://＜サーバ名＞/nissi/tools/check_env.php` | 404 または 403 |
+
+`check_env.php` はコマンドプロンプトから実行する。
+
+```
+C:\php\php tools\check_env.php
+```
 `config` `db` `src` `tools` `docs` には保険として `.htaccess` を置いてあるが、
 Apacheの既定は `AllowOverride None` で `.htaccess` を読まないため、
 **上の httpd.conf の設定が実質的な防御になる**。
