@@ -108,6 +108,56 @@ php tools/check_env.php
 `role` は `entry`（入力者）/ `toutyoku`（当直者）/ `ijika`（医事課）/ `admin`（管理者）。
 `password` を空にすると予備ログインは無効になり、電子カルテからのID引き継ぎでのみ入れる。
 
+### Windows のコマンドプロンプトで実行する場合
+
+**手順2〜8はすべて、プロジェクトのルートフォルダ**（`README.md` と `db` `src` `public`
+が並んでいるフォルダ）で実行する。まずそこへ移動する。
+
+```
+cd /d C:\nissi
+```
+
+`/d` はドライブをまたいで移動するために必要（`D:` に置いた場合など）。
+`dir` と打って `README.md` `db` `public` `src` が見えていればその場所で合っている。
+
+上の手順は Linux の書き方なので、Windows では次のように読み替える。
+
+| 手順 | Linuxの書き方 | Windowsのコマンドプロンプト |
+|---|---|---|
+| ファイルのコピー | `cp a b` | `copy a b` |
+| 設定ファイルの編集 | `vi config/config.php` | `notepad config\config.php` |
+| 区切り文字 | `/` | `\`（PHPは両方受け付けるのでどちらでもよい） |
+
+**`php` と `mysql` にパスが通っているか**を先に確かめる。
+
+```
+php -v
+mysql --version
+```
+
+「内部コマンドまたは外部コマンド〜として認識されていません」と出る場合は、
+フルパスで打つか、環境変数 PATH に追加する。XAMPP なら通常は次の場所にある。
+
+```
+C:\xampp\php\php.exe
+C:\xampp\mysql\bin\mysql.exe
+```
+
+フルパスで打つ例：
+
+```
+C:\xampp\mysql\bin\mysql -u nissi -p nissi < db\schema.sql
+C:\xampp\php\php db\tools\build_seed.php
+```
+
+**日本語を入力するとき。** コマンドプロンプトの既定の文字コードは Shift_JIS のため、
+`--name=栗原` のように日本語を渡すと文字化けの原因になる。
+`db/tools/add_user.php` は Shift_JIS で届いた場合も自動でUTF-8に直すので、
+そのまま打って問題ない。気になる場合は先に `chcp 65001` を実行しておく。
+
+職員をCSVで一括登録するときは、Excelで「CSV UTF-8（コンマ区切り）」で保存するのが確実。
+通常の「CSV（コンマ区切り）」で保存した Shift_JIS のファイルも読めるようにしてある。
+
 Apache/nginx のドキュメントルートは **`public/` を指す**。`src/` `config/` `db/` を
 Web から直接開けないようにするため。
 

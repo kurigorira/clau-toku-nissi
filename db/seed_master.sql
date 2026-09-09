@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-09-08 00:40:44
+-- 生成日時: 2026-09-09 06:28:04
 
 DELETE FROM m_item;
 DELETE FROM m_config;

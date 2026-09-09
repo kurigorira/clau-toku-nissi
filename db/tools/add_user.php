@@ -21,7 +21,28 @@ require_once dirname(__DIR__, 2) . '/src/db.php';
 
 $ROLES = ['entry' => '入力者', 'toutyoku' => '当直者', 'ijika' => '医事課', 'admin' => '管理者'];
 
+/**
+ * コマンドラインから渡された文字列をUTF-8に揃える。
+ *
+ * Windowsのコマンドプロンプトは既定の文字コードがShift_JIS（CP932）なので、
+ * --name=栗原 のように日本語を渡すとSJISのバイト列のまま届く。
+ * そのままUTF-8のデータベースに入れると文字化けするため、ここで変換する。
+ * すでにUTF-8として妥当なら何もしない（chcp 65001 済みの場合など）。
+ */
+function to_utf8(string $s): string
+{
+    if ($s === '' || mb_check_encoding($s, 'UTF-8')) {
+        return $s;
+    }
+    return mb_convert_encoding($s, 'UTF-8', 'SJIS-win');
+}
+
 $opt = getopt('', ['id:', 'name:', 'dept:', 'role:', 'password:', 'csv:', 'list', 'disable:', 'help']);
+foreach (['name', 'dept', 'role', 'id'] as $k) {
+    if (isset($opt[$k]) && is_string($opt[$k])) {
+        $opt[$k] = to_utf8($opt[$k]);
+    }
+}
 
 if (isset($opt['help']) || !$opt) {
     fwrite(STDERR, <<<TXT
@@ -142,6 +163,8 @@ if (isset($opt['csv'])) {
             continue;
         }
         $row = array_combine($head, array_pad(array_slice($r, 0, count($head)), count($head), ''));
+        // Excelから「CSV(コンマ区切り)」で保存するとSJISになるため、ここで揃える
+        $row = array_map('to_utf8', $row);
         $msg = upsert_user($row, $depts, $ROLES);
         echo $msg . "\n";
         strpos($msg, '○') !== false ? $ok++ : $ng++;
