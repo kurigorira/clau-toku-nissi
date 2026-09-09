@@ -35,6 +35,7 @@ db/
     build_seed.php      master/*.csv → seed_master.sql と対応表を生成
     mysql_to_sqlite.php schema.sql → SQLite用DDL
     dev_setup.php       開発用SQLite DBを作り直す
+    add_user.php        職員の登録・一括登録・無効化（最初の管理者はこれで作る）
     import_daily_csv.php 日次実績のCSV取り込み
     migrate_from_legacy.php 旧 nissi テーブル（sjis）→ 縦持ちへ移行
 src/
@@ -92,8 +93,20 @@ mysql -u nissi -p nissi < db/seed_master.sql
 cp config/config.sample.php config/config.php
 vi config/config.php
 
-# 4. 職員マスタを登録する（電子カルテの職員IDをそのまま user_id にする）
+# 4. 最初の管理者を登録する（この時点では職員マスタが空で、誰もログインできない）
+php db/tools/add_user.php --id=＜職員ID＞ --name=＜氏名＞ --dept=jimu --role=admin --password=＜8文字以上＞
+
+# 5. 残りの職員を登録する（CSVで一括登録できる）
+php db/tools/add_user.php --csv=staff.csv     # user_id,user_name,dept_id,role,password
+php db/tools/add_user.php --list              # 部署IDと登録済み職員の確認
+
+# 6. 設定を確認する
+php tools/check_env.php
 ```
+
+2人目以降は画面（管理者でログイン → 職員）からも登録できる。
+`role` は `entry`（入力者）/ `toutyoku`（当直者）/ `ijika`（医事課）/ `admin`（管理者）。
+`password` を空にすると予備ログインは無効になり、電子カルテからのID引き継ぎでのみ入れる。
 
 Apache/nginx のドキュメントルートは **`public/` を指す**。`src/` `config/` `db/` を
 Web から直接開けないようにするため。
