@@ -307,9 +307,9 @@ def build_tejun():
     ]))
 
     s.append(step('3.', 'テーブルとマスタを流し込む', [
-        codebox(['mysql -u root -p nissi < db\\schema.sql        ← CREATE TABLE なので root で流す',
+        codebox(['php db\\tools\\run_sql.php db\\schema.sql --user=root --pass=<rootのパスワード>',
                  'php db\\tools\\build_seed.php                  ← 19部署 / 278項目 / 設定10件 を生成',
-                 'mysql -u nissi -p nissi < db\\seed_master.sql  ← INSERT だけなので nissi で流せる'], st),
+                 'php db\\tools\\run_sql.php db\\seed_master.sql   ← こちらは nissi ユーザのままでよい'], st),
     ]))
 
     s.append(step('4.', '接続設定を作る（このファイルはリポジトリに入れない）', [
@@ -351,7 +351,7 @@ def build_tejun():
          '<font face="Courier">Unknown database</font>=DB、'
          '<font face="Courier">[2002]</font>=<font face="Courier">host=127.0.0.1</font> に）'],
         ['php が見つからない', '<font face="Courier">C:\\php\\php</font> とフルパスで打つ'],
-        ['mysql が見つからない', 'インストール先の <font face="Courier">bin</font> をフルパスで打つ'],
+        ['mysql が見つからない', '<b>手順3の <font face="Courier">run_sql.php</font> を使う</b>（PHPから流し込むので mysql は不要）'],
         ['日本語が化ける', 'コマンドプロンプトで先に <font face="Courier">chcp 65001</font> を実行する'],
         ['PHPのソースがそのまま表示される', 'httpd.conf の <font face="Courier">LoadModule php_module</font> が入っていない。'
                                             '<b><font color="#c0392b">その状態で置くとDBのパスワードが漏れる</font></b>'],

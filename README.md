@@ -38,6 +38,7 @@ db/
     build_seed.php      master/*.csv → seed_master.sql と対応表を生成
     mysql_to_sqlite.php schema.sql → SQLite用DDL
     dev_setup.php       開発用SQLite DBを作り直す
+    run_sql.php         SQLファイルをPDO経由で流し込む（mysqlコマンドが無くても使える）
     add_user.php        職員の登録・一括登録・無効化（最初の管理者はこれで作る）
     import_daily_csv.php 日次実績のCSV取り込み
     migrate_from_legacy.php 旧 nissi テーブル（sjis）→ 縦持ちへ移行
@@ -94,11 +95,11 @@ mysql -u root -p -e "CREATE USER 'nissi'@'localhost' IDENTIFIED BY '＜パスワ
 # 2. テーブルを作る
 #    ここは CREATE / DROP TABLE なので root（DDLを実行できるユーザ）で流す。
 #    nissi ユーザには SELECT/INSERT/UPDATE/DELETE しか与えていないため権限不足になる。
-mysql -u root -p nissi < db/schema.sql
+php db/tools/run_sql.php db/schema.sql --user=root --pass=＜rootのパスワード＞
 
 # 3. マスタを流し込む（DELETE と INSERT だけなので nissi ユーザで流せる）
 php db/tools/build_seed.php
-mysql -u nissi -p nissi < db/seed_master.sql
+php db/tools/run_sql.php db/seed_master.sql
 
 # 4. 設定ファイルを作る（config.php はリポジトリに入れない）
 cp config/config.sample.php config/config.php
@@ -114,6 +115,14 @@ php db/tools/add_user.php --list              # 部署IDと登録済み職員の
 # 7. 設定を確認する
 php tools/check_env.php
 ```
+
+手順1（データベースとユーザの作成）だけは `mysql` コマンドか、MySQL Workbench などの
+管理ツールが要る。**手順2以降はPHPだけで完結する。**
+
+`run_sql.php` はSQLファイルをPHPのPDO経由で流し込む。**`mysql` コマンドが入っていない
+サーバでも使える**（PHPはネットワーク越しに接続するので、クライアントプログラムを必要としない）。
+`mysql` コマンドが使える環境なら `mysql -u root -p nissi < db/schema.sql` でも同じことができる。
+`--dry-run` を付けると、流さずに文の数だけ確認できる。
 
 2人目以降は画面（管理者でログイン → 職員）からも登録できる。
 `role` は `entry`（入力者）/ `toutyoku`（当直者）/ `ijika`（医事課）/ `admin`（管理者）。
@@ -341,6 +350,18 @@ C:\php\php tools\check_env.php
 院内端末のChromeには `gap` 非対応の世代（Chrome 84 / 2020年より前）があり、
 そのブラウザでは `gap` が丸ごと無視されて項目が詰まる。**間隔は `margin` で取ること。**
 
+### `mysql` は、内部コマンドまたは外部コマンド〜として認識されていません
+
+`mysql.exe`（クライアント）がこのサーバに入っていない。**PHPからは繋がるので問題ない** ──
+PHPは PDO でネットワーク越しに接続するため、クライアントプログラムを必要としない。
+
+SQLファイルは `run_sql.php` で流し込む。
+
+```
+php db/tools/run_sql.php db/schema.sql --user=root --pass=＜rootのパスワード＞
+php db/tools/run_sql.php db/seed_master.sql
+```
+
 ### ログイン画面は出るがログインできない
 
 職員マスタが空の可能性がある。`php db\tools\add_user.php --list` で登録を確認し、
@@ -355,6 +376,10 @@ mysqldump -u nissi -p --single-transaction nissi | gzip > /backup/nissi_$(date +
 # 復旧
 gunzip -c /backup/nissi_YYYYMMDD.sql.gz | mysql -u nissi -p nissi
 ```
+
+> **この手順は `mysqldump` を使うので、クライアントツールが入っていないサーバでは実行できない。**
+> 長崎北徳洲会病院のサーバは現状クライアントが無い。レセプト統計アプリ・空きベット情報の
+> バックアップ運用に相乗りするか、クライアントを導入するかを決める必要がある（未決）。
 
 > **バックアップを取るだけでは足りない。** 年に一度は実際に別DBへ復旧してみて、
 > 手順が通ることを確認する。取れていても戻せない事例が最も多い。
