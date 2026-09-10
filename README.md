@@ -35,6 +35,7 @@ db/
     items.csv           項目マスタ（278項目。入力211 / 合算47 / 計算20）
     config.csv          定床などの設定値
   tools/
+    backup.php          DBをSQLファイルに書き出す（mysqldump が無くても取れる）
     build_seed.php      master/*.csv → seed_master.sql と対応表を生成
     mysql_to_sqlite.php schema.sql → SQLite用DDL
     dev_setup.php       開発用SQLite DBを作り直す
@@ -66,7 +67,8 @@ public/
   login.php          予備ログイン
 tools/
   extract_excel.py  現行Excelブックから値をCSVに取り出す（移行・検証用）
-  check_env.php     稼働サーバが要件を満たすか確認する
+  check_env.php     稼働サーバが要件を満たすか確認する（最後のバックアップ日も見る）
+  backup.bat        タスクスケジューラから毎日バックアップを取るためのバッチ
   build_pdf.py      下の2つのPDFを生成する（文章の正本はこのスクリプト）
 docs/
   導入手順書.pdf       サーバの前で見ながら作業するための1枚。印刷して使う
@@ -369,20 +371,65 @@ php db/tools/run_sql.php db/seed_master.sql
 
 ## バックアップと復旧
 
-```bash
-# 毎日 深夜に取得（cron）
-mysqldump -u nissi -p --single-transaction nissi | gzip > /backup/nissi_$(date +\%Y\%m\%d).sql.gz
+**このサーバには `mysqldump` が入っていない**ので、PHPだけで取れるようにしてある。
+出力は素のSQLで、復旧は `run_sql.php` でそのまま流せる。
 
-# 復旧
-gunzip -c /backup/nissi_YYYYMMDD.sql.gz | mysql -u nissi -p nissi
+### 設定
+
+`config/config.php` の `backup` を書く。
+
+```php
+'backup' => [
+    'dir'     => 'C:/backup/nissi',                  // まずここへ取る
+    'copy_to' => '//サーバ名/共有/backup/nissi',      // 院内の共有フォルダへ複製
+    'keep'    => 30,                                 // 残す世代数
+],
 ```
 
-> **この手順は `mysqldump` を使うので、クライアントツールが入っていないサーバでは実行できない。**
-> 長崎北徳洲会病院のサーバは現状クライアントが無い。レセプト統計アプリ・空きベット情報の
-> バックアップ運用に相乗りするか、クライアントを導入するかを決める必要がある（未決）。
+**保存先には患者ID・氏名（`d_tokki`）とパスワードハッシュ（`m_user`）が入る。**
+公開フォルダ（`htdocs` など）の中を指定した場合、`backup.php` は実行を拒否する。
+共有フォルダ側のアクセス権も、医事課と情報システム担当だけに絞ること。
 
-> **バックアップを取るだけでは足りない。** 年に一度は実際に別DBへ復旧してみて、
-> 手順が通ることを確認する。取れていても戻せない事例が最も多い。
+### 毎日自動で取る
+
+`tools/backup.bat` をタスクスケジューラに登録する（管理者のコマンドプロンプトで一度だけ）。
+
+```
+schtasks /create /tn "病院日誌バックアップ" /tr "C:\Apache24\htdocs\nissi\tools\backup.bat" /sc daily /st 22:00 /ru SYSTEM
+```
+
+手で取るときは次のとおり。
+
+```
+php db/tools/backup.php
+php db/tools/backup.php --out=D:/temp --keep=5     # 保存先や世代数を変える
+```
+
+`nissi_YYYYMMDD_HHMM.sql` ができる。**途中で落ちた場合、そのファイルは
+`.writing` のまま残り、正規の名前にはならない。** 最後まで書けたものだけが
+`nissi_*.sql` になるので、中途半端なファイルを復旧に使ってしまうことがない。
+
+### 復旧
+
+**本番のDBへいきなり戻さない。** まず別名のデータベースへ戻して中身を確かめる。
+
+```
+# 1. 戻し先のデータベースを作る
+mysql -u root -p -e "CREATE DATABASE nissi_restore_test DEFAULT CHARACTER SET utf8mb4;"
+
+# 2. バックアップを流し込む（DROP/CREATE TABLE を含むので root で）
+php db/tools/run_sql.php C:/backup/nissi/nissi_20260910_2200.sql ^
+    --dsn="mysql:host=127.0.0.1;dbname=nissi_restore_test;charset=utf8mb4" --user=root --pass=...
+
+# 3. 件数を照合する（バックアップの先頭コメントに取得時点の件数が書いてある）
+```
+
+確かめたうえで本番へ戻すときは、`--dsn` を本番のデータベースに向けて同じことをする。
+
+> **バックアップを取るだけでは足りない。年に一度は実際に戻すこと。**
+> 取れていても戻せない、が最も多い失敗。`php tools/check_env.php` は
+> 最後に取れた日付と、そのファイルが最後まで書けているかを表示する。
+> **2日以上取れていなければ NG を出す**ので、月に一度はこれを見る。
 
 ## システムが止まったとき
 

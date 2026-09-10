@@ -239,7 +239,7 @@ class Doc(BaseDocTemplate):
 # ================================================================ 導入手順書
 def build_tejun():
     """A4縦1ページ。サーバの前で見ながら打ち込むための作業紙。"""
-    st = styles(8.6, 1.42)
+    st = styles(8.2, 1.38)
     path = os.path.join(OUT_DIR, '導入手順書.pdf')
     doc = Doc(path, footer='%s  %s 導入手順書' % (HOSPITAL, SYSTEM),
               margins=(12, 9, 13, 12), show_page=False)
@@ -337,6 +337,12 @@ def build_tejun():
         ], [W * 0.48, W * 0.52], st),
     ]))
 
+    s.append(step('8.', 'バックアップを登録する（これをやらないと復旧できません）', [
+        codebox(['notepad config\\config.php   ← backup.dir を書く／php db\\tools\\backup.php で1回試す',
+                 'schtasks /create /tn "nissi-backup" /tr "%CD%\\tools\\backup.bat"'
+                 ' /sc daily /st 22:00 /ru SYSTEM'], st),
+    ]))
+
     s.append(Spacer(1, 2))
     # この見出しだけ keepWithNext を外す。1枚に収める文書なので、
     # 「表が丸ごと入らないなら見出しごと次ページへ」という動きをさせない。
@@ -355,8 +361,9 @@ def build_tejun():
         ['日本語が化ける', 'コマンドプロンプトで先に <font face="Courier">chcp 65001</font> を実行する'],
         ['PHPのソースがそのまま表示される', 'httpd.conf の <font face="Courier">LoadModule php_module</font> が入っていない。'
                                             '<b><font color="#c0392b">その状態で置くとDBのパスワードが漏れる</font></b>'],
-        ['ログインできない', '手順5をやり直す。<font face="Courier">--list</font> で登録を確認する'],
-        ['やり直したい', '手順2からもう一度。<font face="Courier">DROP DATABASE nissi;</font> で消しても他アプリに影響はない'],
+        ['ログインできない<br/>やり直したい',
+         '手順5をやり直す（<font face="Courier">--list</font> で登録を確認）。'
+         '最初からやるなら <font face="Courier">DROP DATABASE nissi;</font> — 他アプリに影響はない'],
     ], [W * 0.26, W * 0.74], st, header=False))
 
     doc.build(s)

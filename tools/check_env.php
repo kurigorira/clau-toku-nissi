@@ -155,6 +155,48 @@ if (!is_file($confPath)) {
     }
 }
 
+// ---- バックアップ ----
+// 「取れているつもりで止まっている」のがバックアップで最も多い壊れ方なので、
+// 最後に取れた日付をここで見えるようにする。
+echo $nl . "バックアップ" . $nl;
+$bk = isset($conf) && isset($conf['backup']) ? $conf['backup'] : array();
+$bkDir = isset($bk['dir']) ? $bk['dir'] : '';
+if ($bkDir === '') {
+    line('注意', 'バックアップ設定', '未設定 … config/config.php に backup.dir を書き、'
+        . 'tools/backup.bat をタスクスケジューラに登録してください');
+} elseif (!is_dir($bkDir)) {
+    line('NG', 'バックアップ', '保存先がありません: ' . $bkDir);
+} else {
+    $files = glob(rtrim($bkDir, '/\\') . '/nissi_*.sql');
+    if (!$files) {
+        line('NG', 'バックアップ', '1つもありません（' . $bkDir . '）… 一度 '
+            . 'php db/tools/backup.php を実行してください');
+    } else {
+        sort($files);
+        $newest = $files[count($files) - 1];
+        $age    = floor((time() - filemtime($newest)) / 86400);
+        $detail = basename($newest) . '（' . date('Y-m-d H:i', filemtime($newest)) . '・'
+                . count($files) . '世代）';
+        if ($age >= 2) {
+            line('NG', 'バックアップ', $detail . ' … ' . $age . '日前で止まっています');
+        } else {
+            line('OK', 'バックアップ', $detail);
+        }
+        // 末尾の目印が無いファイルは、途中で落ちた不完全なもの
+        $tail = '';
+        $fp = fopen($newest, 'rb');
+        if ($fp) {
+            fseek($fp, max(0, filesize($newest) - 200));
+            $tail = fread($fp, 200);
+            fclose($fp);
+        }
+        line(strpos($tail, 'ここまでで終わり') !== false ? 'OK' : 'NG', '最新ファイルの完全性',
+             strpos($tail, 'ここまでで終わり') !== false
+                ? '最後まで書けています'
+                : '途中で切れています。復旧に使えません');
+    }
+}
+
 // ---- ファイル配置 ----
 echo $nl . "ファイル配置" . $nl;
 $root = dirname(dirname(__FILE__));
