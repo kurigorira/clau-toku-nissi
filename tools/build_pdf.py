@@ -242,7 +242,7 @@ def build_tejun():
     st = styles(8.6, 1.42)
     path = os.path.join(OUT_DIR, '導入手順書.pdf')
     doc = Doc(path, footer='%s  %s 導入手順書' % (HOSPITAL, SYSTEM),
-              margins=(13, 11, 13, 12), show_page=False)
+              margins=(12, 9, 13, 12), show_page=False)
     W = doc.width
     s = []
 
@@ -277,7 +277,7 @@ def build_tejun():
     def step(no, title, body):
         blk = [P('<b><font color="#1f4e79">%s</font></b>　<b>%s</b>' % (no, title), st['body'])]
         blk += body
-        blk.append(Spacer(1, 3.5))
+        blk.append(Spacer(1, 2.2))
         return KeepTogether(blk)
 
     s.append(step('0.', 'コマンドプロンプトを「管理者として実行」し、作業フォルダへ移動する', [
@@ -338,11 +338,20 @@ def build_tejun():
     ]))
 
     s.append(Spacer(1, 2))
-    s.append(P('<b>困ったとき</b>', st['h2']))
+    # この見出しだけ keepWithNext を外す。1枚に収める文書なので、
+    # 「表が丸ごと入らないなら見出しごと次ページへ」という動きをさせない。
+    s.append(P('<b>困ったとき</b>',
+               ParagraphStyle('h2-split', parent=st['h2'], keepWithNext=0)))
     s.append(table([
+        # 注意: Courier を指定した span の中に日本語を入れないこと。
+        #       Courier には日本語の字が無く、黒い四角（豆腐）になる。
+        ['<b>DBに接続できません</b>',
+         '<font face="Courier">php tools\\check_env.php</font> の <font face="Courier">[NG]</font> の行で切り分ける'
+         '（<font face="Courier">Access denied</font>=ユーザ、'
+         '<font face="Courier">Unknown database</font>=DB、'
+         '<font face="Courier">[2002]</font>=<font face="Courier">host=127.0.0.1</font> に）'],
         ['php が見つからない', '<font face="Courier">C:\\php\\php</font> とフルパスで打つ'],
-        ['mysql が見つからない', 'MySQLのインストール先の <font face="Courier">bin</font> をフルパスで打つ'
-                                '（例 <font face="Courier">"C:\\Program Files\\MariaDB\\bin\\mysql"</font>）'],
+        ['mysql が見つからない', 'インストール先の <font face="Courier">bin</font> をフルパスで打つ'],
         ['日本語が化ける', 'コマンドプロンプトで先に <font face="Courier">chcp 65001</font> を実行する'],
         ['PHPのソースがそのまま表示される', 'httpd.conf の <font face="Courier">LoadModule php_module</font> が入っていない。'
                                             '<b><font color="#c0392b">その状態で置くとDBのパスワードが漏れる</font></b>'],

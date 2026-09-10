@@ -304,6 +304,44 @@ php db/tools/migrate_from_legacy.php --dsn="..." --user=... --pass=...
 文字コードは既定が `sjis`。移行後、天候・術名・会議名・行事・人事が正しく表示されるか
 必ず目視で確認する（下見の最後にサンプルが表示される）。
 
+## 困ったとき
+
+### 「データベースに接続できません。管理者に連絡してください。」と出る
+
+まずコマンドプロンプトで環境チェックを走らせる。**失敗の理由がそのまま表示される。**
+
+```
+cd /d C:\Apache24\htdocs\nissi
+C:\php\php tools\check_env.php
+```
+
+`[NG] DB接続  失敗: ...` の行に出たメッセージで切り分ける。
+
+| 出るメッセージ | 意味 | 対処 |
+|---|---|---|
+| `Access denied for user 'nissi'@'localhost'` | ユーザが無い／パスワード不一致 | ユーザ作成をやり直す。`config\config.php` の `pass` がひな形のまま**空**になっていないか確認 |
+| `Unknown database 'nissi'` | データベースが無い | `CREATE DATABASE nissi DEFAULT CHARACTER SET utf8mb4;` を実行 |
+| `Can't connect to MySQL server ... (10061)` | MySQLが起動していない／ポートが違う | サービスを確認。別ポートなら dsn に `;port=3307` を足す |
+| `[2002]` で `host=localhost` のとき | **Windows特有**。`localhost` が名前付きパイプに解決されて失敗する | dsn を `host=127.0.0.1` に変える |
+| `could not find driver` | `pdo_mysql` が無効 | `php.ini` の `extension=pdo_mysql` を有効にして Apache 再起動 |
+
+画面には理由を出さない設計にしてある（接続先やパスワードを利用者に見せないため）。
+**理由は必ずサーバのエラーログに出る。** Windows / Apache24 なら `C:\Apache24\logs\error.log`。
+
+切り分け中だけ `config/config.php` の `'debug' => true` にすると、画面にも理由が出る。
+その場合も dsn とパスワードは出さない。**確認が終わったら必ず `false` に戻す。**
+
+### 画面のヘッダやタブが詰まって表示される
+
+`public/assets/style.css` に `gap`（flexboxの間隔指定）を使うと起きる。
+院内端末のChromeには `gap` 非対応の世代（Chrome 84 / 2020年より前）があり、
+そのブラウザでは `gap` が丸ごと無視されて項目が詰まる。**間隔は `margin` で取ること。**
+
+### ログイン画面は出るがログインできない
+
+職員マスタが空の可能性がある。`php db\tools\add_user.php --list` で登録を確認し、
+空なら管理者を登録する（READMEのセットアップ手順4）。
+
 ## バックアップと復旧
 
 ```bash

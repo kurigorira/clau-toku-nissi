@@ -9,6 +9,7 @@ main { padding: 0; }
 h1 { font-size: 15px; margin: 0 0 6px; }
 .nissi { font-size: 9px; width: 100%; }
 .nissi th, .nissi td { padding: 1px 3px; }
-.nissi-grid { gap: 4px; }
+/* 印刷では間隔を詰める。gap は使わない（style.css 冒頭の注意を参照） */
+.nissi-grid > * { margin: 0 4px 4px 0; }
 table { page-break-inside: avoid; }
 a { color: #000; text-decoration: none; }

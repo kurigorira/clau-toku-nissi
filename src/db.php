@@ -38,10 +38,18 @@ function db(): PDO
             PDO::ATTR_EMULATE_PREPARES   => false,
         ]);
     } catch (PDOException $e) {
-        // 例外を握りつぶさない。ただし接続文字列やパスワードは画面に出さない
+        // 例外を握りつぶさない。ただし接続文字列やパスワードは画面に出さない。
+        // 原因は必ずサーバのエラーログに出す（Windows/Apache24 なら C:\Apache24\logs\error.log）。
         error_log('DB接続に失敗: ' . $e->getMessage());
         http_response_code(500);
-        exit('データベースに接続できません。管理者に連絡してください。');
+        $msg = 'データベースに接続できません。管理者に連絡してください。';
+        // 切り分け中だけ config.php の debug を true にすると、理由が画面に出る。
+        // 出すのは例外のメッセージだけ。dsn（ホスト名・DB名）とパスワードは debug でも出さない。
+        if (cfg('debug')) {
+            $msg .= '<pre>' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8')
+                  . "\n\n原因の切り分けは  php tools/check_env.php  でもできます。</pre>";
+        }
+        exit($msg);
     }
     // SQLite（開発用）でも外部キーと日付比較が期待どおり動くようにする
     if (strpos($d['dsn'], 'sqlite:') === 0) {

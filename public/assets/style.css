@@ -1,5 +1,10 @@
 /* 病院日誌・医事統計 共通スタイル
-   電子カルテ端末のブラウザで見る前提。装飾より一覧性を優先する。 */
+   電子カルテ端末のブラウザで見る前提。装飾より一覧性を優先する。
+
+   【flexbox の gap は使わないこと】
+   院内端末のChromeは gap（Chrome 84 / 2020年〜）に対応していない世代があり、
+   対応していないブラウザでは gap が丸ごと無視されて、項目が詰まって表示される。
+   マージンに落ちてくれないので、間隔は必ず margin で取る。 */
 
 * { box-sizing: border-box; }
 body {
@@ -10,12 +15,14 @@ body {
 a { color: #06c; }
 
 .app-header {
-  display: flex; align-items: center; gap: 24px;
+  display: flex; align-items: center;
   padding: 8px 16px; background: #2c5578; color: #fff;
 }
+.app-title { margin-right: 24px; }
 .app-title a { color: #fff; font-weight: bold; text-decoration: none; font-size: 16px; }
-.app-nav { display: flex; gap: 16px; }
-.app-nav a { color: #dce8f4; text-decoration: none; }
+.app-nav { display: flex; flex-wrap: wrap; }
+.app-nav a { color: #dce8f4; text-decoration: none; margin-right: 16px; }
+.app-nav a:last-child { margin-right: 0; }
 .app-nav a:hover { color: #fff; text-decoration: underline; }
 .app-user { margin-left: auto; font-size: 13px; }
 
@@ -81,7 +88,9 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .st-off       { background: #e3e5e8; }
 
 .badge { display: inline-block; padding: 1px 8px; border-radius: 3px; font-size: 12px; }
-.legend { margin-top: 12px; display: flex; gap: 10px; align-items: center; }
+.legend { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; }
+.legend > * { margin-right: 10px; }
+.legend > :last-child { margin-right: 0; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---- 帳票（総括・統計表） ---- */
@@ -102,14 +111,16 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nissi .sec { background: #dfe6ee; text-align: center; font-weight: bold; }
 .nissi td.n { text-align: right; font-variant-numeric: tabular-nums; }
 .nissi .memo { min-width: 200px; vertical-align: top; white-space: pre-wrap; }
-.nissi-grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+.nissi-grid { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.nissi-grid > * { margin: 0 10px 10px 0; }
 .updaters { margin-top: 14px; font-size: 12px; }
 .updaters td, .updaters th { border: 1px solid #ccc; padding: 2px 8px; }
 
 /* ---- タブ ---- */
-.tabs { display: flex; gap: 4px; margin: 10px 0; flex-wrap: wrap; }
+.tabs { display: flex; margin: 10px 0; flex-wrap: wrap; }
 .tabs a { padding: 5px 14px; background: #e6eaee; border: 1px solid #c7ccd2; border-bottom: none;
-          border-radius: 4px 4px 0 0; text-decoration: none; color: #345; }
+          border-radius: 4px 4px 0 0; text-decoration: none; color: #345;
+          margin: 0 4px 4px 0; }
 .tabs a.active { background: #fff; font-weight: bold; color: #2c5578; }
 .report.daily { font-size: 12px; }
 .report.daily th, .report.daily td { padding: 1px 5px; }
