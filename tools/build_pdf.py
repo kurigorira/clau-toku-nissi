@@ -307,9 +307,9 @@ def build_tejun():
     ]))
 
     s.append(step('3.', 'テーブルとマスタを流し込む', [
-        codebox(['mysql -u nissi -p nissi < db\\schema.sql',
-                 'php db\\tools\\build_seed.php                 ← 19部署 / 278項目 / 設定10件 を生成',
-                 'mysql -u nissi -p nissi < db\\seed_master.sql'], st),
+        codebox(['mysql -u root -p nissi < db\\schema.sql        ← CREATE TABLE なので root で流す',
+                 'php db\\tools\\build_seed.php                  ← 19部署 / 278項目 / 設定10件 を生成',
+                 'mysql -u nissi -p nissi < db\\seed_master.sql  ← INSERT だけなので nissi で流せる'], st),
     ]))
 
     s.append(step('4.', '接続設定を作る（このファイルはリポジトリに入れない）', [

@@ -18,6 +18,40 @@ if (!$isCli) { echo "<pre style='font-family:monospace'>"; }
 $ng = 0;
 $warn = 0;
 
+/**
+ * httpd.conf を探し、public/ を指す Alias が書かれているかを調べる。
+ *   true  … Alias が見つかった（公開フォルダの中に置いていても塞がっている）
+ *   null  … httpd.conf を読めず、判断できない
+ */
+function find_public_alias() {
+    $candidates = array(
+        'C:/Apache24/conf/httpd.conf',
+        'C:/Program Files/Apache24/conf/httpd.conf',
+        '/etc/apache2/apache2.conf',
+        '/etc/httpd/conf/httpd.conf',
+    );
+    foreach ($candidates as $conf) {
+        if (!is_readable($conf)) {
+            continue;
+        }
+        $text = file_get_contents($conf);
+        if ($text === false) {
+            continue;
+        }
+        // 「Alias /なにか  "…/public"」の行があるか。コメント行は除く
+        foreach (explode("\n", $text) as $l) {
+            $l = trim($l);
+            if ($l === '' || $l[0] === '#') {
+                continue;
+            }
+            if (stripos($l, 'Alias') === 0 && preg_match('#public/?["\']?\s*$#i', $l)) {
+                return true;
+            }
+        }
+    }
+    return null;
+}
+
 function line($status, $label, $detail) {
     global $nl, $ng, $warn;
     if ($status === 'NG')   { $ng++; }
@@ -147,12 +181,21 @@ if (!$isCli && $docroot !== '') {
     }
 }
 if ($inDocRoot) {
-    line('NG', 'アプリの置き場所',
-        '公開フォルダの中にあります（' . $path . '）');
-    echo '         config/config.php・db/*.sql・db/*.sqlite がブラウザから'
-       . '直接読める状態です。' . $nl;
-    echo '         公開フォルダの外へ移し、Apacheの Alias で public/ だけを'
-       . '公開してください（READMEの「Apacheの設定」参照）。' . $nl;
+    // 公開フォルダの中にあっても、Alias で public/ だけを公開していれば塞がっている。
+    // httpd.conf を読めるなら実際に確認し、読めない場合だけ判断を保留する。
+    $alias = find_public_alias();
+    if ($alias === true) {
+        line('OK', 'アプリの置き場所',
+            '公開フォルダの中だが Alias で public/ だけを公開している（' . $path . '）');
+    } else {
+        line('注意', 'アプリの置き場所',
+            '公開フォルダの中にあります（' . $path . '）');
+        echo '         Alias で public/ だけを公開していないと、config/config.php・'
+           . 'db/*.sql・db/*.sqlite が' . $nl;
+        echo '         ブラウザから直接読めてしまいます（READMEの「Apacheの設定」参照）。' . $nl;
+        echo '         設定済みかどうかは、ブラウザで /nissi/db/schema.sql を開いて' . $nl;
+        echo '         403 か 404 になれば対処済みです。中身が見えたら未対処です。' . $nl;
+    }
 } else {
     line('OK', 'アプリの置き場所', '公開フォルダの外（' . $path . '）');
 }

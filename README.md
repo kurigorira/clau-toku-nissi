@@ -91,23 +91,27 @@ mysql -u root -p -e "CREATE DATABASE nissi DEFAULT CHARACTER SET utf8mb4;"
 mysql -u root -p -e "CREATE USER 'nissi'@'localhost' IDENTIFIED BY '＜パスワード＞';
                      GRANT SELECT,INSERT,UPDATE,DELETE ON nissi.* TO 'nissi'@'localhost';"
 
-# 2. スキーマとマスタを流し込む
-mysql -u nissi -p nissi < db/schema.sql
+# 2. テーブルを作る
+#    ここは CREATE / DROP TABLE なので root（DDLを実行できるユーザ）で流す。
+#    nissi ユーザには SELECT/INSERT/UPDATE/DELETE しか与えていないため権限不足になる。
+mysql -u root -p nissi < db/schema.sql
+
+# 3. マスタを流し込む（DELETE と INSERT だけなので nissi ユーザで流せる）
 php db/tools/build_seed.php
 mysql -u nissi -p nissi < db/seed_master.sql
 
-# 3. 設定ファイルを作る（config.php はリポジトリに入れない）
+# 4. 設定ファイルを作る（config.php はリポジトリに入れない）
 cp config/config.sample.php config/config.php
 vi config/config.php
 
-# 4. 最初の管理者を登録する（この時点では職員マスタが空で、誰もログインできない）
+# 5. 最初の管理者を登録する（この時点では職員マスタが空で、誰もログインできない）
 php db/tools/add_user.php --id=＜職員ID＞ --name=＜氏名＞ --dept=jimu --role=admin --password=＜8文字以上＞
 
-# 5. 残りの職員を登録する（CSVで一括登録できる）
+# 6. 残りの職員を登録する（CSVで一括登録できる）
 php db/tools/add_user.php --csv=staff.csv     # user_id,user_name,dept_id,role,password
 php db/tools/add_user.php --list              # 部署IDと登録済み職員の確認
 
-# 6. 設定を確認する
+# 7. 設定を確認する
 php tools/check_env.php
 ```
 
@@ -117,7 +121,7 @@ php tools/check_env.php
 
 ### Windows のコマンドプロンプトで実行する場合
 
-**手順2〜8はすべて、プロジェクトのルートフォルダ**（`README.md` と `db` `src` `public`
+**手順1〜7はすべて、プロジェクトのルートフォルダ**（`README.md` と `db` `src` `public`
 が並んでいるフォルダ）で実行する。まずそこへ移動する。
 
 ```
@@ -155,7 +159,7 @@ MySQL は他アプリ（レセプト統計・空きベット情報）が使っ�
 
 ```
 C:\php\php db\tools\build_seed.php
-"C:\Program Files\MariaDB\bin\mysql" -u nissi -p nissi < db\schema.sql
+"C:\Program Files\MySQL\MySQL Server 9.0\bin\mysql" -u root -p nissi < db\schema.sql
 ```
 
 XAMPP を使っている環境なら `C:\xampp\php\php.exe` と `C:\xampp\mysql\bin\mysql.exe`。
