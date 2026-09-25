@@ -2,13 +2,13 @@ item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_ty
 gairai_am,午前 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_am,gk_geka_am,gk_seikei_am,gk_noge_am,gk_shinryo_am,gk_keisei_am,gk_jinzo_am,gk_kenshin_am,gk_shoka_am,gk_kokyu_am,gk_shoni_am,gk_hinyo_am,gk_hifu_am,gk_ikou_am",int,名,10,0,,,,,電子カルテ日報の医科合計 午前（科別の合計）,sum
 gairai_pm,午後 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_pm,gk_geka_pm,gk_seikei_pm,gk_noge_pm,gk_shinryo_pm,gk_keisei_pm,gk_jinzo_pm,gk_kenshin_pm,gk_shoka_pm,gk_kokyu_pm,gk_shoni_pm,gk_hinyo_pm,gk_hifu_pm,gk_ikou_pm",int,名,20,0,,,,,電子カルテ日報の医科合計 午後（科別の合計）,sum
 gairai_night,夜間 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_night,gk_geka_night,gk_seikei_night,gk_noge_night,gk_shinryo_night,gk_keisei_night,gk_jinzo_night,gk_kenshin_night,gk_shoka_night,gk_kokyu_night,gk_shoni_night,gk_hinyo_night,gk_hifu_night,gk_ikou_night",int,名,30,0,,,,,電子カルテ日報の医科合計 夜間（科別の合計）,sum
-gairai_ex1,時間外１（20〜24） 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_s2024,gk_geka_s2024,gk_seikei_s2024,gk_noge_s2024,gk_shinryo_s2024,gk_keisei_s2024,gk_jinzo_s2024,gk_kenshin_s2024,gk_shoka_s2024,gk_kokyu_s2024,gk_shoni_s2024,gk_hinyo_s2024,gk_hifu_s2024,gk_ikou_s2024",int,名,40,0,,,,,電子カルテ日報の医科合計 20〜24（科別の合計）,sum
-gairai_ex2,時間外２（00〜08） 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_s0008,gk_geka_s0008,gk_seikei_s0008,gk_noge_s0008,gk_shinryo_s0008,gk_keisei_s0008,gk_jinzo_s0008,gk_kenshin_s0008,gk_shoka_s0008,gk_kokyu_s0008,gk_shoni_s0008,gk_hinyo_s0008,gk_hifu_s0008,gk_ikou_s0008",int,名,50,0,,,,,電子カルテ日報の医科合計 00〜08（科別の合計）,sum
+gairai_ex1,時間外１（00〜08） 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_s0008,gk_geka_s0008,gk_seikei_s0008,gk_noge_s0008,gk_shinryo_s0008,gk_keisei_s0008,gk_jinzo_s0008,gk_kenshin_s0008,gk_shoka_s0008,gk_kokyu_s0008,gk_shoni_s0008,gk_hinyo_s0008,gk_hifu_s0008,gk_ikou_s0008",int,名,40,0,,,,,電子カルテ日報の医科合計 00〜08（電子カルテの呼び方に合わせた）,sum
+gairai_ex2,時間外２（20〜24） 患者数,gairai,gairai_cnt,外来患者数,sum,"gk_naika_s2024,gk_geka_s2024,gk_seikei_s2024,gk_noge_s2024,gk_shinryo_s2024,gk_keisei_s2024,gk_jinzo_s2024,gk_kenshin_s2024,gk_shoka_s2024,gk_kokyu_s2024,gk_shoni_s2024,gk_hinyo_s2024,gk_hifu_s2024,gk_ikou_s2024",int,名,50,0,,,,,電子カルテ日報の医科合計 20〜24（電子カルテの呼び方に合わせた）,sum
 gairai_am_new,午前 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_am,gkn_geka_am,gkn_seikei_am,gkn_noge_am,gkn_shinryo_am,gkn_keisei_am,gkn_jinzo_am,gkn_kenshin_am,gkn_shoka_am,gkn_kokyu_am,gkn_shoni_am,gkn_hinyo_am,gkn_hifu_am,gkn_ikou_am",int,名,60,0,,,,,電子カルテ日報の新来 医科合計 午前,sum
 gairai_pm_new,午後 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_pm,gkn_geka_pm,gkn_seikei_pm,gkn_noge_pm,gkn_shinryo_pm,gkn_keisei_pm,gkn_jinzo_pm,gkn_kenshin_pm,gkn_shoka_pm,gkn_kokyu_pm,gkn_shoni_pm,gkn_hinyo_pm,gkn_hifu_pm,gkn_ikou_pm",int,名,70,0,,,,,電子カルテ日報の新来 医科合計 午後,sum
 gairai_night_new,夜間 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_night,gkn_geka_night,gkn_seikei_night,gkn_noge_night,gkn_shinryo_night,gkn_keisei_night,gkn_jinzo_night,gkn_kenshin_night,gkn_shoka_night,gkn_kokyu_night,gkn_shoni_night,gkn_hinyo_night,gkn_hifu_night,gkn_ikou_night",int,名,80,0,,,,,電子カルテ日報の新来 医科合計 夜間,sum
-gairai_ex1_new,時間外１（20〜24） 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_s2024,gkn_geka_s2024,gkn_seikei_s2024,gkn_noge_s2024,gkn_shinryo_s2024,gkn_keisei_s2024,gkn_jinzo_s2024,gkn_kenshin_s2024,gkn_shoka_s2024,gkn_kokyu_s2024,gkn_shoni_s2024,gkn_hinyo_s2024,gkn_hifu_s2024,gkn_ikou_s2024",int,名,90,0,,,,,電子カルテ日報の新来 医科合計 20〜24,sum
-gairai_ex2_new,時間外２（00〜08） 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_s0008,gkn_geka_s0008,gkn_seikei_s0008,gkn_noge_s0008,gkn_shinryo_s0008,gkn_keisei_s0008,gkn_jinzo_s0008,gkn_kenshin_s0008,gkn_shoka_s0008,gkn_kokyu_s0008,gkn_shoni_s0008,gkn_hinyo_s0008,gkn_hifu_s0008,gkn_ikou_s0008",int,名,100,0,,,,,電子カルテ日報の新来 医科合計 00〜08,sum
+gairai_ex1_new,時間外１（00〜08） 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_s0008,gkn_geka_s0008,gkn_seikei_s0008,gkn_noge_s0008,gkn_shinryo_s0008,gkn_keisei_s0008,gkn_jinzo_s0008,gkn_kenshin_s0008,gkn_shoka_s0008,gkn_kokyu_s0008,gkn_shoni_s0008,gkn_hinyo_s0008,gkn_hifu_s0008,gkn_ikou_s0008",int,名,90,0,,,,,電子カルテ日報の新来 医科合計 00〜08（電子カルテの呼び方に合わせた）,sum
+gairai_ex2_new,時間外２（20〜24） 新患,gairai,gairai_cnt,外来患者数,sum,"gkn_naika_s2024,gkn_geka_s2024,gkn_seikei_s2024,gkn_noge_s2024,gkn_shinryo_s2024,gkn_keisei_s2024,gkn_jinzo_s2024,gkn_kenshin_s2024,gkn_shoka_s2024,gkn_kokyu_s2024,gkn_shoni_s2024,gkn_hinyo_s2024,gkn_hifu_s2024,gkn_ikou_s2024",int,名,100,0,,,,,電子カルテ日報の新来 医科合計 20〜24（電子カルテの呼び方に合わせた）,sum
 gairai_total,外来患者数 計（医科合計）,gairai,gairai_cnt,外来患者数,sum,"gairai_am,gairai_pm,gairai_night,gairai_ex1,gairai_ex2",int,名,110,0,,,,①!Q,日報の医科合計。ドック・健診・訪問診療科を含む。医事統計表①の外来患者数は gairai_ippan,sum
 gairai_new_total,新患 計,gairai,gairai_cnt,外来患者数,sum,"gairai_am_new,gairai_pm_new,gairai_night_new,gairai_ex1_new,gairai_ex2_new",int,名,120,0,,,,①!E,日報の新来合計。医事統計表①の新患数はこの値をそのまま使う,sum
 gairai_ganchemo,外来癌化学療法,gairai,gairai_cnt,外来患者数,input,,int,件,130,0,0,100,k16,①!S,,sum
@@ -342,11 +342,11 @@ gk_hifu_am,来院 皮膚科 午前,gairai,nippo_raiin,日報 来院数（新来�
 gk_hifu_pm,来院 皮膚科 午後,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3630,0,0,500,,,,sum
 gk_hifu_night,来院 皮膚科 夜間,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3640,0,0,500,,,,sum
 gk_hifu_s2024,来院 皮膚科 20〜24,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3650,0,0,500,,,,sum
-gk_ikou_s0008,来院 科別なし（旧日誌から移行） 00〜08,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3660,0,0,2000,g5,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
+gk_ikou_s0008,来院 科別なし（旧日誌から移行） 00〜08,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3660,0,0,2000,g4,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gk_ikou_am,来院 科別なし（旧日誌から移行） 午前,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3670,0,0,2000,g1,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gk_ikou_pm,来院 科別なし（旧日誌から移行） 午後,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3680,0,0,2000,g2,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gk_ikou_night,来院 科別なし（旧日誌から移行） 夜間,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3690,0,0,2000,g3,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
-gk_ikou_s2024,来院 科別なし（旧日誌から移行） 20〜24,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3700,0,0,2000,g4,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
+gk_ikou_s2024,来院 科別なし（旧日誌から移行） 20〜24,gairai,nippo_raiin,日報 来院数（新来・再来）,input,,int,名,3700,0,0,2000,g5,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gkn_naika_s0008,新来 内科（訪問含む） 00〜08,gairai,nippo_shinrai,日報 新来数,input,,int,名,3710,0,0,500,,,,sum
 gkn_naika_am,新来 内科（訪問含む） 午前,gairai,nippo_shinrai,日報 新来数,input,,int,名,3720,0,0,500,,,,sum
 gkn_naika_pm,新来 内科（訪問含む） 午後,gairai,nippo_shinrai,日報 新来数,input,,int,名,3730,0,0,500,,,,sum
@@ -412,11 +412,11 @@ gkn_hifu_am,新来 皮膚科 午前,gairai,nippo_shinrai,日報 新来数,input,
 gkn_hifu_pm,新来 皮膚科 午後,gairai,nippo_shinrai,日報 新来数,input,,int,名,4330,0,0,500,,,,sum
 gkn_hifu_night,新来 皮膚科 夜間,gairai,nippo_shinrai,日報 新来数,input,,int,名,4340,0,0,500,,,,sum
 gkn_hifu_s2024,新来 皮膚科 20〜24,gairai,nippo_shinrai,日報 新来数,input,,int,名,4350,0,0,500,,,,sum
-gkn_ikou_s0008,新来 科別なし（旧日誌から移行） 00〜08,gairai,nippo_shinrai,日報 新来数,input,,int,名,4360,0,0,2000,g5n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
+gkn_ikou_s0008,新来 科別なし（旧日誌から移行） 00〜08,gairai,nippo_shinrai,日報 新来数,input,,int,名,4360,0,0,2000,g4n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gkn_ikou_am,新来 科別なし（旧日誌から移行） 午前,gairai,nippo_shinrai,日報 新来数,input,,int,名,4370,0,0,2000,g1n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gkn_ikou_pm,新来 科別なし（旧日誌から移行） 午後,gairai,nippo_shinrai,日報 新来数,input,,int,名,4380,0,0,2000,g2n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gkn_ikou_night,新来 科別なし（旧日誌から移行） 夜間,gairai,nippo_shinrai,日報 新来数,input,,int,名,4390,0,0,2000,g3n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
-gkn_ikou_s2024,新来 科別なし（旧日誌から移行） 20〜24,gairai,nippo_shinrai,日報 新来数,input,,int,名,4400,0,0,2000,g4n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
+gkn_ikou_s2024,新来 科別なし（旧日誌から移行） 20〜24,gairai,nippo_shinrai,日報 新来数,input,,int,名,4400,0,0,2000,g5n,,旧病院日誌には科別が無いため、移行した値はここに入る。日報の転記画面には出さない,sum
 gr_rehab_s0008,再掲 リハビリ 00〜08,gairai,nippo_saikei,日報 再掲,input,,int,名,4410,0,0,500,,,,sum
 gr_rehab_am,再掲 リハビリ 午前,gairai,nippo_saikei,日報 再掲,input,,int,名,4420,0,0,500,,,,sum
 gr_rehab_pm,再掲 リハビリ 午後,gairai,nippo_saikei,日報 再掲,input,,int,名,4430,0,0,500,,,,sum

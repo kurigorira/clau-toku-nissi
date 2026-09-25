@@ -92,6 +92,11 @@ line(extension_loaded('pdo_sqlite') ? 'OK' : '注意', 'pdo_sqlite',
      extension_loaded('pdo_sqlite')
         ? 'あり（MySQLを立てない場合はSQLiteでも動かせる）'
         : 'なし（MySQL/MariaDBが必要）');
+// 日報のExcel（.xlsx）を読み込むのに使う。無くても手で転記はできる
+line(class_exists('ZipArchive') && extension_loaded('simplexml') ? 'OK' : '注意', 'zip / simplexml',
+     class_exists('ZipArchive') && extension_loaded('simplexml')
+        ? 'あり（日報のExcelを読み込める）'
+        : 'なし … 日報のExcelを読み込めない。php.ini の extension=zip を有効にして Apache を再起動');
 
 // ---- 設定 ----
 echo $nl . "PHPの設定" . $nl;

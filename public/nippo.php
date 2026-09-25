@@ -53,6 +53,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($locked) {
         $messages[] = ['この日付は医事課が確定済みです。訂正が必要な場合は医事課へ連絡してください。', 'error'];
+    } elseif (($_POST['action'] ?? '') === 'load') {
+        // Excelから読み込む。保存はせず、外来の欄と照合欄を埋めて表示し直すだけ。
+        // すでに打ってある入院の欄などはそのまま残す（$raw は送られてきた値のまま）
+        $errors = [];
+        $load   = nippo_load_upload($_FILES['xlsx'] ?? null, $date);
+        if ($load['errors']) {
+            $errors = $load['errors'];
+            $messages[] = ['Excelを読み込めませんでした。欄は何も変えていません。', 'error'];
+        } else {
+            foreach ($load['v'] as $code => $n) {
+                $raw["v:{$code}"] = (string)$n;
+            }
+            foreach ($load['c'] as $name => $n) {
+                $raw["c:{$name}"] = (string)$n;
+            }
+            foreach ($load['notes'] as $m) {
+                $messages[] = [$m, 'ok'];
+            }
+            $messages[] = ['数字を確かめ、入院の欄を入力してから「照合して保存」を押してください。', 'info'];
+        }
     } else {
         if (!$errors) {
             $chk      = nippo_check($vals, $ctl, $date);
@@ -97,6 +117,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     $otherVals = [];
+}
+
+/**
+ * アップロードされた日報のExcelを読む。一時ファイルのまま読み、どこにも保存しない。
+ */
+function nippo_load_upload($f, string $date): array
+{
+    $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => []];
+    if (!is_array($f) || !isset($f['error']) || is_array($f['error']) || $f['error'] === UPLOAD_ERR_NO_FILE) {
+        return $fail('読み込むExcelファイルを選んでください。');
+    }
+    if (in_array($f['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
+        return $fail('ファイルが大きすぎます。日報のExcelか確かめてください。');
+    }
+    if ($f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
+        return $fail('ファイルを受け取れませんでした（コード ' . (int)$f['error'] . '）。もう一度選んでください。');
+    }
+    try {
+        $sheets = xlsx_read($f['tmp_name']);
+    } catch (RuntimeException $e) {
+        return $fail($e->getMessage());
+    }
+    return nippo_from_xlsx($sheets, $date);
 }
 
 $entries = dept_entries($date, 'gairai');
@@ -160,9 +203,20 @@ page_header('電子カルテ日報の転記', $user);
   </p>
 <?php endif; ?>
 
-<form method="post" class="nippo-form">
+<form method="post" class="nippo-form" enctype="multipart/form-data">
   <?= csrf_field() ?>
   <input type="hidden" name="hizuke" value="<?= h($date) ?>">
+
+  <?php if (!$locked): ?>
+  <?php /* 欄でEnterを押したときに押されるのは、フォームの最初のボタン。
+           読み込みボタンより前に「保存」を置き、これまでどおり Enter＝照合して保存 にする */ ?>
+  <button type="submit" name="action" value="save" class="sr" tabindex="-1" aria-hidden="true">照合して保存</button>
+  <p class="nippo-load">
+    <label>日報のExcel（.xlsx） <input type="file" name="xlsx" accept=".xlsx"></label>
+    <button type="submit" name="action" value="load">Excelから読み込む</button>
+    <span class="note">外来の欄と紙の合計の欄に数字が入ります（まだ保存しません）。入院の欄は紙を見て入力してください。</span>
+  </p>
+  <?php endif; ?>
 
   <h2>外来患者数（科別）日報</h2>
   <div class="nippo-pair">

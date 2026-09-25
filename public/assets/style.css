@@ -144,3 +144,5 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nippo .ctlh, .nippo .ctlc { background: #f7f3e6; }      /* 紙の合計を打つ照合用の欄 */
 .nippo .sumrow th { background: #f0e9d2; }
 .nippo small { color: #777; font-size: 10px; }
+.nippo-load { margin: 0 0 12px; padding: 8px 12px; background: #fff; border: 1px dashed #8fb8d8; border-radius: 4px; }
+.nippo-load button { margin: 0 8px; }

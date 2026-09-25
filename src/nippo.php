@@ -10,11 +10,13 @@
  *   - 紙の合計欄との照合
  *   - 複数部署（外来・病棟・当直）の値をまとめて下書きとして保存する処理
  *
- * 電子カルテからCSV等で出せるようになったときは、同じ対応表と照合を使う
- * 取り込みツールを db/tools に足せばよい（画面と同じルールで検査される）。
+ *   - 日報のExcel（.xlsx）から外来の値を読む処理（nippo_from_xlsx）
+ *
+ * Excelから読んだ値も、画面で打った値と同じ照合を通ってから保存される。
  */
 
 require_once __DIR__ . '/repository.php';
+require_once __DIR__ . '/xlsx.php';
 
 /** 時間帯。紙の左から順。 */
 function nippo_slots(): array
@@ -434,4 +436,310 @@ function nippo_save(string $date, array $v, string $userId): array
         throw $e;
     }
     return ['saved' => $saved, 'depts' => $written, 'skipped' => $skipped, 'warnings' => $warn];
+}
+
+/* ======================================================================
+ * 日報のExcel（.xlsx）から読む
+ *
+ * 日報のExcelは、電子カルテの生データのシート（Sheet2）と、それを数式で
+ * 並べ替えた紙の様式のシート（Sheet1）でできている。読むのは紙の様式のほう。
+ * リハビリ・ドック・健診・介護・訪問診療科内訳などは医事課がそのシートに
+ * 手で入れているので、紙と同じ数字がすべてそこにそろっている。
+ *
+ * セル番地は決め打ちせず、見出しの文字（「科名」「午前」「医科合計」など）で
+ * 位置を探す。様式に行が足されても読めるようにするため。
+ * 入院患者数日報はこのExcelに無いので読まない（画面で打つ）。
+ * ====================================================================== */
+
+/** 見出しを比べるために揃える。空白を除き、全角英数を半角に、波ダッシュを1種類にする。 */
+function nippo_norm(string $s): string
+{
+    $s = mb_convert_kana($s, 'as', 'UTF-8');
+    $s = str_replace(['〜', '～', '∼'], '~', $s);
+    return preg_replace('/\s+/u', '', $s);
+}
+
+/**
+ * 日報のExcelを読み、転記画面の欄に入れる値を返す。
+ *
+ * @param array  $sheets xlsx_read() の戻り値
+ * @param string $date   画面で選んでいる日付。ファイルの「9月 3日」と月日が違えば読まない
+ * @return array ['v' => [item_code => int], 'c' => [照合欄 => int], 'errors' => [...], 'notes' => [...]]
+ */
+function nippo_from_xlsx(array $sheets, string $date): array
+{
+    $v = $c = $errors = $notes = [];
+    $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => []];
+
+    // ---- 紙の様式のシートを探す（「科名」と「医科合計」があるシート） ----
+    $grid = null;
+    $sheetName = '';
+    foreach ($sheets as $name => $cells) {
+        $g = xlsx_grid($cells);
+        $has = ['科名' => false, '医科合計' => false];
+        foreach ($g as $row) {
+            foreach ($row as $x) {
+                $n = nippo_norm($x);
+                if (isset($has[$n])) {
+                    $has[$n] = true;
+                }
+            }
+        }
+        if ($has['科名'] && $has['医科合計']) {
+            $grid = $g;
+            $sheetName = (string)$name;
+            break;
+        }
+    }
+    if ($grid === null) {
+        return $fail('日報の様式のシートが見つかりません（「科名」と「医科合計」のあるシートがありません）。日報のExcelか確かめてください。');
+    }
+
+    /** セルの文字（揃えたもの）。 */
+    $txt = fn(int $r, int $col) => isset($grid[$r][$col]) ? nippo_norm($grid[$r][$col]) : '';
+    /** 見出しの位置をすべて探す。$fromRow より下、$col を指定すればその列だけ。 */
+    $find = function (string $label, int $fromRow = 0, ?int $col = null) use ($grid): array {
+        $want = nippo_norm($label);
+        $hits = [];
+        foreach ($grid as $r => $row) {
+            if ($r <= $fromRow) {
+                continue;
+            }
+            foreach ($row as $cc => $x) {
+                if (($col === null || $cc === $col) && nippo_norm($x) === $want) {
+                    $hits[] = [$r, $cc];
+                }
+            }
+        }
+        return $hits;
+    };
+    /** 数値のセルを読む。空は0。0以上の整数でなければエラーに積んで null。 */
+    $num = function (int $r, int $col, string $what) use ($grid, &$errors): ?int {
+        $x = $grid[$r][$col] ?? '';
+        if (trim($x) === '') {
+            return 0;
+        }
+        if (!is_numeric($x) || (float)$x < 0 || floor((float)$x) != (float)$x) {
+            $errors[] = "{$what}：数値として読めません（" . xlsx_colname($col) . "{$r}「{$x}」）";
+            return null;
+        }
+        return (int)$x;
+    };
+
+    // ---- 日付（「＜ 9月 3日時間帯・…」） ----
+    $md = null;
+    foreach ($grid as $row) {
+        foreach ($row as $x) {
+            if (preg_match('/(\d{1,2})月(\d{1,2})日/u', nippo_norm($x), $m)) {
+                $md = [(int)$m[1], (int)$m[2]];
+                break 2;
+            }
+        }
+    }
+    if ($md === null) {
+        return $fail('ファイルの中に日報の日付（「9月 3日」のような表記）が見つかりません。');
+    }
+    [$wantM, $wantD] = [(int)substr($date, 5, 2), (int)substr($date, 8, 2)];
+    if ($md !== [$wantM, $wantD]) {
+        return $fail("このファイルは {$md[0]}月{$md[1]}日 の日報です。画面の日付（{$wantM}月{$wantD}日）と違うので読み込みませんでした。"
+            . '日付を合わせてからもう一度読み込んでください。');
+    }
+
+    // ---- 「科名」の行と、時間帯の列 ----
+    $head = $find('科名');
+    [$hr, $labelCol] = $head[0];
+    $slotOf = ['00~08' => 's0008', '午前' => 'am', '午後' => 'pm', '夜間' => 'night', '20~24' => 's2024', '合計' => 'total'];
+    $groups = [];
+    $cur    = [];
+    foreach ($grid[$hr] as $col => $x) {
+        $k = $slotOf[nippo_norm($x)] ?? null;
+        if ($k === null) {
+            continue;
+        }
+        if (isset($cur[$k])) {          // 同じ見出しがもう一度出たら、新来の表が始まった
+            $groups[] = $cur;
+            $cur = [];
+        }
+        $cur[$k] = $col;
+    }
+    if ($cur) {
+        $groups[] = $cur;
+    }
+    foreach (['来院数' => 0, '新来数' => 1] as $label => $i) {
+        foreach (nippo_slots() as $s => $sname) {
+            if (!isset($groups[$i][$s])) {
+                return $fail("{$label}の表に「{$sname}」の列が見つかりません。日報の様式が変わっていないか確かめてください。");
+            }
+        }
+    }
+    [$rc, $sc] = $groups;   // 来院・新来の列
+
+    // ---- 医科合計の行 ----
+    $sumHits = $find('医科合計', $hr, $labelCol);
+    if (!$sumHits) {
+        return $fail('「医科合計」の行が見つかりません。');
+    }
+    $sumRow = $sumHits[0][0];
+
+    // ---- 科ごとの行 ----
+    $kaByLabel = [];
+    foreach (nippo_ka() as $ka => $kname) {
+        $kaByLabel[nippo_norm($kname)] = $ka;
+    }
+    $kaByLabel[nippo_norm('内科')] = 'naika';
+    $seen = [];
+    for ($r = $hr + 1; $r < $sumRow; $r++) {
+        $label = $txt($r, $labelCol);
+        $ka    = $kaByLabel[$label] ?? null;
+        if ($ka === null) {
+            // 表に無い科（空行も含む）。値が入っていたら黙って捨てずに止める
+            foreach ([$rc, $sc] as $cols) {
+                foreach (nippo_slots() as $s => $_) {
+                    $x = $grid[$r][$cols[$s]] ?? '';
+                    if (is_numeric($x) && (float)$x != 0.0) {
+                        $errors[] = '「' . ($grid[$r][$labelCol] ?? '（科名なし）') . "」の行（{$r}行目）に人数が入っていますが、"
+                            . 'この科は取り込み先がありません。医事課・管理者に相談してください。';
+                        continue 3;
+                    }
+                }
+            }
+            continue;
+        }
+        $seen[$ka] = true;
+        $kname = nippo_ka()[$ka];
+        foreach ([['gk', $rc, 'raiin', '来院'], ['gkn', $sc, 'shinrai', '新来']] as [$pre, $cols, $t, $tl]) {
+            foreach (nippo_slots() as $s => $sname) {
+                $n = $num($r, $cols[$s], "{$tl} {$kname} {$sname}");
+                if ($n !== null) {
+                    $v["{$pre}_{$ka}_{$s}"] = $n;
+                }
+            }
+            if (isset($cols['total'])) {
+                $n = $num($r, $cols['total'], "{$tl} {$kname} 合計");
+                if ($n !== null) {
+                    $c["{$t}_row_{$ka}"] = $n;
+                }
+            }
+        }
+    }
+    foreach (nippo_ka() as $ka => $kname) {
+        if (!isset($seen[$ka])) {
+            $errors[] = "「{$kname}」の行が見つかりません。";
+        }
+    }
+
+    // 医科合計 → 照合欄
+    foreach ([['raiin', $rc, '来院'], ['shinrai', $sc, '新来']] as [$t, $cols, $tl]) {
+        foreach (nippo_slots() as $s => $sname) {
+            $n = $num($sumRow, $cols[$s], "{$tl} 医科合計 {$sname}");
+            if ($n !== null) {
+                $c["{$t}_{$s}"] = $n;
+            }
+        }
+        if (isset($cols['total'])) {
+            $n = $num($sumRow, $cols['total'], "{$tl} 医科合計 合計");
+            if ($n !== null) {
+                $c["{$t}_all"] = $n;
+            }
+        }
+    }
+
+    // ---- 再掲（医科合計より下の、科名の列にある見出し） ----
+    foreach (nippo_saikei() as $k => $kname) {
+        $hit = $find($kname, $sumRow, $labelCol);
+        if (!$hit) {
+            $errors[] = "再掲の「{$kname}」の行が見つかりません。";
+            continue;
+        }
+        foreach (nippo_slots() as $s => $sname) {
+            $n = $num($hit[0][0], $rc[$s], "再掲 {$kname} {$sname}");
+            if ($n !== null) {
+                $v["gr_{$k}_{$s}"] = $n;
+            }
+        }
+    }
+
+    // ---- 健診科新患内訳（「※健診科新患内訳」の列の「ドック」「健診」の1つ下） ----
+    $uchiCol = null;
+    foreach ($grid as $r => $row) {
+        foreach ($row as $col => $x) {
+            if (mb_strpos(nippo_norm($x), '健診科新患内訳') !== false) {
+                [$uchiRow, $uchiCol] = [$r, $col];
+                break 2;
+            }
+        }
+    }
+    if ($uchiCol === null) {
+        $errors[] = '「健診科新患内訳」が見つかりません。';
+    } else {
+        foreach (['ドック' => 'gkn_uchi_dock', '健診' => 'gkn_uchi_kenshin'] as $label => $code) {
+            $hit = $find($label, $uchiRow, $uchiCol);
+            if (!$hit) {
+                $errors[] = "健診科新患内訳の「{$label}」が見つかりません。";
+                continue;
+            }
+            $n = $num($hit[0][0] + 1, $uchiCol, "健診科新患内訳 {$label}");
+            if ($n !== null) {
+                $v[$code] = $n;
+            }
+        }
+    }
+
+    // ---- 介護（見出しの1つ下）、介護合計 ----
+    foreach (nippo_kaigo() + ['c:kaigo_total' => '介護合計'] as $code => $label) {
+        $hit = $find($label, $sumRow);
+        if (!$hit) {
+            $errors[] = "介護の「{$label}」が見つかりません。";
+            continue;
+        }
+        $n = $num($hit[0][0] + 1, $hit[0][1], $label);
+        if ($n === null) {
+            continue;
+        }
+        if (strpos($code, 'c:') === 0) {
+            $c[substr($code, 2)] = $n;
+        } else {
+            $v[$code] = $n;
+        }
+    }
+
+    // ---- 医療介護合計（同じ行の右にある数値） ----
+    $hit = $find('医療介護合計', $sumRow);
+    if (!$hit) {
+        $errors[] = '「医療介護合計」が見つかりません。';
+    } else {
+        [$r, $col] = $hit[0];
+        foreach ($grid[$r] as $cc => $x) {
+            if ($cc > $col && is_numeric($x)) {
+                $n = $num($r, $cc, '医療介護合計');
+                if ($n !== null) {
+                    $c['iryou_kaigo_total'] = $n;
+                }
+                break;
+            }
+        }
+        if (!isset($c['iryou_kaigo_total'])) {
+            $errors[] = '「医療介護合計」の数値が見つかりません。';
+        }
+    }
+
+    // ---- 訪問診療科内訳（見出しの右隣） ----
+    foreach (nippo_houshin_uchi() as $code => $label) {
+        $hit = $find($label, $sumRow);
+        if (!$hit) {
+            $errors[] = "訪問診療科内訳の「{$label}」が見つかりません。";
+            continue;
+        }
+        $n = $num($hit[0][0], $hit[0][1] + 1, "訪問診療科内訳 {$label}");
+        if ($n !== null) {
+            $v[$code] = $n;
+        }
+    }
+
+    if ($errors) {
+        return ['v' => [], 'c' => [], 'errors' => $errors, 'notes' => []];
+    }
+    $notes[] = "「{$sheetName}」シートから外来の " . count($v) . ' 欄を読み込みました（まだ保存していません）。';
+    $notes[] = '入院患者数日報はこのExcelに無いので、入院の欄は紙を見て入力してください。';
+    return ['v' => $v, 'c' => $c, 'errors' => [], 'notes' => $notes];
 }
