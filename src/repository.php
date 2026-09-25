@@ -37,72 +37,10 @@ function dept_entries(string $date, string $deptId): array
  */
 function save_dept_entries(string $date, string $deptId, array $values, string $userId): array
 {
-    $items   = input_items_of_dept($deptId, $date);
-    $now     = date('Y-m-d H:i:s');
-    $ip      = client_ip();
-    $saved   = 0;
-    $warn    = [];
-
     $pdo = db();
     $pdo->beginTransaction();
     try {
-        foreach ($items as $code => $it) {
-            if (!array_key_exists($code, $values)) {
-                continue;
-            }
-            $raw = trim((string)$values[$code]);
-            $isText = in_array($it['value_type'], ['text', 'multiline'], true);
-
-            if ($isText) {
-                $num  = null;
-                $text = $raw === '' ? null : $raw;
-                $new  = $text;
-            } else {
-                if ($raw !== '' && !is_numeric($raw)) {
-                    $warn[] = "{$it['item_name']}：数値で入力してください（「{$raw}」）";
-                    continue;
-                }
-                $num  = $raw === '' ? null : (float)$raw;
-                $text = null;
-                $new  = $num === null ? null : (string)$num;
-                // 桁の打ち間違いを拾う。止めはせず警告に留める
-                if ($num !== null && $it['min_value'] !== null && $num < (float)$it['min_value']) {
-                    $warn[] = "{$it['item_name']}：{$it['min_value']} 未満の値です（{$raw}）。確認してください";
-                }
-                if ($num !== null && $it['max_value'] !== null && $num > (float)$it['max_value']) {
-                    $warn[] = "{$it['item_name']}：{$it['max_value']} を超えています（{$raw}）。確認してください";
-                }
-            }
-
-            // 監査ログに旧値を残すため、書く前に必ず今の値を読む
-            $cur = db_row('SELECT * FROM d_daily_value WHERE hizuke = ? AND item_code = ?', [$date, $code]);
-            $old = $cur === null ? null
-                 : ($isText ? $cur['value_text'] : ($cur['value_num'] === null ? null : (string)(float)$cur['value_num']));
-
-            if ($cur === null && $new === null) {
-                continue; // 元々無く、今回も空。何もしない
-            }
-            if ($cur !== null && (string)$old === (string)$new) {
-                continue; // 値が変わっていない。更新者・時刻も触らない
-            }
-
-            if ($cur === null) {
-                db_exec(
-                    'INSERT INTO d_daily_value (hizuke,item_code,value_num,value_text,created_by,created_at,updated_by,updated_at)
-                     VALUES (?,?,?,?,?,?,?,?)',
-                    [$date, $code, $num, $text, $userId, $now, $userId, $now]
-                );
-                audit($date, $code, 'insert', null, $new, $userId, $now, $ip);
-            } else {
-                db_exec(
-                    'UPDATE d_daily_value SET value_num = ?, value_text = ?, updated_by = ?, updated_at = ?
-                      WHERE hizuke = ? AND item_code = ?',
-                    [$num, $text, $userId, $now, $date, $code]
-                );
-                audit($date, $code, 'update', $old, $new, $userId, $now, $ip);
-            }
-            $saved++;
-        }
+        $res = write_entries($date, input_items_of_dept($deptId, $date), $values, $userId);
         touch_submission($date, $deptId, 'draft', $userId);
         $pdo->commit();
     } catch (Throwable $e) {
@@ -110,7 +48,85 @@ function save_dept_entries(string $date, string $deptId, array $values, string $
         error_log('入力の保存に失敗: ' . $e->getMessage());
         throw $e;
     }
-    return ['saved' => $saved, 'warnings' => $warn];
+    return $res;
+}
+
+/**
+ * 入力値を書き込む本体。トランザクションは呼び出し側で張る。
+ * 電子カルテ日報の転記（src/nippo.php）は複数部署の値を1回で書くため、
+ * save_dept_entries() とこの関数を分けている。
+ *
+ * $items は書いてよい項目（item_code => 項目マスタの行）。ここに無い item_code は無視する。
+ *
+ * @return array ['saved' => 件数, 'warnings' => [...], 'changes' => [[item_code, 旧値, 新値], ...]]
+ */
+function write_entries(string $date, array $items, array $values, string $userId): array
+{
+    $now     = date('Y-m-d H:i:s');
+    $ip      = client_ip();
+    $saved   = 0;
+    $warn    = [];
+    $changes = [];
+
+    foreach ($items as $code => $it) {
+        if (!array_key_exists($code, $values)) {
+            continue;
+        }
+        $raw = trim((string)$values[$code]);
+        $isText = in_array($it['value_type'], ['text', 'multiline'], true);
+
+        if ($isText) {
+            $num  = null;
+            $text = $raw === '' ? null : $raw;
+            $new  = $text;
+        } else {
+            if ($raw !== '' && !is_numeric($raw)) {
+                $warn[] = "{$it['item_name']}：数値で入力してください（「{$raw}」）";
+                continue;
+            }
+            $num  = $raw === '' ? null : (float)$raw;
+            $text = null;
+            $new  = $num === null ? null : (string)$num;
+            // 桁の打ち間違いを拾う。止めはせず警告に留める
+            if ($num !== null && $it['min_value'] !== null && $num < (float)$it['min_value']) {
+                $warn[] = "{$it['item_name']}：{$it['min_value']} 未満の値です（{$raw}）。確認してください";
+            }
+            if ($num !== null && $it['max_value'] !== null && $num > (float)$it['max_value']) {
+                $warn[] = "{$it['item_name']}：{$it['max_value']} を超えています（{$raw}）。確認してください";
+            }
+        }
+
+        // 監査ログに旧値を残すため、書く前に必ず今の値を読む
+        $cur = db_row('SELECT * FROM d_daily_value WHERE hizuke = ? AND item_code = ?', [$date, $code]);
+        $old = $cur === null ? null
+             : ($isText ? $cur['value_text'] : ($cur['value_num'] === null ? null : (string)(float)$cur['value_num']));
+
+        if ($cur === null && $new === null) {
+            continue; // 元々無く、今回も空。何もしない
+        }
+        if ($cur !== null && (string)$old === (string)$new) {
+            continue; // 値が変わっていない。更新者・時刻も触らない
+        }
+
+        if ($cur === null) {
+            db_exec(
+                'INSERT INTO d_daily_value (hizuke,item_code,value_num,value_text,created_by,created_at,updated_by,updated_at)
+                 VALUES (?,?,?,?,?,?,?,?)',
+                [$date, $code, $num, $text, $userId, $now, $userId, $now]
+            );
+            audit($date, $code, 'insert', null, $new, $userId, $now, $ip);
+        } else {
+            db_exec(
+                'UPDATE d_daily_value SET value_num = ?, value_text = ?, updated_by = ?, updated_at = ?
+                  WHERE hizuke = ? AND item_code = ?',
+                [$num, $text, $userId, $now, $date, $code]
+            );
+            audit($date, $code, 'update', $old, $new, $userId, $now, $ip);
+        }
+        $changes[] = [$code, $old, $new];
+        $saved++;
+    }
+    return ['saved' => $saved, 'warnings' => $warn, 'changes' => $changes];
 }
 
 /** 変更履歴を1件記録する。 */

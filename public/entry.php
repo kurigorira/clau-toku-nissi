@@ -21,6 +21,12 @@ if (!isset($depts[$deptId])) {
 }
 $dept = $depts[$deptId];
 
+// 外来は電子カルテ日報の転記画面で入力する（科別×時間帯の表で、紙と同じ並び）
+if ($deptId === 'gairai') {
+    header('Location: nippo.php?hizuke=' . urlencode($date));
+    exit;
+}
+
 if (!can_edit_dept($user, $deptId)) {
     http_response_code(403);
     page_header('権限がありません', $user);
@@ -110,7 +116,7 @@ page_header($dept['dept_name'] . '　入力', $user);
             $cur  = $entries[$code] ?? null;
             $isMl = $it['value_type'] === 'multiline';
             $isTx = $it['value_type'] === 'text' || $isMl;
-            $val  = $cur === null ? '' : ($isTx ? (string)$cur['value_text'] : rtrim(rtrim((string)$cur['value_num'], '0'), '.'));
+            $val  = $cur === null ? '' : ($isTx ? (string)$cur['value_text'] : num_plain($cur['value_num']));
         ?>
         <tr>
           <th<?= (int)$it['required'] === 1 ? ' class="req"' : '' ?>><?= h($it['item_name']) ?></th>

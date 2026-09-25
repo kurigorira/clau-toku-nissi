@@ -110,6 +110,15 @@ foreach ($items as $it) {
                 }
             }
         }
+        // diff:A-B-C も同様
+        if (strpos($it['calc_source'], 'diff:') === 0) {
+            foreach (explode('-', substr($it['calc_source'], 5)) as $src) {
+                $src = trim($src);
+                if (!isset($itemSet[$src])) {
+                    $errors[] = "{$code}: diff の '{$src}' が未定義です";
+                }
+            }
+        }
     }
     if ($it['calc_type'] !== 'input' && trim((string)$it['required']) === '1') {
         $errors[] = "{$code}: 導出項目に required=1 は付けられません（入力欄が無いため必ず欠測になる）";

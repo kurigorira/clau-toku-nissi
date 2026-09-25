@@ -63,7 +63,7 @@ switch ($type) {
                 $r['hizuke'], youbi($r['hizuke']),
                 $depts[$r['dept_id']]['dept_name'] ?? $r['dept_id'],
                 $r['item_code'], $r['item_name'], '入力',
-                $isText ? $r['value_text'] : rtrim(rtrim((string)$r['value_num'], '0'), '.'),
+                $isText ? $r['value_text'] : num_plain($r['value_num']),
                 $r['unit'], $r['created_by'], $r['created_at'], $r['updated_by'], $r['updated_at'],
             ];
         }
@@ -177,11 +177,9 @@ switch ($type) {
                        $v['byoto_nyuin_all'] ?? '', $v['byoto_taiin_all'] ?? ''];
         }
         $rows[] = [];
-        $g = $v['gairai_total'] ?? null;
-        $k = $v['kaigo_shoukei'] ?? null;
-        $rows[] = ['外来患者延数', $g === null ? '' : $g - (float)($k ?? 0)];
-        $rows[] = ['　全外来患者数', $g ?? ''];
-        $rows[] = ['　在宅患者数（介護保険）', $k ?? ''];
+        $rows[] = ['外来患者延数', $v['gairai_nobe'] ?? ''];
+        $rows[] = ['　全外来患者数', $v['iryou_kaigo_total'] ?? ''];
+        $rows[] = ['　在宅患者数（介護保険）', $v['kaigo_zaitaku'] ?? ''];
         send_csv("病院報告患者票_{$month}", $rows);
 
     // 変更履歴。訂正の追跡や、監査を求められたときに出す

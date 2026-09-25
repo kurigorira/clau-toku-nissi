@@ -33,7 +33,7 @@ $g = fn(string $c) => $v[$c] ?? null;
 // 各種業務量。左が表示名、右が項目コード
 $blocks = [
     '外来' => [
-        ['一般外来',   'gairai_total'],
+        ['一般外来',   'gairai_ippan'],
         ['訪問看護',   'iryou_houkan'],
         ['訪問診療',   'iryou_houshin'],
         ['訪問リハ',   'iryou_hourehab_jin'],

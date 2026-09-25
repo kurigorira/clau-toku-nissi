@@ -29,10 +29,11 @@ $g = fn(string $c) => $v[$c] ?? null;
 $lastDay = daily_values($to);
 $monthEnd = $lastDay['byoto_zaiin_all'] ?? null;
 
-// 外来患者延数 ＝ 全外来患者数 − 在宅患者数（介護保険）
-$gairaiAll = $g('gairai_total');
-$kaigo     = $g('kaigo_shoukei');
-$gairaiNobe = $gairaiAll === null ? null : $gairaiAll - (float)($kaigo ?? 0);
+// 外来患者延数 ＝ 全外来患者数（医療介護合計）− 在宅患者数（介護保険。通所リハを除く）
+// 現行Excelの病院報告 C14。2026年8月は 6,553 − 890 ＝ 5,663
+$gairaiAll  = $g('iryou_kaigo_total');
+$kaigo      = $g('kaigo_zaitaku');
+$gairaiNobe = $g('gairai_nobe');
 
 page_header('病院報告（患者票）　' . $month, $user);
 ?>

@@ -146,6 +146,8 @@ function period_days(string $from, string $to): int
  *  kadou:W       病床稼働率       = (延患者数+退院) × 100 ÷ (実日数 × 定床)  （総括 P列）
  *  kaiten:W      病床回転率       = 実日数 ÷ 平均在院日数 × 100             （H!L = ($F$5/K)*100）
  *  ratio:A/B     A ÷ B × 100
+ *  diff:A-B-C    A − B − C（B以降が空なら0とみなす。A が空なら空）
+ *                例: 医事統計表①の外来患者数 = 医科合計 − ドック − 健診 − 訪問診療科
  *  shoukairitsu  紹介率 = (紹介患者数+救急搬入患者数) × 100 ÷ (初診 − 外休深6歳未満)（⑦!X）
  *  genzai_balance 現入院 = 期首在院数 + 期間新入院 − 期間退院               （②!O の検算用）
  */
@@ -206,6 +208,17 @@ function call_calc_func(string $spec, array $items, array &$vals, string $from, 
             $av = $g(trim((string)$a));
             $bv = $g(trim((string)$b));
             return ($av === null || $bv === null || $bv == 0.0) ? null : $av * 100 / $bv;
+
+        case 'diff':
+            $parts = array_map('trim', explode('-', (string)$arg));
+            $base  = $g(array_shift($parts));
+            if ($base === null) {
+                return null;
+            }
+            foreach ($parts as $p) {
+                $base -= (float)($g($p) ?? 0);
+            }
+            return $base;
 
         case 'shoukairitsu':
             $sh  = $g('shoukai');

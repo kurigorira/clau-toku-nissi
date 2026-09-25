@@ -57,7 +57,7 @@ if ($sheet === '1') {
     $v    = period_values($from, $to);
     $g    = fn(string $c) => $v[$c] ?? null;
     $iryou = [
-        ['一般外来',                 'gairai_total'],
+        ['一般外来',                 'gairai_ippan'],
         ['（うち新患）',             'gairai_new_total'],
         ['訪問看護（医療保険適応分）','iryou_houkan'],
         ['人間ドック',               'dock_ninzu'],

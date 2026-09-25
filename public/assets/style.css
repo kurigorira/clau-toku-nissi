@@ -128,3 +128,19 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .report.daily tr.weekend td { background: #fbf6f6; }
 .report tr.inactive { opacity: .5; }
 .report tr.inactive th, .report tr.inactive td { background: #f2f2f2; }
+
+/* ---- 電子カルテ日報の転記（nippo.php） ----
+   紙と同じ並びにするため、表を横に並べる。gap は使わず inline-block ＋ margin で離す。
+   左の表を打ち終えてから右の表へ進むよう、表は別々にしてある（タブキーの順＝紙の順）。 */
+.nippo-pair { margin-bottom: 8px; }
+.nippo-pair > table { display: inline-table; vertical-align: top; margin: 0 16px 12px 0; }
+.nippo { border-collapse: collapse; background: #fff; }
+.nippo caption { text-align: left; font-weight: bold; color: #2c5578; padding: 2px 0 4px; }
+.nippo th, .nippo td { border: 1px solid #c7ccd2; padding: 1px 3px; }
+.nippo th { background: #eef1f4; font-size: 12px; font-weight: normal; text-align: center; }
+.nippo th.rowh { text-align: left; white-space: nowrap; }
+.nippo input.num { width: 3.6em; text-align: right; }
+.nippo input.ng, .entry-table input.ng { background: #fae3e3; border: 2px solid #c33; }
+.nippo .ctlh, .nippo .ctlc { background: #f7f3e6; }      /* 紙の合計を打つ照合用の欄 */
+.nippo .sumrow th { background: #f0e9d2; }
+.nippo small { color: #777; font-size: 10px; }

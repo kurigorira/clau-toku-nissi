@@ -21,6 +21,21 @@ function num($v, int $decimals = 0): string
     return number_format((float)$v, $decimals);
 }
 
+/**
+ * 保存された数値を、入力欄やCSVに出す形にする（40.00 → 40、2.50 → 2.5、null → 空）。
+ *
+ * 文字列の末尾の0を削るだけだと、小数点の無い値（SQLiteは 40 のまま返す）で
+ * 40 が 4 になってしまうため、数値として整える。
+ */
+function num_plain($v): string
+{
+    if ($v === null || $v === '') {
+        return '';
+    }
+    $s = number_format((float)$v, 2, '.', '');
+    return rtrim(rtrim($s, '0'), '.');
+}
+
 /** セッションを開始する（未開始のときだけ）。 */
 function start_session(): void
 {
@@ -93,6 +108,9 @@ function page_header(string $title, ?array $user = null): void
     <a href="index.php">入力状況</a>
     <a href="nissi.php">病院日誌</a>
     <a href="qq_report.php">救急搬入</a>
+    <?php if ($user && (in_array($user['role'], ['ijika', 'admin'], true) || $user['dept_id'] === 'gairai')): ?>
+      <a href="nippo.php">日報転記</a>
+    <?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
       <a href="soukatsu.php">総括</a>
       <a href="zaiin.php">平均在院日数</a>
