@@ -107,20 +107,10 @@ function split_sql(string $sql): array
     return $out;
 }
 
-// ---- 引数 ----------------------------------------------------------------
-// getopt() は使わない。最初の非オプション引数より後ろのオプションを無視するため、
-//   run_sql.php db/schema.sql --user=root
-// のように書くと --user が黙って捨てられる。順序に依存しないよう自前で解く。
-$opt   = [];
-$files = [];
-foreach (array_slice($argv, 1) as $a) {
-    if (strpos($a, '--') === 0) {
-        $kv = explode('=', substr($a, 2), 2);
-        $opt[$kv[0]] = $kv[1] ?? true;
-    } else {
-        $files[] = $a;
-    }
-}
+// ---- 引数（解き方は src/cli.php を参照） -------------------------------------
+require_once dirname(__DIR__, 2) . '/src/cli.php';
+['opt' => $opt, 'extra' => $extra] = cli_args($argv);
+$files = array_map(fn($e) => $e[1], $extra);   // -- で始まらない引数＝SQLファイル
 
 if (isset($opt['help']) || !$files) {
     fwrite(STDERR, <<<TXT

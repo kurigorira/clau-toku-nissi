@@ -108,10 +108,12 @@ cp config/config.sample.php config/config.php
 vi config/config.php
 
 # 5. 最初の管理者を登録する（この時点では職員マスタが空で、誰もログインできない）
-php db/tools/add_user.php --id=＜職員ID＞ --name="＜氏名＞" --dept=jimu --role=admin --password=＜8文字以上＞
-#    例: php db/tools/add_user.php --id=108699 --name="栗原 剛" --dept=jimu --role=admin --password=xxxxxxxx
+php db/tools/add_user.php --id=＜職員ID＞ --dept=jimu --role=admin --password=＜8文字以上＞ --name="＜氏名＞"
+#    例: php db/tools/add_user.php --id=108699 --dept=jimu --role=admin --password=xxxxxxxx --name="栗原 剛"
 #    ＜＞ の部分は記号ごと値に置き換える（cmd では半角の < > はリダイレクト記号になる）。
-#    氏名に空白があるときは "" で囲む。囲まないと以降の引数が分かれ、add_user.php が止まる。
+#    氏名は最後に書き、空白があるときは "" で囲む。囲まないと以降の引数が分かれ、add_user.php が止まる。
+#    氏名を打ったあと日本語入力のまま空白を打つと全角スペースが入り、cmd は区切りとみなさない。
+#    ツール側で「全角スペース＋--」は区切りとして扱うが、氏名を最後に書けばそもそも起きない。
 
 # 6. 残りの職員を登録する（CSVで一括登録できる）
 php db/tools/add_user.php --csv=staff.csv     # user_id,user_name,dept_id,role,password
@@ -366,6 +368,17 @@ SQLファイルは `run_sql.php` で流し込む。
 php db/tools/run_sql.php db/schema.sql --user=root --pass=＜rootのパスワード＞
 php db/tools/run_sql.php db/seed_master.sql
 ```
+
+### add_user.php で「部署ID '' が存在しません」
+
+`--list` に部署が出ているのにこうなる場合は、**日本語入力のまま空白を打った（全角スペース）**のが原因。
+cmd は半角スペースでしか引数を区切らないため、`--name=栗原　--dept=jimu` が1つの引数になり、
+`--dept` が届かない。
+
+- 現在のツールは「全角スペースのあとに `--`」を区切りとして扱うので、そのまま登録できる
+- 古いファイルのままのサーバでは、**`--name=` を最後に書く**か、半角英数に戻してから空白を打つ
+
+共通の引数解析は `src/cli.php`（`add_user.php` `run_sql.php` `backup.php` が使う）。
 
 ### ログイン画面は出るがログインできない
 

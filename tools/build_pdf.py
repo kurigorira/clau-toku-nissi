@@ -317,9 +317,9 @@ def build_tejun():
                  'notepad config\\config.php        ← dbname・user・pass と auth.mode を書く'], st),
     ]))
 
-    s.append(step('5.', '最初の管理者を登録する（氏名に空白があれば "" で囲む。＜＞は外して値だけ打つ）', [
-        codebox(['php db\\tools\\add_user.php --id=108699 --name="栗原 剛" --dept=jimu'
-                 ' --role=admin --password=＜8文字以上＞',
+    s.append(step('5.', '最初の管理者を登録する（氏名は最後に書き、"" で囲む。＜＞は外して値だけ打つ）', [
+        codebox(['php db\\tools\\add_user.php --id=108699 --dept=jimu --role=admin'
+                 ' --password=＜8文字以上＞ --name="栗原 剛"',
                  'php db\\tools\\add_user.php --list             ← 登録内容と部署IDの確認',
                  'php db\\tools\\add_user.php --csv=staff.csv    ← 2人目以降はCSVで一括登録'], st),
     ]))
@@ -356,12 +356,14 @@ def build_tejun():
          '（<font face="Courier">Access denied</font>=ユーザ、'
          '<font face="Courier">Unknown database</font>=DB、'
          '<font face="Courier">[2002]</font>=<font face="Courier">host=127.0.0.1</font> に）'],
-        ['php が見つからない', '<font face="Courier">C:\\php\\php</font> とフルパスで打つ'],
-        ['mysql が見つからない', '<b>手順3の <font face="Courier">run_sql.php</font> を使う</b>（PHPから流し込むので mysql は不要）'],
+        ['php・mysql が見つからない', 'php は <font face="Courier">C:\\php\\php</font> とフルパスで打つ。'
+                                     'mysql は不要（<b>手順3の <font face="Courier">run_sql.php</font> を使う</b>）'],
         ['日本語が化ける', 'コマンドプロンプトで先に <font face="Courier">chcp 65001</font> を実行する'],
         ['PHPのソースがそのまま表示される', 'httpd.conf の <font face="Courier">LoadModule php_module</font> が入っていない。'
                                             '<b><font color="#c0392b">その状態で置くとDBのパスワードが漏れる</font></b>'],
-        ['ログインできない<br/>やり直したい',
+        ["部署ID '' が存在しません", '日本語入力のまま空白を打った（全角スペース）。'
+                                   '<b>半角英数に戻してから空白を打つ</b>か、<font face="Courier">--name=</font> を最後に書く'],
+        ['ログインできない・やり直したい',
          '手順5をやり直す（<font face="Courier">--list</font> で登録を確認）。'
          '最初からやるなら <font face="Courier">DROP DATABASE nissi;</font> — 他アプリに影響はない'],
     ], [W * 0.26, W * 0.74], st, header=False))

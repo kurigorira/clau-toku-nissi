@@ -8,7 +8,7 @@
  * 部署ごとにまとめて登録したいときはこちらのほうが早い。
  *
  * 使い方:
- *   php db/tools/add_user.php --id=kurihara --name=栗原 --dept=jimu --role=admin --password=＜8文字以上＞
+ *   php db/tools/add_user.php --id=kurihara --dept=jimu --role=admin --password=＜8文字以上＞ --name=栗原
  *   php db/tools/add_user.php --list
  *   php db/tools/add_user.php --csv=staff.csv        （user_id,user_name,dept_id,role,password の順）
  *
@@ -21,46 +21,13 @@ require_once dirname(__DIR__, 2) . '/src/db.php';
 
 $ROLES = ['entry' => '入力者', 'toutyoku' => '当直者', 'ijika' => '医事課', 'admin' => '管理者'];
 
-/**
- * コマンドラインから渡された文字列をUTF-8に揃える。
- *
- * Windowsのコマンドプロンプトは既定の文字コードがShift_JIS（CP932）なので、
- * --name=栗原 のように日本語を渡すとSJISのバイト列のまま届く。
- * そのままUTF-8のデータベースに入れると文字化けするため、ここで変換する。
- * すでにUTF-8として妥当なら何もしない（chcp 65001 済みの場合など）。
- */
-function to_utf8(string $s): string
-{
-    if ($s === '' || mb_check_encoding($s, 'UTF-8')) {
-        return $s;
-    }
-    return mb_convert_encoding($s, 'UTF-8', 'SJIS-win');
-}
+require_once dirname(__DIR__, 2) . '/src/cli.php';
 
-// getopt() は使わない。最初の非オプション引数で解析をやめ、それ以降を黙って捨てるため、
-//   --name=栗原 剛 --dept=jimu
-// と打つと「剛」で止まって --dept 以降が消え、「部署ID '' が存在しません」になる。
-// run_sql.php / backup.php と同じく自前で解き、余分な引数があれば止めて打ち方を示す。
-$opt   = [];
-$extra = [];
-$last  = null;   // 直前に読んだオプション名（余分な引数をどこにつなぐべきかの案内に使う）
-foreach (array_slice($argv, 1) as $a) {
-    if (strpos($a, '--') === 0) {
-        $kv = explode('=', substr($a, 2), 2);
-        $opt[$kv[0]] = $kv[1] ?? true;
-        $last = $kv[0];
-    } else {
-        $extra[] = [$last, $a];
-    }
-}
-foreach (['name', 'dept', 'role', 'id'] as $k) {
-    if (isset($opt[$k]) && is_string($opt[$k])) {
-        $opt[$k] = to_utf8($opt[$k]);
-    }
-}
+// 引数の解き方（Shift_JIS・全角スペース・getopt() の問題）は src/cli.php を参照
+['opt' => $opt, 'extra' => $extra] = cli_args($argv);
 
 if ($extra) {
-    $words = array_map(fn($e) => to_utf8($e[1]), $extra);
+    $words = array_map(fn($e) => $e[1], $extra);
     fwrite(STDERR, '  × 余分な引数があります: ' . implode(' ', $words) . "\n");
     // ほとんどは「氏名の空白で分かれた」ケース。直前のオプションとつないだ形を示す
     $key = $extra[0][0];
@@ -192,7 +159,7 @@ if (isset($opt['csv'])) {
         }
         $row = array_combine($head, array_pad(array_slice($r, 0, count($head)), count($head), ''));
         // Excelから「CSV(コンマ区切り)」で保存するとSJISになるため、ここで揃える
-        $row = array_map('to_utf8', $row);
+        $row = array_map('cli_to_utf8', $row);
         $msg = upsert_user($row, $depts, $ROLES);
         echo $msg . "\n";
         strpos($msg, '○') !== false ? $ok++ : $ng++;

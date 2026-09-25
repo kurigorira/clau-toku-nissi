@@ -49,14 +49,9 @@ function die_with(string $msg): void
     exit(1);
 }
 
-// ---- 引数（run_sql.php と同じ理由で getopt() は使わない） ------------------
-$opt = [];
-foreach (array_slice($argv, 1) as $a) {
-    if (strpos($a, '--') === 0) {
-        $kv = explode('=', substr($a, 2), 2);
-        $opt[$kv[0]] = $kv[1] ?? true;
-    }
-}
+// ---- 引数（解き方は src/cli.php を参照） -------------------------------------
+require_once dirname(__DIR__, 2) . '/src/cli.php';
+['opt' => $opt] = cli_args($argv);
 
 if (isset($opt['help'])) {
     fwrite(STDERR, <<<TXT
