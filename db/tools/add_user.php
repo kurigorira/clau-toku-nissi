@@ -37,11 +37,39 @@ function to_utf8(string $s): string
     return mb_convert_encoding($s, 'UTF-8', 'SJIS-win');
 }
 
-$opt = getopt('', ['id:', 'name:', 'dept:', 'role:', 'password:', 'csv:', 'list', 'disable:', 'help']);
+// getopt() は使わない。最初の非オプション引数で解析をやめ、それ以降を黙って捨てるため、
+//   --name=栗原 剛 --dept=jimu
+// と打つと「剛」で止まって --dept 以降が消え、「部署ID '' が存在しません」になる。
+// run_sql.php / backup.php と同じく自前で解き、余分な引数があれば止めて打ち方を示す。
+$opt   = [];
+$extra = [];
+$last  = null;   // 直前に読んだオプション名（余分な引数をどこにつなぐべきかの案内に使う）
+foreach (array_slice($argv, 1) as $a) {
+    if (strpos($a, '--') === 0) {
+        $kv = explode('=', substr($a, 2), 2);
+        $opt[$kv[0]] = $kv[1] ?? true;
+        $last = $kv[0];
+    } else {
+        $extra[] = [$last, $a];
+    }
+}
 foreach (['name', 'dept', 'role', 'id'] as $k) {
     if (isset($opt[$k]) && is_string($opt[$k])) {
         $opt[$k] = to_utf8($opt[$k]);
     }
+}
+
+if ($extra) {
+    $words = array_map(fn($e) => to_utf8($e[1]), $extra);
+    fwrite(STDERR, '  × 余分な引数があります: ' . implode(' ', $words) . "\n");
+    // ほとんどは「氏名の空白で分かれた」ケース。直前のオプションとつないだ形を示す
+    $key = $extra[0][0];
+    if ($key !== null && isset($opt[$key]) && is_string($opt[$key])) {
+        fwrite(STDERR, "    値に空白を含めるときは \"\" で囲んでください。\n");
+        fwrite(STDERR, "      --{$key}=\"" . $opt[$key] . ' ' . implode(' ', $words) . "\"\n");
+    }
+    fwrite(STDERR, "    （登録はしていません）\n");
+    exit(1);
 }
 
 if (isset($opt['help']) || !$opt) {

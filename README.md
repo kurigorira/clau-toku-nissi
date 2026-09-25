@@ -108,7 +108,10 @@ cp config/config.sample.php config/config.php
 vi config/config.php
 
 # 5. 最初の管理者を登録する（この時点では職員マスタが空で、誰もログインできない）
-php db/tools/add_user.php --id=＜職員ID＞ --name=＜氏名＞ --dept=jimu --role=admin --password=＜8文字以上＞
+php db/tools/add_user.php --id=＜職員ID＞ --name="＜氏名＞" --dept=jimu --role=admin --password=＜8文字以上＞
+#    例: php db/tools/add_user.php --id=108699 --name="栗原 剛" --dept=jimu --role=admin --password=xxxxxxxx
+#    ＜＞ の部分は記号ごと値に置き換える（cmd では半角の < > はリダイレクト記号になる）。
+#    氏名に空白があるときは "" で囲む。囲まないと以降の引数が分かれ、add_user.php が止まる。
 
 # 6. 残りの職員を登録する（CSVで一括登録できる）
 php db/tools/add_user.php --csv=staff.csv     # user_id,user_name,dept_id,role,password

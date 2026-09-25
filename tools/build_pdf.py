@@ -301,13 +301,13 @@ def build_tejun():
 
     s.append(step('2.', 'データベースを作る（既存のMySQLに追加するだけ）', [
         codebox(['mysql -u root -p -e "CREATE DATABASE nissi DEFAULT CHARACTER SET utf8mb4;"',
-                 'mysql -u root -p -e "CREATE USER \'nissi\'@\'localhost\' IDENTIFIED BY \'<パスワード>\';"',
+                 'mysql -u root -p -e "CREATE USER \'nissi\'@\'localhost\' IDENTIFIED BY \'＜パスワード＞\';"',
                  'mysql -u root -p -e "GRANT SELECT,INSERT,UPDATE,DELETE ON nissi.*'
                  ' TO \'nissi\'@\'localhost\';"'], st),
     ]))
 
     s.append(step('3.', 'テーブルとマスタを流し込む', [
-        codebox(['php db\\tools\\run_sql.php db\\schema.sql --user=root --pass=<rootのパスワード>',
+        codebox(['php db\\tools\\run_sql.php db\\schema.sql --user=root --pass=＜rootのパスワード＞',
                  'php db\\tools\\build_seed.php                  ← 19部署 / 278項目 / 設定10件 を生成',
                  'php db\\tools\\run_sql.php db\\seed_master.sql   ← こちらは nissi ユーザのままでよい'], st),
     ]))
@@ -317,9 +317,9 @@ def build_tejun():
                  'notepad config\\config.php        ← dbname・user・pass と auth.mode を書く'], st),
     ]))
 
-    s.append(step('5.', '最初の管理者を登録する（職員マスタが空だと誰もログインできない）', [
-        codebox(['php db\\tools\\add_user.php --id=<職員ID> --name=栗原 --dept=jimu'
-                 ' --role=admin --password=<8文字以上>',
+    s.append(step('5.', '最初の管理者を登録する（氏名に空白があれば "" で囲む。＜＞は外して値だけ打つ）', [
+        codebox(['php db\\tools\\add_user.php --id=108699 --name="栗原 剛" --dept=jimu'
+                 ' --role=admin --password=＜8文字以上＞',
                  'php db\\tools\\add_user.php --list             ← 登録内容と部署IDの確認',
                  'php db\\tools\\add_user.php --csv=staff.csv    ← 2人目以降はCSVで一括登録'], st),
     ]))
