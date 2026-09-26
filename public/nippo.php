@@ -54,10 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($locked) {
         $messages[] = ['この日付は医事課が確定済みです。訂正が必要な場合は医事課へ連絡してください。', 'error'];
     } elseif (($_POST['action'] ?? '') === 'load') {
-        // Excelから読み込む。保存はせず、外来の欄と照合欄を埋めて表示し直すだけ。
-        // すでに打ってある入院の欄などはそのまま残す（$raw は送られてきた値のまま）
+        // Excelから読み込む。保存はせず、読んだ欄と照合欄を埋めて表示し直すだけ。
+        // 読まなかった欄（すでに打ってある値）はそのまま残す（$raw は送られてきた値のまま）
         $errors = [];
-        $load   = nippo_load_upload($_FILES['xlsx'] ?? null, $date);
+        $load   = nippo_load_uploads([$_FILES['xlsx_gairai'] ?? null, $_FILES['xlsx_nyuin'] ?? null], $date);
         if ($load['errors']) {
             $errors = $load['errors'];
             $messages[] = ['Excelを読み込めませんでした。欄は何も変えていません。', 'error'];
@@ -69,9 +69,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $raw["c:{$name}"] = (string)$n;
             }
             foreach ($load['notes'] as $m) {
-                $messages[] = [$m, 'ok'];
+                $messages[] = [$m . '（まだ保存していません）', 'ok'];
             }
-            $messages[] = ['数字を確かめ、入院の欄を入力してから「照合して保存」を押してください。', 'info'];
+            $warnings = $load['warnings'];
+            $rest = [];
+            if (!isset($load['kinds']['gairai'])) {
+                $rest[] = '外来';
+            }
+            if (!isset($load['kinds']['nyuin'])) {
+                $rest[] = '入院';
+            }
+            $messages[] = [($rest ? implode('・', $rest) . 'の欄は紙を見て入力し、' : '')
+                . '数字を確かめてから「照合して保存」を押してください。', 'info'];
         }
     } else {
         if (!$errors) {
@@ -120,26 +129,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 /**
- * アップロードされた日報のExcelを読む。一時ファイルのまま読み、どこにも保存しない。
+ * アップロードされた日報のExcel（外来・入院、どちらか一方でも両方でもよい）を読む。
+ * どちらの日報かは中身で判定する（欄を取り違えて選ばれても読める）。
+ * 一時ファイルのまま読み、どこにも保存しない。1つでも読めなければ何も返さない。
  */
-function nippo_load_upload($f, string $date): array
+function nippo_load_uploads(array $files, string $date): array
 {
-    $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => []];
-    if (!is_array($f) || !isset($f['error']) || is_array($f['error']) || $f['error'] === UPLOAD_ERR_NO_FILE) {
+    $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => [], 'warnings' => [], 'kinds' => []];
+    $out  = ['v' => [], 'c' => [], 'errors' => [], 'notes' => [], 'warnings' => [], 'kinds' => []];
+    $any  = false;
+    foreach ($files as $f) {
+        if (!is_array($f) || !isset($f['error']) || is_array($f['error']) || $f['error'] === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+        $any  = true;
+        $name = (string)($f['name'] ?? '');
+        if (in_array($f['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
+            return $fail("{$name}：ファイルが大きすぎます。日報のExcelか確かめてください。");
+        }
+        if ($f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
+            return $fail("{$name}：ファイルを受け取れませんでした（コード " . (int)$f['error'] . '）。もう一度選んでください。');
+        }
+        try {
+            $sheets = xlsx_read($f['tmp_name']);
+        } catch (RuntimeException $e) {
+            return $fail("{$name}：" . $e->getMessage());
+        }
+        $kind = nippo_xlsx_kind($sheets);
+        if ($kind === null) {
+            return $fail("{$name}：外来日報・入院患者数日報のどちらのExcelでもありません。");
+        }
+        if (isset($out['kinds'][$kind])) {
+            return $fail(($kind === 'gairai' ? '外来日報' : '入院患者数日報') . 'のExcelが2つ選ばれています。');
+        }
+        $r = $kind === 'gairai' ? nippo_gairai_from_xlsx($sheets, $date) : nippo_nyuin_from_xlsx($sheets, $date);
+        if ($r['errors']) {
+            return ['v' => [], 'c' => [], 'errors' => array_map(fn($e) => "{$name}：{$e}", $r['errors']),
+                    'notes' => [], 'warnings' => [], 'kinds' => []];
+        }
+        $out['kinds'][$kind] = true;
+        $out['v'] += $r['v'];
+        $out['c'] += $r['c'];
+        $out['notes']    = array_merge($out['notes'], $r['notes']);
+        $out['warnings'] = array_merge($out['warnings'], $r['warnings'] ?? []);
+    }
+    if (!$any) {
         return $fail('読み込むExcelファイルを選んでください。');
     }
-    if (in_array($f['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
-        return $fail('ファイルが大きすぎます。日報のExcelか確かめてください。');
-    }
-    if ($f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
-        return $fail('ファイルを受け取れませんでした（コード ' . (int)$f['error'] . '）。もう一度選んでください。');
-    }
-    try {
-        $sheets = xlsx_read($f['tmp_name']);
-    } catch (RuntimeException $e) {
-        return $fail($e->getMessage());
-    }
-    return nippo_from_xlsx($sheets, $date);
+    return $out;
 }
 
 $entries = dept_entries($date, 'gairai');
@@ -180,7 +217,7 @@ page_header('電子カルテ日報の転記', $user);
 <?php endif; ?>
 <?php if ($warnings): ?>
   <div class="flash flash-warn">
-    <strong>確認してください<?= $errors ? '' : '（保存はしています）' ?></strong>
+    <strong>確認してください<?= ($errors || ($_POST['action'] ?? '') === 'load') ? '' : '（保存はしています）' ?></strong>
     <ul><?php foreach ($warnings as $w): ?><li><?= h($w) ?></li><?php endforeach; ?></ul>
   </div>
 <?php endif; ?>
@@ -212,9 +249,11 @@ page_header('電子カルテ日報の転記', $user);
            読み込みボタンより前に「保存」を置き、これまでどおり Enter＝照合して保存 にする */ ?>
   <button type="submit" name="action" value="save" class="sr" tabindex="-1" aria-hidden="true">照合して保存</button>
   <p class="nippo-load">
-    <label>日報のExcel（.xlsx） <input type="file" name="xlsx" accept=".xlsx"></label>
+    <label>外来日報（.xlsx） <input type="file" name="xlsx_gairai" accept=".xlsx,.xlsm"></label>
+    <label>入院日報（.xlsm） <input type="file" name="xlsx_nyuin" accept=".xlsx,.xlsm"></label>
     <button type="submit" name="action" value="load">Excelから読み込む</button>
-    <span class="note">外来の欄と紙の合計の欄に数字が入ります（まだ保存しません）。入院の欄は紙を見て入力してください。</span>
+    <br><span class="note">片方だけでも読み込めます。欄に数字が入るだけで、まだ保存はしません。
+      入院日報は、画面の日付と同じ日のシートを読みます。</span>
   </p>
   <?php endif; ?>
 

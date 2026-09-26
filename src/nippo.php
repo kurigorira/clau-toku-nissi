@@ -10,7 +10,7 @@
  *   - 紙の合計欄との照合
  *   - 複数部署（外来・病棟・当直）の値をまとめて下書きとして保存する処理
  *
- *   - 日報のExcel（.xlsx）から外来の値を読む処理（nippo_from_xlsx）
+ *   - 日報のExcelから値を読む処理（外来 nippo_gairai_from_xlsx・入院 nippo_nyuin_from_xlsx）
  *
  * Excelから読んだ値も、画面で打った値と同じ照合を通ってから保存される。
  */
@@ -439,16 +439,16 @@ function nippo_save(string $date, array $v, string $userId): array
 }
 
 /* ======================================================================
- * 日報のExcel（.xlsx）から読む
+ * 外来日報のExcel（.xlsx）から読む
  *
- * 日報のExcelは、電子カルテの生データのシート（Sheet2）と、それを数式で
+ * 外来日報のExcelは、電子カルテの生データのシート（Sheet2）と、それを数式で
  * 並べ替えた紙の様式のシート（Sheet1）でできている。読むのは紙の様式のほう。
  * リハビリ・ドック・健診・介護・訪問診療科内訳などは医事課がそのシートに
  * 手で入れているので、紙と同じ数字がすべてそこにそろっている。
  *
  * セル番地は決め打ちせず、見出しの文字（「科名」「午前」「医科合計」など）で
  * 位置を探す。様式に行が足されても読めるようにするため。
- * 入院患者数日報はこのExcelに無いので読まない（画面で打つ）。
+ * 入院患者数日報は別のブック（nippo_nyuin_from_xlsx）。
  * ====================================================================== */
 
 /** 見出しを比べるために揃える。空白を除き、全角英数を半角に、波ダッシュを1種類にする。 */
@@ -466,7 +466,7 @@ function nippo_norm(string $s): string
  * @param string $date   画面で選んでいる日付。ファイルの「9月 3日」と月日が違えば読まない
  * @return array ['v' => [item_code => int], 'c' => [照合欄 => int], 'errors' => [...], 'notes' => [...]]
  */
-function nippo_from_xlsx(array $sheets, string $date): array
+function nippo_gairai_from_xlsx(array $sheets, string $date): array
 {
     $v = $c = $errors = $notes = [];
     $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => []];
@@ -739,7 +739,261 @@ function nippo_from_xlsx(array $sheets, string $date): array
     if ($errors) {
         return ['v' => [], 'c' => [], 'errors' => $errors, 'notes' => []];
     }
-    $notes[] = "「{$sheetName}」シートから外来の " . count($v) . ' 欄を読み込みました（まだ保存していません）。';
-    $notes[] = '入院患者数日報はこのExcelに無いので、入院の欄は紙を見て入力してください。';
+    $notes[] = "外来日報（「{$sheetName}」シート）から " . count($v) . ' 欄を読み込みました。';
     return ['v' => $v, 'c' => $c, 'errors' => [], 'notes' => $notes];
+}
+
+/* ======================================================================
+ * 入院患者数日報のExcel（.xlsm）から読む
+ *
+ * 入院日報は月1冊のブックで、シート「1」〜「31」が日ごとの日報
+ * （ほかに MENU・目標・作業用）。日のシートは紙の下半分と同じ並び。
+ * マクロ付き（.xlsm）だが、中身は .xlsx と同じ zip＋XML なので同じ方法で読める。
+ * マクロ（vbaProject.bin）は開かないし動かさない。
+ *
+ * 【古い月のデータが残ったシートに注意】
+ * まだ使っていない日のシートには前の月の数字が残っている（9月なのに「31」にまで数字がある）。
+ * シートの日付は MENU の処理年月から自動で入るので、日付だけでは見分けられない。
+ * そこで「前日のシートの本日患者数」と「この日の前日患者数」が合うかを確かめる。
+ * ====================================================================== */
+
+/** 入院の科別内訳の見出し（揃えた文字）→ 科コード。日のシートの見出しに合わせる。 */
+function nippo_bka_labels(): array
+{
+    $out = [];
+    foreach (nippo_bka() as $ka => $label) {
+        $out[nippo_norm($label)] = $ka;
+    }
+    return $out;
+}
+
+/**
+ * どちらの日報のブックかを中身で判定する。画面の欄を取り違えて選ばれても読めるように。
+ * @return string|null 'gairai' / 'nyuin' / 分からなければ null
+ */
+function nippo_xlsx_kind(array $sheets): ?string
+{
+    $gairai = false;
+    foreach ($sheets as $cells) {
+        $has = [];
+        foreach ($cells as $x) {
+            $n = nippo_norm($x);
+            if (mb_strpos($n, '入院患者数日報') !== false) {
+                return 'nyuin';
+            }
+            if ($n === '科名' || $n === '医科合計') {
+                $has[$n] = true;
+            }
+        }
+        if (count($has) === 2) {
+            $gairai = true;
+        }
+    }
+    return $gairai ? 'gairai' : null;
+}
+
+/**
+ * 入院日報のブックから、選んだ日のシートを読む。
+ *
+ * @return array ['v' => [item_code => int], 'c' => ['zenjitsu_3' => int, ...], 'errors' => [...], 'notes' => [...], 'warnings' => [...]]
+ */
+function nippo_nyuin_from_xlsx(array $sheets, string $date): array
+{
+    $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => [], 'warnings' => []];
+    $y = (int)substr($date, 0, 4);
+    $m = (int)substr($date, 5, 2);
+    $d = (int)substr($date, 8, 2);
+
+    if (!isset($sheets[(string)$d])) {
+        return $fail("入院日報のブックに「{$d}」日のシートがありません。");
+    }
+    $one = nippo_nyuin_sheet(xlsx_grid($sheets[(string)$d]), "{$d}日");
+    if ($one['errors']) {
+        return $fail(implode(' / ', $one['errors']));
+    }
+    if ($one['ym'] === null || $one['day'] === null) {
+        return $fail("入院日報の「{$d}」日のシートに日付（「2026年9月」と日）が見つかりません。");
+    }
+    if ($one['ym'] !== [$y, $m] || $one['day'] !== $d) {
+        return $fail("入院日報の「{$d}」日のシートは {$one['ym'][0]}年{$one['ym'][1]}月{$one['day']}日 になっています。"
+            . "画面の日付（{$y}年{$m}月{$d}日）と違うので読み込みませんでした。MENU の処理年月を確かめてください。");
+    }
+    $v = $one['v'];
+    $c = [];
+    $honjitsu = 0;
+    foreach (nippo_wards() as $w => $_) {
+        $c["zenjitsu_{$w}"] = $one['zenjitsu'][$w];
+        $honjitsu += $v["byoto{$w}_zaiin"];
+    }
+    if ($honjitsu === 0) {
+        return $fail("入院日報の「{$d}」日のシートには、まだ本日患者数が入っていません。");
+    }
+
+    // 前日のシートとのつながり。古い月のデータが残ったシートを見分ける
+    $warnings = [];
+    if ($d > 1 && isset($sheets[(string)($d - 1)])) {
+        $prev = nippo_nyuin_sheet(xlsx_grid($sheets[(string)($d - 1)]), ($d - 1) . '日');
+        if (!$prev['errors']) {
+            $bad = [];
+            foreach (nippo_wards() as $w => $wname) {
+                if ($prev['v']["byoto{$w}_zaiin"] !== $c["zenjitsu_{$w}"]) {
+                    $bad[] = "{$wname} 前日 {$c["zenjitsu_{$w}"]} ／ {$prev['day']}日の本日 " . $prev['v']["byoto{$w}_zaiin"];
+                }
+            }
+            if ($bad) {
+                $warnings[] = "入院日報：この日の前日患者数が、前日（" . ($d - 1) . "日）のシートの本日患者数と合いません（"
+                    . implode('、', $bad) . '）。前の月のデータが残ったシートかもしれません。数字を紙と見比べてください。';
+            }
+        }
+    }
+
+    return ['v' => $v, 'c' => $c, 'errors' => [],
+            'notes' => ["入院日報（「{$d}」シート）から " . count($v) . ' 欄と前日患者数を読み込みました。'],
+            'warnings' => $warnings];
+}
+
+/**
+ * 入院日報の日のシートを1枚読む。
+ * @return array ['v' => [...], 'zenjitsu' => [w => int], 'ym' => [年, 月]|null, 'day' => int|null, 'errors' => [...]]
+ */
+function nippo_nyuin_sheet(array $grid, string $what): array
+{
+    $errors = [];
+    $out    = ['v' => [], 'zenjitsu' => [], 'ym' => null, 'day' => null, 'errors' => &$errors];
+    $txt    = fn(int $r, int $col) => isset($grid[$r][$col]) ? nippo_norm($grid[$r][$col]) : '';
+    $num    = function (int $r, int $col, string $label) use ($grid, &$errors, $what): int {
+        $x = trim($grid[$r][$col] ?? '');
+        if ($x === '') {
+            return 0;
+        }
+        if (!is_numeric($x) || (float)$x < 0 || floor((float)$x) != (float)$x) {
+            $errors[] = "{$what}のシート {$label}：数値として読めません（" . xlsx_colname($col) . "{$r}「{$x}」）";
+            return 0;
+        }
+        return (int)$x;
+    };
+
+    // 日付：「2026年9月」のセルと、その右の最初の数値（日）
+    foreach ($grid as $r => $row) {
+        foreach ($row as $col => $x) {
+            if (preg_match('/^(\d{4})年(\d{1,2})月$/u', nippo_norm($x), $mm)) {
+                $out['ym'] = [(int)$mm[1], (int)$mm[2]];
+                foreach ($row as $cc => $y) {
+                    if ($cc > $col && is_numeric($y)) {
+                        $out['day'] = (int)$y;
+                        break;
+                    }
+                }
+                break 2;
+            }
+        }
+    }
+
+    // 見出し行：「病棟」が2つある行。1つ目＝入退院情報、2つ目＝科別内訳
+    $hr = $idouCol = $kaCol = null;
+    foreach ($grid as $r => $row) {
+        $cols = [];
+        foreach ($row as $col => $x) {
+            if (nippo_norm($x) === '病棟') {
+                $cols[] = $col;
+            }
+        }
+        if (count($cols) >= 2) {
+            [$hr, $idouCol, $kaCol] = [$r, $cols[0], $cols[1]];
+            break;
+        }
+    }
+    if ($hr === null) {
+        $errors[] = "{$what}のシートに「病棟」の見出しが見つかりません。入院患者数日報のシートか確かめてください。";
+        return $out;
+    }
+
+    // 入退院の列（見出し行とその下の行）
+    $want = ['前日患者数' => 'zenjitsu', '入院' => 'nyuin', '転入' => 'tennyu', '退院' => 'taiin',
+             '転出' => 'tenshutsu', '本日患者数' => 'zaiin'];
+    $idou = [];
+    foreach ([$hr, $hr + 1] as $r) {
+        foreach ($grid[$r] ?? [] as $col => $x) {
+            $k = $want[nippo_norm($x)] ?? null;
+            if ($k !== null && $col > $idouCol && $col < $kaCol && !isset($idou[$k])) {
+                $idou[$k] = $col;
+            }
+        }
+    }
+    foreach ($want as $label => $k) {
+        if (!isset($idou[$k])) {
+            $errors[] = "{$what}のシートに「{$label}」の列が見つかりません。";
+        }
+    }
+
+    // 科別の列（見出し行の、2つ目の「病棟」より右）
+    $bka  = nippo_bka_labels();
+    $kaAt = [];
+    $unknown = [];
+    foreach ($grid[$hr] as $col => $x) {
+        if ($col <= $kaCol) {
+            continue;
+        }
+        $n = nippo_norm($x);
+        if (isset($bka[$n])) {
+            $kaAt[$bka[$n]] = $col;
+        } elseif ($n !== '合計' && $n !== '') {
+            $unknown[$col] = trim($x);
+        }
+    }
+    foreach (nippo_bka() as $ka => $label) {
+        if (!isset($kaAt[$ka])) {
+            $errors[] = "{$what}のシートの科別内訳に「{$label}」の列が見つかりません。";
+        }
+    }
+    if ($errors) {
+        return $out;
+    }
+
+    // 病棟の行（3F・4F・5F）
+    foreach (nippo_wards() as $w => $wname) {
+        $row = null;
+        foreach ($grid as $r => $_) {
+            if ($r > $hr && $txt($r, $idouCol) === $wname) {
+                $row = $r;
+                break;
+            }
+        }
+        if ($row === null) {
+            $errors[] = "{$what}のシートに「{$wname}」の行が見つかりません。";
+            continue;
+        }
+        foreach ($idou as $k => $col) {
+            $n = $num($row, $col, "{$wname} " . array_search($k, $want, true));
+            if ($k === 'zenjitsu') {
+                $out['zenjitsu'][$w] = $n;
+            } else {
+                $out['v']["byoto{$w}_{$k}"] = $n;
+            }
+        }
+        // 科別は同じ行の、科別側の「病棟」列に同じ病棟名がある前提。違えば探し直す
+        $kaRow = $txt($row, $kaCol) === $wname ? $row : null;
+        if ($kaRow === null) {
+            foreach ($grid as $r => $_) {
+                if ($r > $hr && $txt($r, $kaCol) === $wname) {
+                    $kaRow = $r;
+                    break;
+                }
+            }
+        }
+        if ($kaRow === null) {
+            $errors[] = "{$what}のシートの科別内訳に「{$wname}」の行が見つかりません。";
+            continue;
+        }
+        foreach ($kaAt as $ka => $col) {
+            $out['v']["bk{$w}_{$ka}"] = $num($kaRow, $col, "{$wname} " . nippo_bka()[$ka]);
+        }
+        foreach ($unknown as $col => $label) {
+            $x = $grid[$kaRow][$col] ?? '';
+            if (is_numeric($x) && (float)$x != 0.0) {
+                $errors[] = "{$what}のシートの科別内訳「{$label}」（{$wname}）に人数がありますが、取り込み先がありません。医事課・管理者に相談してください。";
+            }
+        }
+    }
+    return $out;
 }
