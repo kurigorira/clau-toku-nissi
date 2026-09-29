@@ -282,3 +282,36 @@ function emr_dept_guess(string $emrName, array $depts): string
     }
     return DEPT_VIEW_ONLY;
 }
+
+/*
+ * 電子カルテの部署名ごとの役割（m_config の emr_role:部署名）。
+ * 例：総務課の職員は管理者。取り込むときに、その部署の職員の役割をこれにする。
+ * 'keep' は「決めない」（新規は入力者、登録済みの人は今の役割のまま）。
+ */
+
+/** 保存してある部署ごとの役割（電子カルテの部署名 => 'keep' / 役割コード）。 */
+function emr_role_map_load(): array
+{
+    $out = [];
+    foreach (db_all("SELECT config_key, config_value FROM m_config WHERE config_key LIKE 'emr_role:%'") as $r) {
+        $out[substr($r['config_key'], strlen('emr_role:'))] = $r['config_value'];
+    }
+    return $out;
+}
+
+/** 部署ごとの役割を保存する（'keep' も保存して「決めない」を覚える）。 */
+function emr_role_map_save(array $map): void
+{
+    foreach ($map as $emrName => $role) {
+        $key = 'emr_role:' . $emrName;
+        db_exec('DELETE FROM m_config WHERE config_key = ?', [$key]);
+        db_exec("INSERT INTO m_config (config_key, valid_from, config_value, note) VALUES (?, '2000-01-01', ?, ?)",
+                [$key, $role, '電子カルテの部署ごとの役割（職員画面で設定）']);
+    }
+}
+
+/** 初めて見る部署名の役割の候補。総務課の職員は管理者（栗原様の指定）。それ以外は決めない。 */
+function emr_role_guess(string $emrName): string
+{
+    return mb_strpos(user_norm($emrName), '総務') !== false ? 'admin' : 'keep';
+}

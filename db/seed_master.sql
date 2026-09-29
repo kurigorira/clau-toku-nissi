@@ -1,9 +1,9 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-09-29 02:30:43
+-- 生成日時: 2026-09-29 02:39:20
 
 DELETE FROM m_item;
-DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%';
+DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
 DELETE FROM m_dept;
 
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('gairai','外来',10,'18:00','1234567',1);

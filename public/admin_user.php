@@ -42,16 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 // 電子カルテの職員一覧。部署名の対応表は、保存済みのもの＋初めての部署は候補
                 $depts = all_depts(false);
-                $saved = emr_dept_map_load();
-                $map   = [];
+                $saved     = emr_dept_map_load();
+                $savedRole = emr_role_map_load();
+                $map = $roleMap = [];
                 foreach ($emr['rows'] as [, , , $ed]) {
                     if (!isset($map[$ed])) {
-                        $map[$ed] = isset($saved[$ed], $depts[$saved[$ed]]) ? $saved[$ed] : emr_dept_guess($ed, $depts);
+                        $map[$ed]     = isset($saved[$ed], $depts[$saved[$ed]]) ? $saved[$ed] : emr_dept_guess($ed, $depts);
+                        $roleMap[$ed] = $savedRole[$ed] ?? emr_role_guess($ed);
                     }
                 }
-                $_SESSION['csv_emr'] = ['issued' => $emr['issued'], 'rows' => $emr['rows'], 'map' => $map,
-                                        'saved' => array_keys($saved), 'deactivate' => !empty($_POST['deactivate_missing'])];
-                $preview = csv_build_preview(emr_rows_to_users($emr['rows'], $map), !empty($_POST['deactivate_missing']), $user['user_id']);
+                $_SESSION['csv_emr'] = ['issued' => $emr['issued'], 'rows' => $emr['rows'], 'map' => $map, 'roles' => $roleMap,
+                                        'saved' => array_keys($saved), 'savedRole' => array_keys($savedRole),
+                                        'deactivate' => !empty($_POST['deactivate_missing'])];
+                $preview = csv_build_preview(emr_rows_to_users($emr['rows'], $map, $roleMap), !empty($_POST['deactivate_missing']), $user['user_id']);
             }
         } else {
             $csv = users_read_csv($f['tmp_name']);
@@ -70,14 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $messages[] = ['確認画面の内容が見つかりません。もう一度CSVを選んでください。', 'error'];
         } else {
             $depts = all_depts(false);
+            $names = array_keys($emr['map']);
             foreach ((array)($_POST['map'] ?? []) as $i => $deptId) {
-                $names = array_keys($emr['map']);
                 if (isset($names[(int)$i]) && is_string($deptId) && isset($depts[$deptId])) {
                     $emr['map'][$names[(int)$i]] = $deptId;
                 }
             }
+            foreach ((array)($_POST['role'] ?? []) as $i => $r) {
+                if (isset($names[(int)$i]) && is_string($r) && ($r === 'keep' || isset($roles[$r]))) {
+                    $emr['roles'][$names[(int)$i]] = $r;
+                }
+            }
             $_SESSION['csv_emr'] = $emr;
-            $preview = csv_build_preview(emr_rows_to_users($emr['rows'], $emr['map']), $emr['deactivate'], $user['user_id']);
+            $preview = csv_build_preview(emr_rows_to_users($emr['rows'], $emr['map'], $emr['roles']), $emr['deactivate'], $user['user_id']);
         }
     }
 
@@ -94,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 if (!empty($imp['emr_map'])) {
                     emr_dept_map_save($imp['emr_map']);    // 確かめた対応表を先に保存する（次回からこれが出る）
+                    emr_role_map_save($imp['emr_roles'] ?? []);
                 }
                 foreach ($imp['rows'] as $row) {
                     [$row2, $err] = user_validate($row, $depts);   // 確認画面から時間がたっても部署が消えていないか
@@ -191,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function csv_build_preview(array $rows, bool $deactivate, string $selfId): array
 {
     $depts   = all_depts(false);
-    $preview = ['new' => [], 'update' => [], 'same' => 0, 'errors' => [], 'deactivate' => []];
+    $preview = ['new' => [], 'update' => [], 'same' => 0, 'errors' => [], 'deactivate' => [], 'warn' => []];
     $valid   = [];
     foreach ($rows as [$line, $u]) {
         [$row, $err] = user_validate($u, $depts);
@@ -204,6 +213,13 @@ function csv_build_preview(array $rows, bool $deactivate, string $selfId): array
         }
         $plan = user_plan($row, $depts);
         $valid[$row['user_id']] = $row + ['line' => $line];
+        // 管理者・医事課の人が部署を移った（役割はそのまま）。権限を外し忘れないよう知らせる
+        $cur = db_row('SELECT dept_id, role FROM m_user WHERE user_id = ?', [$row['user_id']]);
+        if ($cur && $row['role'] === null && in_array($cur['role'], ['admin', 'ijika'], true) && $cur['dept_id'] !== $row['dept_id']) {
+            $preview['warn'][] = "{$row['user_name']}（{$row['user_id']}）は部署が "
+                . ($depts[$cur['dept_id']]['dept_name'] ?? $cur['dept_id']) . ' → ' . $depts[$row['dept_id']]['dept_name']
+                . ' に変わりますが、役割は' . user_roles()[$cur['role']] . 'のままです。必要なら下の一覧で役割を変えてください。';
+        }
         if ($plan['kind'] === 'same') {
             $preview['same']++;
         } else {
@@ -223,16 +239,19 @@ function csv_build_preview(array $rows, bool $deactivate, string $selfId): array
         'rows'       => array_values(array_map(fn($r) => array_diff_key($r, ['line' => 1]), $valid)),
         'deactivate' => array_column($preview['deactivate'], 'user_id'),
         'emr_map'    => $_SESSION['csv_emr']['map'] ?? null,
+        'emr_roles'  => $_SESSION['csv_emr']['roles'] ?? null,
     ];
     return $preview;
 }
 
 /** 電子カルテの職員一覧の行を、対応表で部署を置き換えて登録用の行にする。役割は取り込まない。 */
-function emr_rows_to_users(array $rows, array $map): array
+function emr_rows_to_users(array $rows, array $map, array $roleMap = []): array
 {
     $out = [];
     foreach ($rows as [$line, $id, $name, $emrDept]) {
-        $out[] = [$line, ['user_id' => $id, 'user_name' => $name, 'dept_id' => $map[$emrDept] ?? DEPT_VIEW_ONLY]];
+        $role  = $roleMap[$emrDept] ?? 'keep';
+        $out[] = [$line, ['user_id' => $id, 'user_name' => $name, 'dept_id' => $map[$emrDept] ?? DEPT_VIEW_ONLY,
+                          'role' => $role === 'keep' ? '' : $role]];
     }
     return $out;
 }
@@ -259,19 +278,27 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
 <p class="note">
   電子カルテの部署名を、このシステムのどの部署として扱うかを決めます。<strong>★は今回初めて出た部署名で、名前からの候補です。必ず確かめてください。</strong>
   日誌に関係しない部署は「その他（閲覧のみ）」にします（入力はできず、病院日誌などを見るだけ）。
-  決めた対応は「この内容で登録する」で保存され、次回からはそれが出ます。
+  決めた対応は「この内容で登録する」で保存され、次回からはそれが出ます。<br>
+  「役割」を選ぶと、その部署の職員全員をその役割にします（<strong>総務課は管理者</strong>）。
+  「決めない」なら、新しい人は入力者、登録済みの人は今の役割のまま（医事課・当直者などは下の一覧で個別に設定）。
+  管理者・医事課の権限は、電子カルテから開いたあとパスワードを入れてから使えるので、該当する人には「PW変更」でパスワードを設定してください。
 </p>
 <form method="post">
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="csv_remap">
   <table class="report">
-    <tr><th>電子カルテの部署名</th><th>人数</th><th>このシステムの部署</th></tr>
-    <?php $i = 0; foreach ($emr['map'] as $ed => $did): ?>
+    <tr><th>電子カルテの部署名</th><th>人数</th><th>このシステムの部署</th><th>役割</th></tr>
+    <?php $i = 0; foreach ($emr['map'] as $ed => $did): $rsel = $emr['roles'][$ed] ?? 'keep'; ?>
     <tr><td><?= in_array($ed, $emr['saved'], true) ? '' : '★' ?><?= h($ed === '' ? '（空欄）' : $ed) ?></td>
       <td class="n"><?= (int)($cnt[$ed] ?? 0) ?></td>
-      <td><select name="map[<?= $i++ ?>]">
+      <td><select name="map[<?= $i ?>]">
         <?php foreach ($depts as $id => $d): ?>
           <option value="<?= h($id) ?>"<?= $id === $did ? ' selected' : '' ?>><?= h($d['dept_name']) ?></option>
+        <?php endforeach; ?></select></td>
+      <td><select name="role[<?= $i++ ?>]">
+        <option value="keep"<?= $rsel === 'keep' ? ' selected' : '' ?>>決めない（今のまま）</option>
+        <?php foreach ($roles as $r => $lab): ?>
+          <option value="<?= h($r) ?>"<?= $r === $rsel ? ' selected' : '' ?>><?= h($lab) ?></option>
         <?php endforeach; ?></select></td></tr>
     <?php endforeach; ?>
   </table>
@@ -285,6 +312,10 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
   エラー <strong><?= count($preview['errors']) ?></strong>行
   <?php if ($preview['deactivate']): ?>・無効にする <strong><?= count($preview['deactivate']) ?></strong>人<?php endif; ?>
 </p>
+<?php if ($preview['warn']): ?>
+  <div class="flash flash-warn"><strong>確かめてください</strong><ul>
+  <?php foreach ($preview['warn'] as $w): ?><li><?= h($w) ?></li><?php endforeach; ?></ul></div>
+<?php endif; ?>
 <?php if ($preview['errors']): ?>
   <div class="flash flash-error"><strong>次の行は登録しません</strong><ul>
   <?php foreach ($preview['errors'] as [$line, $id, $name, $err]): ?>
