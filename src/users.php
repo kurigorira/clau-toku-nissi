@@ -41,10 +41,10 @@ function user_roles(): array
     return ['entry' => '入力者', 'toutyoku' => '当直者', 'ijika' => '医事課', 'admin' => '管理者'];
 }
 
-/** 見出しや部署名を比べるために揃える（空白を除き、全角英数字を半角に）。 */
+/** 見出しや部署名を比べるために揃える（空白を除き、全角英数字を半角に、半角カナを全角に）。 */
 function user_norm(string $s): string
 {
-    return preg_replace('/\s+/u', '', mb_convert_kana($s, 'as', 'UTF-8'));
+    return preg_replace('/\s+/u', '', mb_convert_kana($s, 'asKV', 'UTF-8'));
 }
 
 /**
@@ -275,6 +275,39 @@ function users_read_emr_csv(string $path): ?array
     return ['issued' => $issued, 'rows' => $rows, 'error' => null];
 }
 
+/**
+ * 見出し付きCSV（users_read_csv の結果）の部署の列が、ほとんどこのアプリに無い部署名（電子カルテの部署名）なら、
+ * 電子カルテの職員一覧として扱う（Excelで見出しを付けて保存し直したファイルなど）。
+ * そうでなければ null（今までどおりの見出し付きCSV）。
+ *
+ * @return array|null users_read_emr_csv() と同じ形。rows の5番目は行の役割（空なら部署ごとの役割）。'headed' => true
+ */
+function users_csv_as_emr(array $csvRows, array $depts): ?array
+{
+    $known = [];
+    foreach ($depts as $id => $d) {
+        $known[user_norm((string)$id)] = true;
+        $known[user_norm((string)$d['dept_name'])] = true;
+    }
+    $filled = $unknown = 0;
+    $rows = [];
+    foreach ($csvRows as [$line, $u]) {
+        $dept = trim(preg_replace('/[\s\x{3000}]+/u', '', (string)($u['dept_id'] ?? '')));
+        if ($dept !== '') {
+            $filled++;
+            if (!isset($known[user_norm($dept)])) {
+                $unknown++;
+            }
+        }
+        $rows[] = [$line, trim(mb_convert_kana((string)($u['user_id'] ?? ''), 'as', 'UTF-8')),
+                   trim(preg_replace('/[\s\x{3000}]+/u', ' ', (string)($u['user_name'] ?? ''))), $dept,
+                   trim((string)($u['role'] ?? ''))];
+    }
+    // 半分より多くがこのアプリに無い部署名なら電子カルテの部署名とみなす
+    // （このアプリの部署名で書いたCSVに打ち間違いが少しあるだけなら、今までどおりその行をエラーにする）
+    return $unknown * 2 > $filled ? ['issued' => '見出し付きCSV', 'rows' => $rows, 'error' => null, 'headed' => true] : null;
+}
+
 /** 保存してある対応表（電子カルテの部署名 => dept_id）。 */
 function emr_dept_map_load(): array
 {
@@ -308,14 +341,18 @@ function emr_dept_guess(string $emrName, array $depts): string
             return $id;     // 名前がそのまま同じ（栄養科・医事課 など）
         }
     }
+    // 先に当たったものを使う（「医師事務支援課」を事務課にしないよう、医師事務は事務より先）
     $rules = [
+        '医師事務' => DEPT_VIEW_ONLY, '秘書' => DEPT_VIEW_ONLY,
         '病棟' => 'byoto', '薬剤' => 'yakuzai', '栄養' => 'eiyou', 'リハビリ' => 'rehab', '放射線' => 'housha',
-        '検査' => 'kensa', '透析' => 'touseki', '手術' => 'ope', '医事' => 'ijika', '総務' => 'jimu', '事務' => 'jimu',
-        '施設' => 'shisetsu', '地域医療連携' => 'renkei', '連携' => 'renkei', '健診' => 'dock', 'ドック' => 'dock',
-        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kansen', '外来' => 'gairai',
+        '検査' => 'kensa', '臨床工学' => 'touseki', '透析' => 'touseki', '外来' => 'gairai', '手術' => 'ope',
+        '医事' => 'ijika', '総務' => 'jimu', '事務' => 'jimu',
+        '施設' => 'shisetsu', '地域医療連携' => 'renkei', '連携' => 'renkei',
+        '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
+        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kansen',
     ];
     foreach ($rules as $word => $id) {
-        if (mb_strpos($n, $word) !== false && isset($depts[$id])) {
+        if (mb_strpos($n, $word) !== false && ($id === DEPT_VIEW_ONLY || isset($depts[$id]))) {
             return $id;
         }
     }

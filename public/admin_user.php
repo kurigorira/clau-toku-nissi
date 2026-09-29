@@ -36,36 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $messages[] = ['CSVファイルを選んでください。', 'error'];
         } elseif ($f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name']) || $f['size'] > 2 * 1024 * 1024) {
             $messages[] = ['CSVを受け取れませんでした（2MBまで）。', 'error'];
-        } elseif (($emr = users_read_emr_csv($f['tmp_name'])) !== null) {
-            if ($emr['error'] !== null) {
-                $messages[] = [$emr['error'], 'error'];
-            } elseif (!isset(all_depts(false)[DEPT_VIEW_ONLY])) {
-                // マスタを流し直していないサーバ。候補の「その他」が選べず、先頭の部署が選ばれてしまうので止める
-                $messages[] = ['部署マスタに「その他（閲覧のみ）」がありません。サーバでマスタを流し直してから、もう一度CSVを選んでください'
-                    . '（C:\\php\\php db\\tools\\build_seed.php → C:\\php\\php db\\tools\\run_sql.php db\\seed_master.sql）。', 'error'];
-            } elseif (!users_has_emr_dept()) {
-                $messages[] = ['職員マスタに「電子カルテの部署名」の列がありません。サーバで db\\migrations\\003_user_emr_dept.sql を流してから、'
-                    . 'もう一度CSVを選んでください（README の「電子カルテから開く」）。', 'error'];
-            } else {
-                // 電子カルテの職員一覧。部署名の対応表は、保存済みのもの＋初めての部署は候補
-                $depts = all_depts(false);
-                $saved     = emr_dept_map_load();
-                $savedRole = emr_role_map_load();
-                $map = $roleMap = [];
-                foreach ($emr['rows'] as [, , , $ed]) {
-                    if (!isset($map[$ed])) {
-                        $map[$ed]     = isset($saved[$ed], $depts[$saved[$ed]]) ? $saved[$ed] : emr_dept_guess($ed, $depts);
-                        $roleMap[$ed] = $savedRole[$ed] ?? emr_role_guess($ed);
-                    }
-                }
-                $_SESSION['csv_emr'] = ['issued' => $emr['issued'], 'rows' => $emr['rows'], 'map' => $map, 'roles' => $roleMap,
-                                        'saved' => array_keys($saved), 'savedRole' => array_keys($savedRole),
-                                        'deactivate' => !empty($_POST['deactivate_missing'])];
-                $preview = csv_build_preview(emr_rows_to_users($emr['rows'], $map, $roleMap), !empty($_POST['deactivate_missing']), $user['user_id']);
-            }
         } else {
-            $csv = users_read_csv($f['tmp_name']);
-            if ($csv['error'] !== null) {
+            // 電子カルテの職員一覧（1行目が「発行日」）→ だめなら見出し付きCSV。
+            // 見出し付きでも部署の列が電子カルテの部署名なら、電子カルテの職員一覧として対応表へ回す
+            $emr = users_read_emr_csv($f['tmp_name']);
+            $csv = null;
+            if ($emr === null) {
+                $csv = users_read_csv($f['tmp_name']);
+                if ($csv['error'] === null) {
+                    $emr = users_csv_as_emr($csv['rows'], all_depts(false));
+                }
+            }
+            if ($emr !== null) {
+                $preview = csv_emr_start($emr, !empty($_POST['deactivate_missing']), $user['user_id'], $messages);
+            } elseif ($csv['error'] !== null) {
                 $messages[] = [$csv['error'], 'error'];
             } else {
                 $preview = csv_build_preview($csv['rows'], !empty($_POST['deactivate_missing']), $user['user_id']);
@@ -251,12 +235,54 @@ function csv_build_preview(array $rows, bool $deactivate, string $selfId): array
     return $preview;
 }
 
-/** 電子カルテの職員一覧の行を、対応表で部署を置き換えて登録用の行にする。役割は取り込まない。 */
+/**
+ * 電子カルテの職員一覧から確認画面を作り始める。部署名の対応表は、保存済みのもの＋初めての部署は候補。
+ * サーバの準備（マスタの流し直し・003）が済んでいなければ理由を $messages に積んで null。
+ */
+function csv_emr_start(array $emr, bool $deactivate, string $me, array &$messages): ?array
+{
+    $depts = all_depts(false);
+    if ($emr['error'] !== null) {
+        $messages[] = [$emr['error'], 'error'];
+        return null;
+    }
+    if (!isset($depts[DEPT_VIEW_ONLY])) {
+        // マスタを流し直していないサーバ。候補の「その他」が選べず、先頭の部署が選ばれてしまうので止める
+        $messages[] = ['部署マスタに「その他（閲覧のみ）」がありません。サーバでマスタを流し直してから、もう一度CSVを選んでください'
+            . '（C:\\php\\php db\\tools\\build_seed.php → C:\\php\\php db\\tools\\run_sql.php db\\seed_master.sql）。', 'error'];
+        return null;
+    }
+    if (!users_has_emr_dept()) {
+        $messages[] = ['職員マスタに「電子カルテの部署名」の列がありません。サーバで db\\migrations\\003_user_emr_dept.sql を流してから、'
+            . 'もう一度CSVを選んでください（README の「電子カルテから開く」）。', 'error'];
+        return null;
+    }
+    $saved     = emr_dept_map_load();
+    $savedRole = emr_role_map_load();
+    $map = $roleMap = [];
+    foreach ($emr['rows'] as $r) {
+        $ed = $r[3];
+        if (!isset($map[$ed])) {
+            $map[$ed]     = isset($saved[$ed], $depts[$saved[$ed]]) ? $saved[$ed] : emr_dept_guess($ed, $depts);
+            $roleMap[$ed] = $savedRole[$ed] ?? emr_role_guess($ed);
+        }
+    }
+    $_SESSION['csv_emr'] = ['issued' => $emr['issued'], 'rows' => $emr['rows'], 'map' => $map, 'roles' => $roleMap,
+                            'saved' => array_keys($saved), 'savedRole' => array_keys($savedRole),
+                            'deactivate' => $deactivate, 'headed' => !empty($emr['headed'])];
+    return csv_build_preview(emr_rows_to_users($emr['rows'], $map, $roleMap), $deactivate, $me);
+}
+
+/**
+ * 電子カルテの職員一覧の行を、対応表で部署を置き換えて登録用の行にする。
+ * 役割は部署ごとの役割。見出し付きCSVに役割の列があれば、その行の役割を優先する。
+ */
 function emr_rows_to_users(array $rows, array $map, array $roleMap = []): array
 {
     $out = [];
-    foreach ($rows as [$line, $id, $name, $emrDept]) {
-        $role  = $roleMap[$emrDept] ?? 'keep';
+    foreach ($rows as $r) {
+        [$line, $id, $name, $emrDept] = $r;
+        $role  = trim((string)($r[4] ?? '')) !== '' ? $r[4] : ($roleMap[$emrDept] ?? 'keep');
         $out[] = [$line, ['user_id' => $id, 'user_name' => $name, 'emr_dept' => $emrDept,
                           'dept_id' => $map[$emrDept] ?? DEPT_VIEW_ONLY,
                           'role' => $role === 'keep' ? '' : $role]];
@@ -281,7 +307,15 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
 <h2>CSVの確認（まだ登録していません）</h2>
 <?php if (!empty($_SESSION['csv_emr'])): $emr = $_SESSION['csv_emr'];
     $cnt = array_count_values(array_map(fn($r) => $r[3], $emr['rows'])); ?>
+<?php if (!empty($emr['headed'])): ?>
+<p class="flash flash-warn">
+  見出しの付いたCSVでした。部署の列が電子カルテの部署名なので、<strong>電子カルテの職員一覧として</strong>読みました（<?= count($emr['rows']) ?>人）。<br>
+  <strong>Excelで保存し直したファイルは、職員IDの先頭の0が消えていることがあります</strong>（0108699 → 108699。電子カルテから開いたときに「登録されていません」になる）。
+  電子カルテから出したままのファイルを選ぶのが確実です。
+</p>
+<?php else: ?>
 <p>電子カルテの職員一覧（<?= h($emr['issued']) ?>・<?= count($emr['rows']) ?>人）を読みました。</p>
+<?php endif; ?>
 <h3>電子カルテの部署ごとの入力画面と役割</h3>
 <p class="note">
   職員の部署は<strong>電子カルテの部署名のまま</strong>登録・表示します。ここでは、その部署の職員が<strong>どの入力画面を使えるか</strong>を決めます。
