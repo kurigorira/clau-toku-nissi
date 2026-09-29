@@ -55,7 +55,8 @@ CREATE TABLE m_user (
 
   user_id       VARCHAR(32)  NOT NULL,
   user_name     VARCHAR(64)  NOT NULL,
-  dept_id       VARCHAR(16)  NOT NULL,
+  dept_id       VARCHAR(16)  NOT NULL,          -- 入力できる画面（このシステムの部署）
+  emr_dept      VARCHAR(64)  NOT NULL DEFAULT '', -- 電子カルテの部署名（表示用。電子カルテの職員一覧から取り込む）
   -- entry=入力者 / toutyoku=当直者 / ijika=医事課 / admin=管理者
   role          VARCHAR(16)  NOT NULL DEFAULT 'entry',
   -- 電子カルテからのID引き継ぎが使えない端末・保守用の予備ログイン。

@@ -163,6 +163,14 @@ if (!is_file($confPath)) {
         line($hasLog ? 'OK' : '注意', '閲覧履歴',
              $hasLog ? 'テーブルあり'
              : '未作成 … php db\\tools\\run_sql.php --user=root --pass=... db\\migrations\\002_access_log.sql');
+
+        // 職員の電子カルテの部署名（後から足した列）
+        $hasEmrDept = true;
+        try { $pdo->query('SELECT emr_dept FROM m_user WHERE 1 = 0'); }
+        catch (Exception $e) { $hasEmrDept = false; }
+        line($hasEmrDept ? 'OK' : '注意', '職員の電子カルテ部署',
+             $hasEmrDept ? '列あり'
+             : '未作成 … php db\\tools\\run_sql.php --user=root --pass=... db\\migrations\\003_user_emr_dept.sql');
     } catch (Exception $e) {
         line('NG', 'DB接続', '失敗: ' . $e->getMessage());
     }

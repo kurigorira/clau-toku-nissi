@@ -137,7 +137,7 @@ function page_header(string $title, ?array $user = null): void
         $here = basename((string)strtok($_SERVER['REQUEST_URI'] ?? 'index.php', '#')); ?>
       <a href="elevate.php?next=<?= h(urlencode($here)) ?>"><?= $user['role_real'] === 'admin' ? '管理者' : '医事課' ?>として作業</a>
     <?php endif; ?>
-    <?= h($user['user_name']) ?>（<?= h($user['dept_name'] ?? $user['dept_id']) ?>）
+    <?= h($user['user_name']) ?>（<?= h(trim((string)($user['emr_dept'] ?? '')) !== '' ? $user['emr_dept'] : ($user['dept_name'] ?? $user['dept_id'])) ?>）
     <a href="logout.php">終了</a>
   </div>
   <?php endif; ?>

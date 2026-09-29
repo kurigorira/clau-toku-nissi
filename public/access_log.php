@@ -7,6 +7,7 @@
  * 記録は src/auth.php の access_log_record()。
  */
 require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../src/users.php';
 
 $user = require_login();
 if (!has_role($user, 'admin')) {
@@ -45,7 +46,7 @@ if ($page !== '' && isset($pages[$page])) {
     $where[]  = 'a.page = ?';
     $params[] = $page;
 }
-$sql = 'SELECT a.*, u.user_name, d.dept_name FROM d_access_log a
+$sql = 'SELECT a.*, u.user_name, d.dept_name' . (users_has_emr_dept() ? ', u.emr_dept' : '') . ' FROM d_access_log a
           LEFT JOIN m_user u ON u.user_id = a.user_id
           LEFT JOIN m_dept d ON d.dept_id = u.dept_id
          WHERE ' . implode(' AND ', $where) . '
@@ -70,7 +71,7 @@ if (isset($_GET['csv'])) {
     fwrite($out, "\xEF\xBB\xBF");
     fputcsv($out, ['日時', '職員ID', '氏名', '部署', '画面', '条件', '送信', '端末']);
     foreach ($rows as $r) {
-        fputcsv($out, [$r['acted_at'], $r['user_id'], $r['user_name'] ?? '', $r['dept_name'] ?? '',
+        fputcsv($out, [$r['acted_at'], $r['user_id'], $r['user_name'] ?? '', user_dept_label($r),
                        $pages[$r['page']] ?? $r['page'], $r['query'], $r['method'], $r['client_ip']]);
     }
     exit;
@@ -97,7 +98,7 @@ page_header('閲覧履歴', $user);
   <tr>
     <td><?= h($r['acted_at']) ?></td>
     <td><?= h($r['user_name'] ?? '（登録なし）') ?> <code><?= h($r['user_id']) ?></code></td>
-    <td><?= h($r['dept_name'] ?? '') ?></td>
+    <td><?= h(user_dept_label($r)) ?></td>
     <td><?= h($pages[$r['page']] ?? $r['page']) ?></td>
     <td class="note"><?= h($r['query']) ?></td>
     <td><?= $r['method'] === 'POST' ? '送信' : '' ?></td>

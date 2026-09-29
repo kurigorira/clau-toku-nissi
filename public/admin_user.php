@@ -39,6 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (($emr = users_read_emr_csv($f['tmp_name'])) !== null) {
             if ($emr['error'] !== null) {
                 $messages[] = [$emr['error'], 'error'];
+            } elseif (!isset(all_depts(false)[DEPT_VIEW_ONLY])) {
+                // マスタを流し直していないサーバ。候補の「その他」が選べず、先頭の部署が選ばれてしまうので止める
+                $messages[] = ['部署マスタに「その他（閲覧のみ）」がありません。サーバでマスタを流し直してから、もう一度CSVを選んでください'
+                    . '（C:\\php\\php db\\tools\\build_seed.php → C:\\php\\php db\\tools\\run_sql.php db\\seed_master.sql）。', 'error'];
+            } elseif (!users_has_emr_dept()) {
+                $messages[] = ['職員マスタに「電子カルテの部署名」の列がありません。サーバで db\\migrations\\003_user_emr_dept.sql を流してから、'
+                    . 'もう一度CSVを選んでください（README の「電子カルテから開く」）。', 'error'];
             } else {
                 // 電子カルテの職員一覧。部署名の対応表は、保存済みのもの＋初めての部署は候補
                 $depts = all_depts(false);
@@ -250,7 +257,8 @@ function emr_rows_to_users(array $rows, array $map, array $roleMap = []): array
     $out = [];
     foreach ($rows as [$line, $id, $name, $emrDept]) {
         $role  = $roleMap[$emrDept] ?? 'keep';
-        $out[] = [$line, ['user_id' => $id, 'user_name' => $name, 'dept_id' => $map[$emrDept] ?? DEPT_VIEW_ONLY,
+        $out[] = [$line, ['user_id' => $id, 'user_name' => $name, 'emr_dept' => $emrDept,
+                          'dept_id' => $map[$emrDept] ?? DEPT_VIEW_ONLY,
                           'role' => $role === 'keep' ? '' : $role]];
     }
     return $out;
@@ -274,10 +282,11 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
 <?php if (!empty($_SESSION['csv_emr'])): $emr = $_SESSION['csv_emr'];
     $cnt = array_count_values(array_map(fn($r) => $r[3], $emr['rows'])); ?>
 <p>電子カルテの職員一覧（<?= h($emr['issued']) ?>・<?= count($emr['rows']) ?>人）を読みました。</p>
-<h3>電子カルテの部署 → このシステムの部署</h3>
+<h3>電子カルテの部署ごとの入力画面と役割</h3>
 <p class="note">
-  電子カルテの部署名を、このシステムのどの部署として扱うかを決めます。<strong>★は今回初めて出た部署名で、名前からの候補です。必ず確かめてください。</strong>
-  日誌に関係しない部署は「その他（閲覧のみ）」にします（入力はできず、病院日誌などを見るだけ）。
+  職員の部署は<strong>電子カルテの部署名のまま</strong>登録・表示します。ここでは、その部署の職員が<strong>どの入力画面を使えるか</strong>を決めます。
+  <strong>★は今回初めて出た部署名で、名前からの候補です。必ず確かめてください。</strong>
+  入力する項目の無い部署は「その他（閲覧のみ）」にします（入力はできず、病院日誌などを見るだけ）。
   決めた対応は「この内容で登録する」で保存され、次回からはそれが出ます。<br>
   「役割」を選ぶと、その部署の職員全員をその役割にします（<strong>総務課は管理者</strong>）。
   「決めない」なら、新しい人は入力者、登録済みの人は今の役割のまま（医事課・当直者などは下の一覧で個別に設定）。
@@ -287,7 +296,7 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="csv_remap">
   <table class="report">
-    <tr><th>電子カルテの部署名</th><th>人数</th><th>このシステムの部署</th><th>役割</th></tr>
+    <tr><th>電子カルテの部署名</th><th>人数</th><th>入力する画面</th><th>役割</th></tr>
     <?php $i = 0; foreach ($emr['map'] as $ed => $did): $rsel = $emr['roles'][$ed] ?? 'keep'; ?>
     <tr><td><?= in_array($ed, $emr['saved'], true) ? '' : '★' ?><?= h($ed === '' ? '（空欄）' : $ed) ?></td>
       <td class="n"><?= (int)($cnt[$ed] ?? 0) ?></td>
@@ -324,9 +333,10 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
 <?php endif; ?>
 <?php if ($preview['new'] || $preview['update']): ?>
 <table class="report">
-  <tr><th>区分</th><th>電子カルテID</th><th>氏名</th><th>部署</th><th>役割</th><th>変わる所</th></tr>
+  <tr><th>区分</th><th>電子カルテID</th><th>氏名</th><th>部署</th><th>入力する画面</th><th>役割</th><th>変わる所</th></tr>
   <?php foreach (['new' => '新規', 'update' => '更新'] as $k => $lab): foreach ($preview[$k] as [$r, $ch]): ?>
     <tr><td><?= h($lab) ?></td><td><code><?= h($r['user_id']) ?></code></td><td><?= h($r['user_name']) ?></td>
+      <td><?= h($r['emr_dept'] ?? '') ?></td>
       <td><?= h($depts[$r['dept_id']]['dept_name'] ?? $r['dept_id']) ?></td>
       <td><?= h($r['role'] === null ? ($k === 'new' ? '入力者' : '（今のまま）') : $roles[$r['role']]) ?></td>
       <td><?= h(implode('、', $ch)) ?></td></tr>
@@ -375,11 +385,12 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="update">
   <table class="report">
-    <tr><th>職員ID</th><th>氏名</th><th>部署</th><th>役割</th><th>有効</th><th>予備ログイン</th><th>操作件数</th><th></th></tr>
+    <tr><th>職員ID</th><th>氏名</th><th>部署（電子カルテ）</th><th>入力する画面</th><th>役割</th><th>有効</th><th>予備ログイン</th><th>操作件数</th><th></th></tr>
     <?php foreach ($users as $u): ?>
       <tr class="<?= $u['is_active'] ? '' : 'inactive' ?>">
         <td><code><?= h($u['user_id']) ?></code></td>
         <td><input type="text" name="u[<?= h($u['user_id']) ?>][user_name]" size="14" value="<?= h($u['user_name']) ?>"></td>
+        <td><?= h($u['emr_dept'] ?? '') ?></td>
         <td><select name="u[<?= h($u['user_id']) ?>][dept_id]">
             <?php foreach ($depts as $id => $d): ?>
               <option value="<?= h($id) ?>"<?= $id === $u['dept_id'] ? ' selected' : '' ?>><?= h($d['dept_name']) ?></option>

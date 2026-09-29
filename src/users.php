@@ -11,6 +11,30 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/master.php';
 require_once __DIR__ . '/cli.php';
 
+/**
+ * 職員マスタに「電子カルテの部署名」の列（emr_dept）があるか。
+ * 後から足した列なので、db/migrations/003_user_emr_dept.sql を流す前のサーバでも動くようにする。
+ */
+function users_has_emr_dept(): bool
+{
+    static $has = null;
+    if ($has === null) {
+        try {
+            db_row('SELECT emr_dept FROM m_user WHERE 1 = 0');
+            $has = true;
+        } catch (Throwable $e) {
+            $has = false;
+        }
+    }
+    return $has;
+}
+
+/** 画面に出す部署名。電子カルテの部署名があればそれ、無ければこのシステムの部署名。 */
+function user_dept_label(array $u): string
+{
+    return trim((string)($u['emr_dept'] ?? '')) !== '' ? (string)$u['emr_dept'] : (string)($u['dept_name'] ?? $u['dept_id'] ?? '');
+}
+
 /** 役割。 */
 function user_roles(): array
 {
@@ -69,7 +93,11 @@ function user_validate(array $u, array $depts): array
             return [null, "役割 '{$role}' は " . implode(' / ', user_roles()) . ' のいずれかです'];
         }
     }
-    return [['user_id' => $id, 'user_name' => $name, 'dept_id' => $deptId, 'role' => $roleCode], null];
+    $row = ['user_id' => $id, 'user_name' => $name, 'dept_id' => $deptId, 'role' => $roleCode];
+    if (array_key_exists('emr_dept', $u)) {
+        $row['emr_dept'] = mb_substr(trim((string)$u['emr_dept']), 0, 64);   // 電子カルテの部署名（表示用）
+    }
+    return [$row, null];
 }
 
 /**
@@ -86,8 +114,11 @@ function user_plan(array $row, array $depts): array
     if ($cur['user_name'] !== $row['user_name']) {
         $ch[] = "氏名: {$cur['user_name']} → {$row['user_name']}";
     }
+    if (isset($row['emr_dept']) && users_has_emr_dept() && (string)($cur['emr_dept'] ?? '') !== $row['emr_dept']) {
+        $ch[] = '電子カルテの部署: ' . (($cur['emr_dept'] ?? '') === '' ? '（なし）' : $cur['emr_dept']) . ' → ' . $row['emr_dept'];
+    }
     if ($cur['dept_id'] !== $row['dept_id']) {
-        $ch[] = '部署: ' . ($depts[$cur['dept_id']]['dept_name'] ?? $cur['dept_id']) . ' → ' . $depts[$row['dept_id']]['dept_name'];
+        $ch[] = '入力する画面: ' . ($depts[$cur['dept_id']]['dept_name'] ?? $cur['dept_id']) . ' → ' . $depts[$row['dept_id']]['dept_name'];
     }
     if ($row['role'] !== null && $cur['role'] !== $row['role']) {
         $ch[] = '役割: ' . (user_roles()[$cur['role']] ?? $cur['role']) . ' → ' . user_roles()[$row['role']];
@@ -106,16 +137,24 @@ function user_apply(array $row, ?string $pwHash = null): string
 {
     $now = date('Y-m-d H:i:s');
     $cur = db_row('SELECT * FROM m_user WHERE user_id = ?', [$row['user_id']]);
+    // 電子カルテの部署名は、列があって、行に入っているときだけ書く
+    $emr = isset($row['emr_dept']) && users_has_emr_dept() ? $row['emr_dept'] : null;
     if ($cur === null) {
         db_exec('INSERT INTO m_user (user_id,user_name,dept_id,role,password_hash,is_active,created_at,updated_at)
                  VALUES (?,?,?,?,?,1,?,?)',
                 [$row['user_id'], $row['user_name'], $row['dept_id'], $row['role'] ?? 'entry', $pwHash, $now, $now]);
+        if ($emr !== null) {
+            db_exec('UPDATE m_user SET emr_dept = ? WHERE user_id = ?', [$emr, $row['user_id']]);
+        }
         return 'new';
     }
     db_exec('UPDATE m_user SET user_name = ?, dept_id = ?, role = ?, is_active = 1, updated_at = ?'
             . ($pwHash !== null ? ', password_hash = ?' : '') . ' WHERE user_id = ?',
             array_merge([$row['user_name'], $row['dept_id'], $row['role'] ?? $cur['role'], $now],
                         $pwHash !== null ? [$pwHash] : [], [$row['user_id']]));
+    if ($emr !== null) {
+        db_exec('UPDATE m_user SET emr_dept = ? WHERE user_id = ?', [$emr, $row['user_id']]);
+    }
     return 'update';
 }
 
