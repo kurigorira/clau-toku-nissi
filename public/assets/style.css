@@ -147,3 +147,5 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nippo-load { margin: 0 0 12px; padding: 8px 12px; background: #fff; border: 1px dashed #8fb8d8; border-radius: 4px; }
 .nippo-load button { margin: 0 8px; }
 .nippo-load label { margin-right: 16px; }
+.app-user a { color: #dce8f4; margin: 0 6px; }
+.app-user a:hover { color: #fff; }

@@ -17,7 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($u && $u['password_hash'] && password_verify($pw, $u['password_hash'])) {
         start_session();
         session_regenerate_id(true);
+        $_SESSION = [];                          // 前にこの端末を使った人の状態は持ち越さない
         $_SESSION['user_id'] = $u['user_id'];
+        $_SESSION['via']       = 'local';      // パスワードで入った。医事課・管理者も最初から本来の役割
+        $_SESSION['last_seen'] = time();
         header('Location: index.php');
         exit;
     }

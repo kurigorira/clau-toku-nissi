@@ -40,6 +40,8 @@ function num_plain($v): string
 function start_session(): void
 {
     if (session_status() === PHP_SESSION_NONE) {
+        // JavaScript からセッションを読めないようにし、よそのサイトからの送信には付けない
+        session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
         session_start();
     }
 }
@@ -111,6 +113,9 @@ function page_header(string $title, ?array $user = null): void
     <?php if ($user && (in_array($user['role'], ['ijika', 'admin'], true) || $user['dept_id'] === 'gairai')): ?>
       <a href="nippo.php">日報転記</a>
     <?php endif; ?>
+    <?php if ($user && $user['role'] === 'toutyoku' && $user['dept_id'] !== 'toutyoku'): ?>
+      <a href="entry.php?dept=toutyoku">当直入力</a>
+    <?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
       <a href="soukatsu.php">総括</a>
       <a href="zaiin.php">平均在院日数</a>
@@ -126,7 +131,14 @@ function page_header(string $title, ?array $user = null): void
     <?php endif; ?>
   </nav>
   <?php if ($user): ?>
-  <div class="app-user"><?= h($user['user_name']) ?>（<?= h($user['dept_name'] ?? $user['dept_id']) ?>）</div>
+  <div class="app-user">
+    <?php if (function_exists('can_elevate') && can_elevate($user)):
+        $here = basename((string)strtok($_SERVER['REQUEST_URI'] ?? 'index.php', '#')); ?>
+      <a href="elevate.php?next=<?= h(urlencode($here)) ?>"><?= $user['role_real'] === 'admin' ? '管理者' : '医事課' ?>として作業</a>
+    <?php endif; ?>
+    <?= h($user['user_name']) ?>（<?= h($user['dept_name'] ?? $user['dept_id']) ?>）
+    <a href="logout.php">終了</a>
+  </div>
   <?php endif; ?>
 </header>
 <main>

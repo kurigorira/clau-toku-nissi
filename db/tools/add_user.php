@@ -19,9 +19,10 @@
 
 require_once dirname(__DIR__, 2) . '/src/db.php';
 
-$ROLES = ['entry' => '入力者', 'toutyoku' => '当直者', 'ijika' => '医事課', 'admin' => '管理者'];
-
 require_once dirname(__DIR__, 2) . '/src/cli.php';
+require_once dirname(__DIR__, 2) . '/src/users.php';
+
+$ROLES = user_roles();
 
 // 引数の解き方（Shift_JIS・全角スペース・getopt() の問題）は src/cli.php を参照
 ['opt' => $opt, 'extra' => $extra] = cli_args($argv);
@@ -55,6 +56,7 @@ TXT);
     exit(1);
 }
 
+$deptRows = all_depts(false);   // 登録用（src/users.php に渡す）
 $depts = [];
 foreach (db_all('SELECT dept_id, dept_name FROM m_dept ORDER BY sort_no') as $d) {
     $depts[$d['dept_id']] = $d['dept_name'];
@@ -94,50 +96,23 @@ if (isset($opt['disable'])) {
     exit($n ? 0 : 1);
 }
 
-/** 1人ぶん登録・更新する。問題があればメッセージを返す。 */
-function upsert_user(array $u, array $depts, array $roles): string
+/** 1人ぶん登録・更新する（src/users.php を使う）。結果の1行を返す。 */
+function upsert_user(array $u, array $deptRows, array $roles): string
 {
-    $id   = trim((string)($u['user_id'] ?? ''));
-    $name = trim((string)($u['user_name'] ?? ''));
-    $dept = trim((string)($u['dept_id'] ?? ''));
-    $role = trim((string)($u['role'] ?? 'entry'));
-    $pw   = (string)($u['password'] ?? '');
-
-    if ($id === '' || $name === '') {
-        return "  × 職員IDと氏名は必須です（{$id}）";
-    }
-    if (!preg_match('/^[\w.\-]{1,32}$/', $id)) {
-        return "  × {$id}: 職員IDは半角英数字・ハイフン・ピリオド・アンダースコアで32文字までです";
-    }
-    if (!isset($depts[$dept])) {
-        return "  × {$id}: 部署ID '{$dept}' が存在しません";
-    }
-    if (!isset($roles[$role])) {
-        return "  × {$id}: 役割 '{$role}' は " . implode(' / ', array_keys($roles)) . " のいずれかです";
+    $pw = (string)($u['password'] ?? '');
+    [$row, $err] = user_validate($u, $deptRows);
+    $id = trim((string)($u['user_id'] ?? ''));
+    if ($err !== null) {
+        return $id === '' ? "  × {$err}" : "  × {$id}: {$err}";
     }
     if ($pw !== '' && mb_strlen($pw) < 8) {
-        return "  × {$id}: パスワードは8文字以上にしてください";
+        return "  × {$row['user_id']}: パスワードは8文字以上にしてください";
     }
-
-    $now  = date('Y-m-d H:i:s');
-    $hash = $pw === '' ? null : password_hash($pw, PASSWORD_DEFAULT);
-    $cur  = db_row('SELECT user_id FROM m_user WHERE user_id = ?', [$id]);
-
-    if ($cur) {
-        // パスワード未指定なら既存のものを変えない
-        if ($hash === null) {
-            db_exec('UPDATE m_user SET user_name = ?, dept_id = ?, role = ?, is_active = 1, updated_at = ?
-                      WHERE user_id = ?', [$name, $dept, $role, $now, $id]);
-        } else {
-            db_exec('UPDATE m_user SET user_name = ?, dept_id = ?, role = ?, password_hash = ?, is_active = 1, updated_at = ?
-                      WHERE user_id = ?', [$name, $dept, $role, $hash, $now, $id]);
-        }
-        return "  ○ {$id}（{$name}）を更新しました";
-    }
-
-    db_exec('INSERT INTO m_user (user_id,user_name,dept_id,role,password_hash,is_active,created_at,updated_at)
-             VALUES (?,?,?,?,?,1,?,?)', [$id, $name, $dept, $role, $hash, $now, $now]);
-    return "  ○ {$id}（{$name}／{$depts[$dept]}／{$roles[$role]}）を登録しました";
+    $kind = user_apply($row, $pw === '' ? null : password_hash($pw, PASSWORD_DEFAULT));
+    $cur  = db_row('SELECT role FROM m_user WHERE user_id = ?', [$row['user_id']]);
+    return $kind === 'new'
+        ? "  ○ {$row['user_id']}（{$row['user_name']}／{$deptRows[$row['dept_id']]['dept_name']}／{$roles[$cur['role']]}）を登録しました"
+        : "  ○ {$row['user_id']}（{$row['user_name']}）を更新しました";
 }
 
 // ---- CSV一括 -------------------------------------------------------------
@@ -147,24 +122,19 @@ if (isset($opt['csv'])) {
         fwrite(STDERR, "CSVがありません: {$path}\n");
         exit(1);
     }
-    $fp   = fopen($path, 'r');
-    $head = fgetcsv($fp);
-    if ($head && isset($head[0])) {
-        $head[0] = preg_replace('/^\xEF\xBB\xBF/', '', $head[0]);   // ExcelのBOM
+    // 見出しは 電子カルテID・氏名・部署・役割・パスワード（英字の user_id,user_name,dept_id,role,password も可）。
+    // Excelから「CSV(コンマ区切り)」で保存した Shift_JIS も読める（src/users.php）
+    $csv = users_read_csv($path);
+    if ($csv['error'] !== null) {
+        fwrite(STDERR, $csv['error'] . "\n");
+        exit(1);
     }
     $ok = $ng = 0;
-    while (($r = fgetcsv($fp)) !== false) {
-        if (count($r) === 1 && trim((string)$r[0]) === '') {
-            continue;
-        }
-        $row = array_combine($head, array_pad(array_slice($r, 0, count($head)), count($head), ''));
-        // Excelから「CSV(コンマ区切り)」で保存するとSJISになるため、ここで揃える
-        $row = array_map('cli_to_utf8', $row);
-        $msg = upsert_user($row, $depts, $ROLES);
+    foreach ($csv['rows'] as [$line, $row]) {
+        $msg = upsert_user($row, $deptRows, $ROLES);
         echo $msg . "\n";
         strpos($msg, '○') !== false ? $ok++ : $ng++;
     }
-    fclose($fp);
     echo "\n登録・更新 {$ok}件 / エラー {$ng}件\n";
     exit($ng ? 1 : 0);
 }
@@ -176,6 +146,6 @@ $msg = upsert_user([
     'dept_id'   => $opt['dept']     ?? '',
     'role'      => $opt['role']     ?? 'entry',
     'password'  => $opt['password'] ?? '',
-], $depts, $ROLES);
+], $deptRows, $ROLES);
 echo $msg . "\n";
 exit(strpos($msg, '○') !== false ? 0 : 1);
