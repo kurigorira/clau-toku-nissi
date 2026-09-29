@@ -15,6 +15,13 @@ $date   = valid_date($_REQUEST['hizuke'] ?? null) ?? date('Y-m-d', strtotime('-1
 $deptId = (string)($_REQUEST['dept'] ?? $user['dept_id']);
 $depts  = all_depts();
 
+if (!isset($depts[$deptId]) && $deptId === $user['dept_id']) {
+    // 日誌に関係しない部署（その他・閲覧のみ）の職員
+    page_header('入力する項目はありません', $user);
+    flash('この部署には入力する項目がありません（閲覧のみ）。入力状況・病院日誌・救急搬入は上のメニューから見られます。', 'info');
+    page_footer();
+    exit;
+}
 if (!isset($depts[$deptId])) {
     http_response_code(404);
     exit('部署が見つかりません。');

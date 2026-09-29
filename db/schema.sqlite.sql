@@ -20,6 +20,7 @@ PRAGMA foreign_keys = ON;
 
 
 DROP TABLE IF EXISTS d_audit;
+DROP TABLE IF EXISTS d_access_log;
 DROP TABLE IF EXISTS d_tokki;
 DROP TABLE IF EXISTS d_submission;
 DROP TABLE IF EXISTS d_daily_value;
@@ -162,6 +163,23 @@ CREATE TABLE d_audit (
   client_ip  VARCHAR(45)  NOT NULL DEFAULT ''
 );
 
+-- ---------------------------------------------------------------------------
+--  d_access_log : 閲覧履歴
+--  誰が・いつ・どの画面を・どの条件で見たか。d_audit は「直した」記録、こちらは「見た」記録。
+--  特記事項（患者ID・氏名）やCSV出力を誰が見たかを追えるようにする。
+--  保存期間は config.php の access_log.keep_days（既定3年）。古い行は自動で消す。
+-- ---------------------------------------------------------------------------
+CREATE TABLE d_access_log (
+
+  access_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  acted_at   DATETIME     NOT NULL,
+  user_id    VARCHAR(32)  NOT NULL DEFAULT '',
+  page       VARCHAR(64)  NOT NULL DEFAULT '',
+  query      VARCHAR(255) NOT NULL DEFAULT '',
+  method     VARCHAR(8)   NOT NULL DEFAULT '',
+  client_ip  VARCHAR(45)  NOT NULL DEFAULT ''
+);
+
 
 -- ------------------------------------------------------------
 --  d_tokki : 特記事項（定員超過報告）
@@ -220,4 +238,6 @@ CREATE INDEX idx_item_group ON m_item (group_code, sort_no);
 CREATE INDEX idx_daily_item ON d_daily_value (item_code, hizuke);
 CREATE INDEX idx_audit_hizuke ON d_audit (hizuke);
 CREATE INDEX idx_audit_at ON d_audit (acted_at);
+CREATE INDEX idx_access_at ON d_access_log (acted_at);
+CREATE INDEX idx_access_user ON d_access_log (user_id, acted_at);
 CREATE INDEX idx_tokki_hizuke ON d_tokki (hizuke);

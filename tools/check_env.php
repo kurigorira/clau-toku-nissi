@@ -155,6 +155,14 @@ if (!is_file($confPath)) {
             line($c > 0 ? 'OK' : '注意', '項目マスタ',
                  $c > 0 ? $c . '項目' : '空 … db/seed_master.sql を流してください');
         }
+
+        // 閲覧履歴のテーブル（後から足したので、既存のサーバでは別に流す必要がある）
+        $hasLog = true;
+        try { $pdo->query('SELECT 1 FROM d_access_log LIMIT 1'); }
+        catch (Exception $e) { $hasLog = false; }
+        line($hasLog ? 'OK' : '注意', '閲覧履歴',
+             $hasLog ? 'テーブルあり'
+             : '未作成 … php db\\tools\\run_sql.php --user=root --pass=... db\\migrations\\002_access_log.sql');
     } catch (Exception $e) {
         line('NG', 'DB接続', '失敗: ' . $e->getMessage());
     }

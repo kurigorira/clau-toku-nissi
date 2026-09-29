@@ -1,9 +1,9 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-09-25 18:20:11
+-- 生成日時: 2026-09-29 02:30:43
 
 DELETE FROM m_item;
-DELETE FROM m_config;
+DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%';
 DELETE FROM m_dept;
 
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('gairai','外来',10,'18:00','1234567',1);
@@ -25,6 +25,7 @@ INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('shisetsu','施設課',170,'18:00','12345',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('jimu','事務課',180,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('ijika','医事課',190,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('sonota','その他（閲覧のみ）',999,'18:00','',0);
 
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('gairai_am','午前 患者数','gairai','gairai_cnt','外来患者数','sum','gk_naika_am,gk_geka_am,gk_seikei_am,gk_noge_am,gk_shinryo_am,gk_keisei_am,gk_jinzo_am,gk_kenshin_am,gk_shoka_am,gk_kokyu_am,gk_shoni_am,gk_hinyo_am,gk_hifu_am,gk_ikou_am','int','sum','名',10,0,NULL,NULL,'2000-01-01',NULL,NULL,NULL,'電子カルテ日報の医科合計 午前（科別の合計）');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('gairai_pm','午後 患者数','gairai','gairai_cnt','外来患者数','sum','gk_naika_pm,gk_geka_pm,gk_seikei_pm,gk_noge_pm,gk_shinryo_pm,gk_keisei_pm,gk_jinzo_pm,gk_kenshin_pm,gk_shoka_pm,gk_kokyu_pm,gk_shoni_pm,gk_hinyo_pm,gk_hifu_pm,gk_ikou_pm','int','sum','名',20,0,NULL,NULL,'2000-01-01',NULL,NULL,NULL,'電子カルテ日報の医科合計 午後（科別の合計）');

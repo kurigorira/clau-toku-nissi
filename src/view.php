@@ -113,7 +113,7 @@ function page_header(string $title, ?array $user = null): void
     <?php if ($user && (in_array($user['role'], ['ijika', 'admin'], true) || $user['dept_id'] === 'gairai')): ?>
       <a href="nippo.php">日報転記</a>
     <?php endif; ?>
-    <?php if ($user && $user['role'] === 'toutyoku' && $user['dept_id'] !== 'toutyoku'): ?>
+    <?php if ($user && function_exists('does_toutyoku') && does_toutyoku($user)): ?>
       <a href="entry.php?dept=toutyoku">当直入力</a>
     <?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
@@ -128,6 +128,7 @@ function page_header(string $title, ?array $user = null): void
     <?php if ($user && $user['role'] === 'admin'): ?>
       <a href="admin_master.php">マスタ</a>
       <a href="admin_user.php">職員</a>
+      <a href="access_log.php">閲覧履歴</a>
     <?php endif; ?>
   </nav>
   <?php if ($user): ?>

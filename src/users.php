@@ -180,3 +180,105 @@ function users_read_csv(string $path): array
     }
     return ['rows' => $rows, 'error' => null];
 }
+
+/* ======================================================================
+ * 電子カルテの職員一覧（syokuinID.csv）
+ *
+ * 電子カルテから出した職員一覧は見出しの無いCSVで、1行目が「発行日 令和 8年 9月29日」。
+ *   A列 … 電子カルテID（電子カルテからこのアプリを開くときに渡される番号）
+ *   E列 … 漢字の氏名
+ *   F列 … 電子カルテの部署名（新4階病棟・薬剤部・総務課 …）
+ * ほかの列（番号・カナ・区分・役職・職種・資格・診療科）は使わない。
+ *
+ * 電子カルテの部署名はこのアプリの部署と一致しないので、対応表（m_config の emr_dept:部署名）で
+ * このアプリの部署に置き換える。対応表は職員画面で確かめて保存する。
+ * ====================================================================== */
+
+/** 閲覧だけの職員の部署（depts.csv の is_active=0 の部署）。 */
+const DEPT_VIEW_ONLY = 'sonota';
+
+/**
+ * 電子カルテの職員一覧なら読む。そうでなければ null（見出し付きCSVとして読む）。
+ *
+ * @return array|null ['issued' => '発行日 …', 'rows' => [[行番号, ID, 氏名, 電子カルテの部署名], ...], 'error' => 文|null]
+ */
+function users_read_emr_csv(string $path): ?array
+{
+    $text = (string)file_get_contents($path);
+    $text = preg_replace('/^\xEF\xBB\xBF/', '', $text);
+    $text = cli_to_utf8($text);
+    $fp = fopen('php://temp', 'w+');
+    fwrite($fp, $text);
+    rewind($fp);
+
+    $first = fgetcsv($fp);
+    if (!$first || mb_strpos(user_norm((string)($first[0] ?? '')), '発行日') !== 0) {
+        fclose($fp);
+        return null;
+    }
+    $issued = trim(preg_replace('/\s+/u', ' ', implode(' ', array_filter($first, fn($x) => trim((string)$x) !== ''))));
+    $rows = [];
+    $line = 1;
+    while (($r = fgetcsv($fp)) !== false) {
+        $line++;
+        $id = trim(mb_convert_kana((string)($r[0] ?? ''), 'as', 'UTF-8'));
+        if (!preg_match('/^\d+$/', $id)) {
+            continue;   // 空行や、番号でない行（途中の見出しなど）は読まない
+        }
+        $name = trim(preg_replace('/[\s\x{3000}]+/u', ' ', (string)($r[4] ?? '')));
+        $dept = trim(preg_replace('/[\s\x{3000}]+/u', '', (string)($r[5] ?? '')));
+        $rows[] = [$line, $id, $name, $dept];
+    }
+    fclose($fp);
+    if (!$rows) {
+        return ['issued' => $issued, 'rows' => [], 'error' => '電子カルテの職員一覧に職員の行がありません。'];
+    }
+    return ['issued' => $issued, 'rows' => $rows, 'error' => null];
+}
+
+/** 保存してある対応表（電子カルテの部署名 => dept_id）。 */
+function emr_dept_map_load(): array
+{
+    $out = [];
+    foreach (db_all("SELECT config_key, config_value FROM m_config WHERE config_key LIKE 'emr_dept:%'") as $r) {
+        $out[substr($r['config_key'], strlen('emr_dept:'))] = $r['config_value'];
+    }
+    return $out;
+}
+
+/** 対応表を保存する（ある部署名は上書き）。 */
+function emr_dept_map_save(array $map): void
+{
+    foreach ($map as $emrName => $deptId) {
+        $key = 'emr_dept:' . $emrName;
+        db_exec('DELETE FROM m_config WHERE config_key = ?', [$key]);
+        db_exec("INSERT INTO m_config (config_key, valid_from, config_value, note) VALUES (?, '2000-01-01', ?, ?)",
+                [$key, $deptId, '電子カルテの部署名との対応（職員画面で設定）']);
+    }
+}
+
+/**
+ * 初めて見る電子カルテの部署名に、このアプリの部署の候補を出す。
+ * あくまで候補。画面で確かめてから保存する。
+ */
+function emr_dept_guess(string $emrName, array $depts): string
+{
+    $n = user_norm($emrName);
+    foreach ($depts as $id => $d) {
+        if ($id !== DEPT_VIEW_ONLY && user_norm($d['dept_name']) === $n) {
+            return $id;     // 名前がそのまま同じ（栄養科・医事課 など）
+        }
+    }
+    $rules = [
+        '病棟' => 'byoto', '薬剤' => 'yakuzai', '栄養' => 'eiyou', 'リハビリ' => 'rehab', '放射線' => 'housha',
+        '検査' => 'kensa', '透析' => 'touseki', '手術' => 'ope', '医事' => 'ijika', '総務' => 'jimu', '事務' => 'jimu',
+        '施設' => 'shisetsu', '地域医療連携' => 'renkei', '連携' => 'renkei', '健診' => 'dock', 'ドック' => 'dock',
+        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kansen', '外来' => 'gairai',
+    ];
+    foreach ($rules as $word => $id) {
+        if (mb_strpos($n, $word) !== false && isset($depts[$id])) {
+            return $id;
+        }
+    }
+    return DEPT_VIEW_ONLY;
+}

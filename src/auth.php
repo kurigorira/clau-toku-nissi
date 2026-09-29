@@ -155,6 +155,7 @@ function require_login(): array
 {
     $u = current_user();
     if ($u !== null) {
+        access_log_record($u);
         return $u;
     }
     $mode = (cfg('auth') ?? [])['mode'] ?? 'emr';
@@ -182,6 +183,44 @@ function require_login(): array
     exit;
 }
 
+/**
+ * 閲覧履歴を1行残す（誰が・いつ・どの画面を・どの条件で）。
+ *
+ * ログインが要る画面はすべて require_login() を通るので、ここ1か所で記録できる。
+ * 職員ID（staff_id）・署名・パスワード・CSRFトークンは残さない。
+ * 記録に失敗しても画面は止めない（テーブルがまだ無いサーバでも動くように）。
+ */
+function access_log_record(array $u): void
+{
+    static $done = false;
+    if ($done || PHP_SAPI === 'cli') {
+        return;
+    }
+    $done = true;
+
+    $auth = cfg('auth') ?? [];
+    $q = $_GET;
+    unset($q[$auth['emr_param'] ?? 'staff_id'], $q['sig'], $q['password'], $q['_csrf']);
+    $method = (string)($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    if ($method === 'POST' && is_string($_POST['action'] ?? null)) {
+        $q['action'] = $_POST['action'];      // 何をしたか（保存・提出・読み込み など）。値そのものは残さない
+    }
+    $query = mb_substr(urldecode(http_build_query($q)), 0, 255);
+
+    try {
+        db_exec('INSERT INTO d_access_log (acted_at, user_id, page, query, method, client_ip) VALUES (?,?,?,?,?,?)',
+                [date('Y-m-d H:i:s'), $u['user_id'], mb_substr(basename((string)($_SERVER['SCRIPT_NAME'] ?? '')), 0, 64),
+                 $query, substr($method, 0, 8), client_ip()]);
+        // 保存期間を過ぎた行は、ときどき（約500回に1回）まとめて消す
+        $keep = (int)((cfg('access_log') ?? [])['keep_days'] ?? 1095);
+        if ($keep > 0 && mt_rand(1, 500) === 1) {
+            db_exec('DELETE FROM d_access_log WHERE acted_at < ?', [date('Y-m-d H:i:s', time() - $keep * 86400)]);
+        }
+    } catch (Throwable $e) {
+        error_log('閲覧履歴を記録できませんでした（db/migrations/002_access_log.sql を流したか確認）: ' . $e->getMessage());
+    }
+}
+
 /** 指定した役割のいずれかを持っているか。 */
 function has_role(array $user, string ...$roles): bool
 {
@@ -202,14 +241,22 @@ function can_elevate(array $user): bool
 
 /**
  * その部署の入力ができるか。
- * 自部署のみ入力可。医事課と管理者は全部署を代行入力できる。
- * 当直者は、所属（病棟など）に加えて当直（在宅②の訪問系・通所リハ）の欄も入力する。
+ * 自部署のみ入力可。医事課と管理者は全部署を代行入力できる（パスワード確認後）。
+ *
+ * 当直（在宅②の訪問系・通所リハ）の欄は医事課の職員が入力する運用なので、
+ * 所属が医事課の職員はパスワード確認なしで入力できる。役割が当直者の人も入力できる。
  */
 function can_edit_dept(array $user, string $deptId): bool
 {
     return is_ijika($user)
         || $user['dept_id'] === $deptId
-        || ($user['role'] === 'toutyoku' && $deptId === 'toutyoku');
+        || ($deptId === 'toutyoku' && ($user['dept_id'] === 'ijika' || $user['role'] === 'toutyoku'));
+}
+
+/** 当直の欄を入力する人か（ヘッダに「当直入力」を出すかに使う）。 */
+function does_toutyoku(array $user): bool
+{
+    return $user['dept_id'] !== 'toutyoku' && can_edit_dept($user, 'toutyoku');
 }
 
 /** ログイン中の職員IDを返す（保存時の created_by / updated_by に使う）。 */

@@ -137,7 +137,8 @@ $sql[] = '-- db/master/*.csv を編集し、php db/tools/build_seed.php で再�
 $sql[] = '-- 生成日時: ' . date('Y-m-d H:i:s');
 $sql[] = '';
 $sql[] = 'DELETE FROM m_item;';
-$sql[] = 'DELETE FROM m_config;';
+// 電子カルテの部署名との対応表（emr_dept:…）は職員画面で決めて保存するので、流し直しても消さない
+$sql[] = "DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%';";
 $sql[] = 'DELETE FROM m_dept;';
 $sql[] = '';
 
