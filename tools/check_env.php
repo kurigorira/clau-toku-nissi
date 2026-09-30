@@ -179,6 +179,20 @@ if (!is_file($confPath)) {
 // ---- バックアップ ----
 // 「取れているつもりで止まっている」のがバックアップで最も多い壊れ方なので、
 // 最後に取れた日付をここで見えるようにする。
+// ---- 電子カルテからの起動 ----
+// ログイン画面が出て電子カルテIDが引き継がれないときは、ほぼここ（mode が local のまま・パラメータ名の違い）
+echo $nl . "電子カルテからの起動" . $nl;
+$au = isset($conf) && isset($conf['auth']) ? $conf['auth'] : array();
+$auMode  = isset($au['mode']) ? $au['mode'] : 'emr';
+$auParam = isset($au['emr_param']) ? $au['emr_param'] : 'staffId';
+if ($auMode === 'emr') {
+    line('OK', '認証方式', "emr（電子カルテから ?{$auParam}=職員ID で開く）");
+} else {
+    line('注意', '認証方式', "{$auMode} … 電子カルテIDは使われず、ログイン画面が出ます。"
+        . "config/config.php の auth.mode を 'emr' にしてください");
+}
+line('情報', 'パラメータ名', $auParam . ' … 電子カルテのボタンの引数（例 ?staffId=$$INPCDN$$）と一字一句同じに');
+
 echo $nl . "バックアップ" . $nl;
 $bk = isset($conf) && isset($conf['backup']) ? $conf['backup'] : array();
 $bkDir = isset($bk['dir']) ? $bk['dir'] : '';

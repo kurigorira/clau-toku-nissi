@@ -54,7 +54,7 @@ function current_user(): ?array
 
     // 電子カルテからの引き継ぎ
     if ($mode === 'emr') {
-        $param = $auth['emr_param'] ?? 'staff_id';
+        $param = $auth['emr_param'] ?? 'staffId';
         $raw   = $_GET[$param] ?? $_POST[$param] ?? null;
         if (is_string($raw) && trim($raw) !== '') {
             $id = auth_normalize_id($raw);
@@ -187,7 +187,7 @@ function require_login(): array
  * 閲覧履歴を1行残す（誰が・いつ・どの画面を・どの条件で）。
  *
  * ログインが要る画面はすべて require_login() を通るので、ここ1か所で記録できる。
- * 職員ID（staff_id）・署名・パスワード・CSRFトークンは残さない。
+ * 職員ID（staffId）・署名・パスワード・CSRFトークンは残さない。
  * 記録に失敗しても画面は止めない（テーブルがまだ無いサーバでも動くように）。
  */
 function access_log_record(array $u): void
@@ -200,7 +200,7 @@ function access_log_record(array $u): void
 
     $auth = cfg('auth') ?? [];
     $q = $_GET;
-    unset($q[$auth['emr_param'] ?? 'staff_id'], $q['sig'], $q['password'], $q['_csrf']);
+    unset($q[$auth['emr_param'] ?? 'staffId'], $q['sig'], $q['password'], $q['_csrf']);
     $method = (string)($_SERVER['REQUEST_METHOD'] ?? 'GET');
     if ($method === 'POST' && is_string($_POST['action'] ?? null)) {
         $q['action'] = $_POST['action'];      // 何をしたか（保存・提出・読み込み など）。値そのものは残さない
