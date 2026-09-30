@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      empty($u['is_active']) ? 0 : 1, $now, $id]);
             $n++;
         }
-        $messages[] = ["{$n}件を更新しました。", 'ok'];
+        $messages[] = ["一覧の {$n}人 を保存しました。", 'ok'];
     }
 
     if ($action === 'reset_pw') {
@@ -233,6 +233,28 @@ function csv_build_preview(array $rows, bool $deactivate, string $selfId): array
         'emr_roles'  => $_SESSION['csv_emr']['roles'] ?? null,
     ];
     return $preview;
+}
+
+/**
+ * 確認画面の「この内容で登録する」ボタン。人数が多いと一覧の下まで行かないので、一覧の上と下の両方に出す。
+ */
+function csv_commit_form(array $preview): void
+{
+    if (!$preview['new'] && !$preview['update'] && !$preview['deactivate']) {
+        echo '<p>登録・更新する職員はありません。 <a href="admin_user.php">職員の一覧に戻る</a></p>';
+        return;
+    }
+    $label = 'この内容で登録する（新規 ' . count($preview['new']) . '人・更新 ' . count($preview['update']) . '人'
+        . ($preview['deactivate'] ? '・無効 ' . count($preview['deactivate']) . '人' : '') . '）';
+    ?>
+<form method="post">
+  <?= csrf_field() ?>
+  <input type="hidden" name="action" value="csv_commit">
+  <input type="hidden" name="token" value="<?= h($_SESSION['csv_import']['token'] ?? '') ?>">
+  <p class="actions"><button type="submit" class="primary"><?= h($label) ?></button>
+    <a href="admin_user.php">やめる</a></p>
+</form>
+<?php
 }
 
 /**
@@ -355,6 +377,7 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
   エラー <strong><?= count($preview['errors']) ?></strong>行
   <?php if ($preview['deactivate']): ?>・無効にする <strong><?= count($preview['deactivate']) ?></strong>人<?php endif; ?>
 </p>
+<?php csv_commit_form($preview); ?>
 <?php if ($preview['warn']): ?>
   <div class="flash flash-warn"><strong>確かめてください</strong><ul>
   <?php foreach ($preview['warn'] as $w): ?><li><?= h($w) ?></li><?php endforeach; ?></ul></div>
@@ -381,19 +404,13 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
   <p class="flash flash-warn">CSVに無いため無効にする職員：
     <?= h(implode('、', array_map(fn($x) => "{$x['user_name']}（{$x['user_id']}）", $preview['deactivate']))) ?></p>
 <?php endif; ?>
-<?php if ($preview['new'] || $preview['update'] || $preview['deactivate']): ?>
-<form method="post">
-  <?= csrf_field() ?>
-  <input type="hidden" name="action" value="csv_commit">
-  <input type="hidden" name="token" value="<?= h($_SESSION['csv_import']['token'] ?? '') ?>">
-  <p class="actions"><button type="submit" class="primary">この内容で登録する</button>
-    <a href="admin_user.php">やめる</a></p>
-</form>
-<?php else: ?>
-  <p>登録・更新する職員はありません。</p>
-<?php endif; ?>
-<hr>
-<?php endif; ?>
+<?php csv_commit_form($preview); ?>
+<?php
+// 確認画面の間は、登録済みの一覧（「一覧の変更を保存」）や新規登録を出さない。
+// 取り込んだつもりで一覧の保存を押し、確認画面の内容が捨てられるのを防ぐ
+page_footer();
+exit;
+endif; ?>
 
 <h2>CSVで一括登録</h2>
 <form method="post" enctype="multipart/form-data">
@@ -440,7 +457,7 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
       </tr>
     <?php endforeach; ?>
   </table>
-  <p class="actions"><button type="submit" class="primary">保存</button></p>
+  <p class="actions"><button type="submit" class="primary">一覧の変更を保存</button></p>
 </form>
 
 <?php if (!empty($_GET['pw'])): $pwId = (string)$_GET['pw']; ?>
