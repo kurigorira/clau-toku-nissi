@@ -145,6 +145,23 @@ function emr_signature_ok(string $id, array $auth): bool
 }
 
 /**
+ * URL に電子カルテの職員IDらしいものが付いていれば、そのパラメータ名を返す。
+ * 設定の名前（auth.emr_param）に加え、よくある書き方（staffId・staff_id の大文字小文字違い）も見る。
+ * 「ボタンから開いたのにログイン画面になる」ときに、原因を画面に出すために使う。
+ */
+function auth_emr_param_in_url(): ?string
+{
+    $want = strtolower((string)((cfg('auth') ?? [])['emr_param'] ?? 'staffId'));
+    foreach ($_GET as $k => $v) {
+        $lk = strtolower((string)$k);
+        if (is_string($v) && trim($v) !== '' && ($lk === $want || in_array($lk, ['staffid', 'staff_id'], true))) {
+            return (string)$k;
+        }
+    }
+    return null;
+}
+
+/**
  * ログインしていなければ止める。
  *
  * 予備ログイン（mode=local）ならログイン画面へ。
@@ -158,10 +175,23 @@ function require_login(): array
         access_log_record($u);
         return $u;
     }
-    $mode = (cfg('auth') ?? [])['mode'] ?? 'emr';
+    $auth = cfg('auth') ?? [];
+    $mode = $auth['mode'] ?? 'emr';
+    $got  = auth_emr_param_in_url();
     if ($mode !== 'emr') {
-        header('Location: login.php');
+        if ($got !== null) {
+            // 電子カルテのボタンから開かれたが、設定が local なのでIDを使えない。ログイン画面で理由を出す
+            error_log("電子カルテから職員ID（{$got}）が渡されましたが、auth.mode が '{$mode}' のため使っていません");
+            header('Location: login.php?emr=ignored');
+        } else {
+            header('Location: login.php');
+        }
         exit;
+    }
+    $param = (string)($auth['emr_param'] ?? 'staffId');
+    $wrongName = $got !== null && $got !== $param ? $got : null;
+    if ($wrongName !== null) {
+        error_log("電子カルテから渡されたパラメータ名（{$wrongName}）が auth.emr_param（{$param}）と違います");
     }
     $unknown  = $_SESSION['unknown_id'] ?? null;
     $timedOut = !empty($_SESSION['timed_out']);
@@ -173,6 +203,10 @@ function require_login(): array
         flash("電子カルテID「{$unknown}」は、このシステムの職員マスタに登録されていないか、無効になっています。", 'error');
         echo '<p>医事課・管理者に、電子カルテID・氏名・部署を伝えて登録を依頼してください。</p>';
     } else {
+        if ($wrongName !== null) {
+            flash("電子カルテから職員IDが渡されましたが、パラメータ名が違います（URL は「{$wrongName}」、"
+                . "config/config.php の auth.emr_param は「{$param}」）。どちらかを揃えてください。", 'error');
+        }
         if ($timedOut) {
             flash('しばらく操作が無かったため終了しました。', 'info');
         }

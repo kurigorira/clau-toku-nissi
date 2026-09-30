@@ -7,6 +7,17 @@
  */
 require_once __DIR__ . '/../src/auth.php';
 
+$authCfg = cfg('auth') ?? [];
+$emrMode = ($authCfg['mode'] ?? 'emr') === 'emr';
+
+// 電子カルテのボタンがこの画面を開いた（?staffId=… 付き）なら、入口（index.php）に回してそのまま入る
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $emrMode && auth_emr_param_in_url() !== null) {
+    header('Location: index.php?' . http_build_query($_GET));
+    exit;
+}
+// 電子カルテからIDが渡されたのに、設定が local で使えなかった（require_login から来た）
+$emrIgnored = !$emrMode && (($_GET['emr'] ?? '') === 'ignored' || auth_emr_param_in_url() !== null);
+
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
@@ -33,6 +44,10 @@ page_header('ログイン');
 ?>
 <form method="post" class="login-form">
   <?= csrf_field() ?>
+  <?php if ($emrIgnored): ?>
+  <p class="flash flash-warn">電子カルテから職員IDが渡されましたが、config/config.php の auth.mode が
+    「<?= h($authCfg['mode'] ?? '') ?>」のため使っていません。電子カルテから開いて入るには 'emr' にしてください。</p>
+  <?php endif; ?>
   <?php if ($error): ?><p class="flash flash-error"><?= h($error) ?></p><?php endif; ?>
   <p><label>職員ID<br><input type="text" name="user_id" autofocus required></label></p>
   <p><label>パスワード<br><input type="password" name="password" required></label></p>
