@@ -3,6 +3,8 @@
  * 画面まわりの共通処理。エスケープ・CSRF・ヘッダ／フッタ。
  */
 
+require_once __DIR__ . '/version.php';
+
 /**
  * HTMLエスケープ。画面に文字を出すときは必ずこれを通す。
  * 特記事項には患者氏名が入るため、素通しにはできない。
@@ -152,7 +154,7 @@ function page_footer(): void
 {
     ?>
 </main>
-<footer class="app-footer">長崎北徳洲会病院</footer>
+<footer class="app-footer">長崎北徳洲会病院　<span class="app-version">版 <?= h(APP_VERSION) ?></span></footer>
 </body>
 </html>
 <?php

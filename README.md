@@ -404,6 +404,8 @@ C:\php\php db\tools\run_sql.php --user=root --pass=＜rootのパスワード＞ 
 C:\php\php tools\check_env.php
 ```
 
+- **置き直したら、`check_env.php` の先頭の「版」が、リポジトリの `src/version.php` と同じかを確かめる**（画面の一番下にも出る）。
+  違う・「不明」なら古いファイルが残っている。フォルダごと置き直す（`config` だけは残す）
 - `002` `003` は一度流せばよい。2回目は「既にある」エラーになるが害はない
 - 職員CSVの取り込みで「部署ID 'sonota' が存在しません」が出たら、上の1〜2行目（マスタの流し直し）が済んでいない
 

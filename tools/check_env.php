@@ -60,6 +60,10 @@ function line($status, $label, $detail) {
 }
 
 echo "病院日誌・医事統計表 入力システム　環境チェック" . $nl;
+// 置いたファイルが最新かを確かめる。リポジトリの src/version.php と同じなら最新
+$verFile = dirname(dirname(__FILE__)) . '/src/version.php';
+if (is_readable($verFile)) { include_once $verFile; }
+echo "版 " . (defined('APP_VERSION') ? APP_VERSION : '不明（src/version.php が無い＝2026-09-30より前の古いファイル）') . $nl;
 echo str_repeat("=", 68) . $nl;
 
 // ---- PHP本体 ----
