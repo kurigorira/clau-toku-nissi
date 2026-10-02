@@ -172,12 +172,12 @@ if ($sheet === '1') {
         ]],
       ],
       '5' => [
-        ['group' => '透析件数', 'cols' => cols_nyuin_gairai('touseki')],
         ['group' => '透析登録人数', 'cols' => [
             ['label' => '登録人数', 'code' => 'touseki_touroku'],
             ['label' => '新規登録', 'code' => 'touseki_shinki'],
             ['label' => '登録抹消', 'code' => 'touseki_masshou'],
         ]],
+        ['group' => '透析件数', 'cols' => cols_nyuin_gairai('touseki')],
       ],
     ];
     echo '<h2>' . h($sheets[$sheet]) . '</h2>';

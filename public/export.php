@@ -134,8 +134,8 @@ switch ($type) {
                     'kaigo_houkai_under30','kaigo_kyotaku','kaigo_houeiyou','kaigo_hourehab',
                     'kaigo_houyaku','kaigo_shoukei','iryou_houkan','iryou_houshin','iryou_oushin',
                     'iryou_houeiyou','iryou_hourehab_jin','iryou_hourehab_tani','iryou_houyaku','iryou_shoukei'],
-            '5' => ['touseki_nyuin','touseki_gairai','touseki_total','touseki_touroku',
-                    'touseki_shinki','touseki_masshou'],
+            '5' => ['touseki_touroku','touseki_shinki','touseki_masshou',
+                    'touseki_nyuin','touseki_gairai','touseki_total'],
         ];
         if (!isset($codes[$sheet])) {
             http_response_code(400);
