@@ -1,0 +1,16 @@
+# 実際の接続情報を含むため、リポジトリには入れない
+/config/config.php
+
+# 患者数や職員名を含む実データ。院内に置き、リポジトリには入れない
+/legacy/*.xls
+/legacy/*.xlsx
+/legacy/*.sql
+/data/
+
+# 開発時のみ使う SQLite の実体
+/db/dev.sqlite
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
+*.swp
