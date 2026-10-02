@@ -439,10 +439,12 @@ function nippo_save(string $date, array $v, string $userId): array
 }
 
 /* ======================================================================
- * 外来日報のExcel（.xlsx）から読む
+ * 外来日報のExcel（.xlsx / .xlsm）から読む
  *
  * 外来日報のExcelは、電子カルテの生データのシート（Sheet2）と、それを数式で
  * 並べ替えた紙の様式のシート（Sheet1）でできている。読むのは紙の様式のほう。
+ * マクロ付き（.xlsm）も中身は同じ zip＋XML なので同じ方法で読む（マクロは読まない・動かさない）。
+ * 月1冊で日ごとに様式のシートがあるブックなら、画面の日付と同じ日のシートを使う。
  * リハビリ・ドック・健診・介護・訪問診療科内訳などは医事課がそのシートに
  * 手で入れているので、紙と同じ数字がすべてそこにそろっている。
  *
@@ -472,28 +474,39 @@ function nippo_gairai_from_xlsx(array $sheets, string $date): array
     $fail = fn(string $m) => ['v' => [], 'c' => [], 'errors' => [$m], 'notes' => []];
 
     // ---- 紙の様式のシートを探す（「科名」と「医科合計」があるシート） ----
-    $grid = null;
-    $sheetName = '';
+    // 月1冊・日ごとのシート（.xlsm）のこともあるので、候補が複数なら画面の日付と同じ日のシートを使う
+    [$wantM, $wantD] = [(int)substr($date, 5, 2), (int)substr($date, 8, 2)];
+    $cands = [];
     foreach ($sheets as $name => $cells) {
         $g = xlsx_grid($cells);
         $has = ['科名' => false, '医科合計' => false];
+        $sheetMd = null;
         foreach ($g as $row) {
             foreach ($row as $x) {
                 $n = nippo_norm($x);
                 if (isset($has[$n])) {
                     $has[$n] = true;
                 }
+                if ($sheetMd === null && preg_match('/(\d{1,2})月(\d{1,2})日/u', $n, $m)) {
+                    $sheetMd = [(int)$m[1], (int)$m[2]];
+                }
             }
         }
         if ($has['科名'] && $has['医科合計']) {
-            $grid = $g;
-            $sheetName = (string)$name;
+            $cands[] = [(string)$name, $g, $sheetMd];
+        }
+    }
+    if (!$cands) {
+        return $fail('日報の様式のシートが見つかりません（「科名」と「医科合計」のあるシートがありません）。日報のExcelか確かめてください。');
+    }
+    [$sheetName, $grid] = $cands[0];
+    foreach ($cands as [$nm, $g, $smd]) {
+        if ($smd === [$wantM, $wantD]) {
+            [$sheetName, $grid] = [$nm, $g];
             break;
         }
     }
-    if ($grid === null) {
-        return $fail('日報の様式のシートが見つかりません（「科名」と「医科合計」のあるシートがありません）。日報のExcelか確かめてください。');
-    }
+    $multi = count($cands) > 1;
 
     /** セルの文字（揃えたもの）。 */
     $txt = fn(int $r, int $col) => isset($grid[$r][$col]) ? nippo_norm($grid[$r][$col]) : '';
@@ -539,8 +552,11 @@ function nippo_gairai_from_xlsx(array $sheets, string $date): array
     if ($md === null) {
         return $fail('ファイルの中に日報の日付（「9月 3日」のような表記）が見つかりません。');
     }
-    [$wantM, $wantD] = [(int)substr($date, 5, 2), (int)substr($date, 8, 2)];
     if ($md !== [$wantM, $wantD]) {
+        if ($multi) {
+            return $fail("このブックには {$wantM}月{$wantD}日 の日報のシートがありません（日報のシートが " . count($cands) . ' 枚ありますが、'
+                . '日付が合いません）。画面の日付を確かめてから、もう一度読み込んでください。');
+        }
         return $fail("このファイルは {$md[0]}月{$md[1]}日 の日報です。画面の日付（{$wantM}月{$wantD}日）と違うので読み込みませんでした。"
             . '日付を合わせてからもう一度読み込んでください。');
     }

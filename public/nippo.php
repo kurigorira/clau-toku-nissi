@@ -249,11 +249,11 @@ page_header('電子カルテ日報の転記', $user);
            読み込みボタンより前に「保存」を置き、これまでどおり Enter＝照合して保存 にする */ ?>
   <button type="submit" name="action" value="save" class="sr" tabindex="-1" aria-hidden="true">照合して保存</button>
   <p class="nippo-load">
-    <label>外来日報（.xlsx） <input type="file" name="xlsx_gairai" accept=".xlsx,.xlsm"></label>
-    <label>入院日報（.xlsm） <input type="file" name="xlsx_nyuin" accept=".xlsx,.xlsm"></label>
+    <label>外来日報（.xlsm / .xlsx） <input type="file" name="xlsx_gairai" accept=".xlsm,.xlsx"></label>
+    <label>入院日報（.xlsm / .xlsx） <input type="file" name="xlsx_nyuin" accept=".xlsm,.xlsx"></label>
     <button type="submit" name="action" value="load">Excelから読み込む</button>
     <br><span class="note">片方だけでも読み込めます。欄に数字が入るだけで、まだ保存はしません。
-      入院日報は、画面の日付と同じ日のシートを読みます。</span>
+      日ごとのシートがあるブックは、画面の日付と同じ日のシートを読みます。</span>
   </p>
   <?php endif; ?>
 
