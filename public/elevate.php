@@ -81,7 +81,7 @@ if ($error !== '') {
     <input type="hidden" name="next" value="<?= h($next) ?>">
     <p>職員：<?= h($user['user_name']) ?>（<?= h($user['user_id']) ?>）</p>
     <p><label>パスワード<br><input type="password" name="password" autofocus required></label></p>
-    <p><button type="submit" class="primary">確かめる</button></p>
+    <p><button type="submit" class="primary">確定</button></p>
   </form>
 <?php endif; ?>
 <?php page_footer();

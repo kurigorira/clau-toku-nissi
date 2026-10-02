@@ -5,4 +5,4 @@
  * サーバに置いたファイルが最新かどうかを、tools/check_env.php の先頭と画面の下の表示で確かめるため。
  * check_env.php から読むので、古いPHPでも読める define で書く。
  */
-define('APP_VERSION', '2026-09-30.3');
+define('APP_VERSION', '2026-10-02.1');
