@@ -7,6 +7,7 @@
  */
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/calc.php';
+require_once __DIR__ . '/../src/report.php';
 require_once __DIR__ . '/../src/repository.php';
 
 $user = require_login();
@@ -18,12 +19,9 @@ if (!is_ijika($user)) {
     exit;
 }
 
-$month = $_GET['month'] ?? date('Y-m', strtotime('-1 month'));
-if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
-    $month = date('Y-m', strtotime('-1 month'));
-}
-$from = $month . '-01';
-$to   = date('Y-m-t', strtotime($from));
+// 集計期間。既定は「前日までの当月分」。実日数・平均・目標の延数はこの期間の日数で計算する（src/report.php）
+$print = isset($_GET['print']);
+[$month, $from, $to, $noData] = soukatsu_period($_GET['month'] ?? null);
 $days = period_days($from, $to);
 $fy   = fiscal_year($to);
 
@@ -82,14 +80,22 @@ $v['houkan_kaigo_disp'] = ($g('kaigo_houkan_over30') ?? 0) + ($g('kaigo_houkan_u
 
 $wards = ['3' => '3階', '4' => '4階', '5' => '5階', 'all' => '総合計'];
 
-page_header('各種業務量他総括　' . $month, $user);
+page_header('各種業務量他総括', $user);
+// 印刷はいつでも A4縦・左とじ（print.css）。「印刷用」で開いたときは画面でも同じ見た目にする
+echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' : 'print') . '">';
+$ymd = fn(string $d) => date('Y年n月j日', strtotime($d));
 ?>
 <form method="get" class="datebar">
   <label>対象月 <input type="month" name="month" value="<?= h($month) ?>"></label>
   <button type="submit">表示</button>
-  <span class="note">実日数 <?= (int)$days ?>日／<?= (int)$fy ?>年度</span>
   <a href="export.php?type=soukatsu&amp;month=<?= h($month) ?>">CSV出力</a>
+  <a href="soukatsu.php?month=<?= h($month) ?>&amp;print=1" target="_blank">印刷用</a>
 </form>
+<?php if ($noData): ?>
+  <p class="flash flash-warn"><?= h($ymd($from)) ?> からの集計はまだできません（前日までの分を集計します）。</p>
+<?php page_footer(); exit; endif; ?>
+<p class="soukatsu-period"><strong>集計期間　<?= h($ymd($from)) ?>〜<?= h(date('n月j日', strtotime($to))) ?>（<?= (int)$days ?>日間）</strong>
+  <span class="note"><?= (int)$fy ?>年度<?= $to < date('Y-m-t', strtotime($from)) ? '・前日までの当月分' : '' ?>　作成 <?= h(date('Y年n月j日 H:i')) ?></span></p>
 
 <h2>病棟別 在院日数・稼働率・回転率</h2>
 <table class="report">
@@ -182,8 +188,8 @@ foreach ($status as $d => $byDept) {
 }
 if ($notdone):
     $depts = all_depts(); ?>
-  <div class="flash flash-warn">
-    <strong>この月には未提出・欠測のある日があります。</strong>集計値が不足している可能性があります。
+  <div class="flash flash-warn noprint">
+    <strong>この期間には未提出・欠測のある日があります。</strong>集計値が不足している可能性があります。
     <ul>
       <?php foreach ($notdone as $deptId => $ds): ?>
         <li><?= h($depts[$deptId]['dept_name'] ?? $deptId) ?>：<?= count($ds) ?>日
@@ -191,5 +197,8 @@ if ($notdone):
       <?php endforeach; ?>
     </ul>
   </div>
+  <?php // 印刷ではA4に収めるため1段落にまとめる（紙でも数字が足りない理由が分かるように残す） ?>
+  <p class="printonly flash-warn"><strong>未提出・欠測のある日がある部署</strong>（集計値が不足している可能性があります）：
+    <?= h(implode('、', array_map(fn($id) => ($depts[$id]['dept_name'] ?? $id) . ' ' . count($notdone[$id]) . '日', array_keys($notdone)))) ?></p>
 <?php endif;
 page_footer();

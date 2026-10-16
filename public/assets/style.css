@@ -111,8 +111,13 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nissi .sec { background: #dfe6ee; text-align: center; font-weight: bold; }
 .nissi td.n { text-align: right; font-variant-numeric: tabular-nums; }
 .nissi .memo { min-width: 200px; vertical-align: top; white-space: pre-wrap; }
-.nissi-grid { display: flex; flex-wrap: wrap; align-items: flex-start; }
-.nissi-grid > * { margin: 0 10px 10px 0; }
+.nissi-grid { display: block; }
+.nissi-row { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.nissi-row > .ncol { margin: 0 10px 10px 0; }
+.nissi.wide { margin-bottom: 10px; }
+.nissi .kaigi-h { width: 120px; }
+/* 印刷だけに出すもの（print.css で表示する） */
+.printonly { display: none; }
 .updaters { margin-top: 14px; font-size: 12px; }
 .updaters td, .updaters th { border: 1px solid #ccc; padding: 2px 8px; }
 

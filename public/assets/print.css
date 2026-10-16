@@ -1,15 +1,60 @@
-/* 病院日誌の印刷用。A3横1枚に収める。
-   現行はtFPDFでPDFを作っていたが、SJIS依存とフォント同梱の保守負担が大きいため、
-   ブラウザの印刷機能に置き換えた。PDFが必要な場合は「PDFとして保存」を使う。 */
-@page { size: A3 landscape; margin: 8mm; }
+/* 印刷用（病院日誌・総括）。A4縦・左とじ。
+   左の余白を広く取り、穴あけ・とじしろにする。
+   ブラウザの印刷（Ctrl+P）で、余白は「デフォルト」、「ヘッダーとフッター」は外して印刷する。
+   院内端末の古いChromeでも崩れないよう、gap と JavaScript は使わない。
+   段組みは display: table / table-cell で作る（flex の折り返しより確実に1段に並ぶ）。
 
-body { background: #fff; font-size: 10px; }
-.app-header, .app-nav, .app-footer, .datebar, .noprint { display: none !important; }
+   このファイルは印刷時にいつも読まれる（media="print"）。
+   「印刷用」で開いたときは画面でも読み、A4の見本として表示する。 */
+@page { size: A4 portrait; margin: 10mm 10mm 10mm 22mm; }
+
+body { background: #fff; font-size: 8.5pt; color: #000; }
+.app-header, .app-nav, .app-footer, .datebar, .noprint, .flash-ok, .flash-info { display: none !important; }
+.printonly { display: block; }
 main { padding: 0; }
-h1 { font-size: 15px; margin: 0 0 6px; }
-.nissi { font-size: 9px; width: 100%; }
-.nissi th, .nissi td { padding: 1px 3px; }
-/* 印刷では間隔を詰める。gap は使わない（style.css 冒頭の注意を参照） */
-.nissi-grid > * { margin: 0 4px 4px 0; }
-table { page-break-inside: avoid; }
+h1 { font-size: 13pt; margin: 0 0 2mm; letter-spacing: 2px; }
+h2 { font-size: 9.5pt; margin: 2.5mm 0 1mm; }
+.note { font-size: 7.5pt; margin-left: 0; color: #444; }
 a { color: #000; text-decoration: none; }
+table { page-break-inside: avoid; }
+
+/* 「印刷用」を画面で見たとき：A4の紙の幅（210mm − 左22mm − 右10mm）に合わせて見せる */
+@media screen {
+  body { background: #e9ebee; }
+  main { width: 178mm; margin: 6mm auto; padding: 10mm 8mm; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.25); }
+}
+
+/* ---- 病院日誌 ---- */
+/* 見出しと日付は1行に並べて、表に高さを回す */
+h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
+.nissi-date, .soukatsu-period { display: inline-block; vertical-align: baseline; }
+.nissi-date { margin: 0 0 1.5mm; font-size: 10pt; }
+.nissi-grid { display: block; }
+.nissi-row { display: table; width: 100%; table-layout: fixed; margin: 0 0 1.5mm; }
+.nissi-row > .ncol { display: table-cell; vertical-align: top; padding-right: 1.5mm; margin: 0; }
+.nissi-row > .ncol:last-child { padding-right: 0; }
+.ncol.w33 { width: 33%; } .ncol.w34 { width: 34%; }
+.ncol.w40 { width: 40%; } .ncol.w60 { width: 60%; }
+.ncol.w100 { width: 100%; }
+.nissi { width: 100%; font-size: 8.4pt; border-collapse: collapse; }
+.nissi th, .nissi td { padding: 0.4mm 1mm; border: 0.5pt solid #555; line-height: 1.25; }
+.nissi th { background: #eee; white-space: nowrap; }
+.nissi .sec { background: #d9d9d9; }
+.nissi .memo { min-width: 0; }
+.nissi.wide { margin: 0 0 1.5mm; }
+.nissi .kaigi-h { width: 22mm; }
+.nissi-h2 { font-size: 9pt; margin: 1.5mm 0 0.5mm; }
+.nissi-status { margin: 1.5mm 0 0; font-size: 7.5pt; color: #333; }
+
+/* ---- 総括 ---- */
+.soukatsu-period { font-size: 9.5pt; margin: 0 0 1.5mm; }
+.report { width: 100%; border-collapse: collapse; margin: 0 0 1mm; font-size: 8.5pt; }
+.report th, .report td { border: 0.5pt solid #555; padding: 0.4mm 1mm; line-height: 1.25; }
+.report thead th { font-size: 7.5pt; background: #e6e6e6; }
+.report tbody th { background: #f2f2f2; }
+.report td.n, .report.narrow td.n { min-width: 0; }
+.report .itemname { min-width: 0; }
+.report .block { writing-mode: horizontal-tb; width: 12mm; font-size: 7.5pt; }
+.flash-warn { border: 0.5pt solid #888; background: #fff; padding: 1mm 2mm; margin: 1.5mm 0 0; font-size: 7.5pt; }
+.flash-warn ul { margin: 0.5mm 0 0 4mm; }
+.ncol.w20 { width: 20%; }

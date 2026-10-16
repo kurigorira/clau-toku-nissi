@@ -71,10 +71,12 @@ switch ($type) {
 
     // 各種業務量他総括。画面と同じ数字をそのまま出す
     case 'soukatsu':
+        // 総括は画面と同じ期間（前日までの当月分／過去の月は1か月）
+        [$month, $from, $to] = soukatsu_period($_GET['month'] ?? null);
         $v    = period_values($from, $to);
         $days = period_days($from, $to);
         $fy   = fiscal_year($to);
-        $rows[] = ['各種業務量他総括', $month, "実日数{$days}日"];
+        $rows[] = ['各種業務量他総括', $month, "集計期間 {$from}〜{$to}", "実日数{$days}日"];
         $rows[] = [];
         $rows[] = ['病棟', '定床', '延患者数', '算定対象延患者数', '新入院', '退院', '転入', '転出',
                    '1日平均患者数', '平均在院日数', '病床稼働率', '病床回転率'];

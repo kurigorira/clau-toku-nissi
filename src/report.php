@@ -131,3 +131,23 @@ function valid_month(?string $s): string
             && (int)substr($s, 5, 2) <= 12)
         ? $s : date('Y-m', strtotime('-1 month'));
 }
+
+/**
+ * 総括の集計期間。既定は「前日までの当月分」（今日が1日なら前月の1か月分）。
+ * 今月を選んだら1日〜前日、過去の月は1日〜末日。画面・印刷・CSVで同じ期間にするため1か所にまとめる。
+ *
+ * @return array [対象月 'Y-m', 開始日, 終了日, まだ集計できる日が無いか]
+ */
+function soukatsu_period(?string $month, ?string $today = null): array
+{
+    $yesterday = date('Y-m-d', strtotime(($today ?? date('Y-m-d')) . ' -1 day'));
+    if (!is_string($month) || !preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month)) {
+        $month = substr($yesterday, 0, 7);
+    }
+    $from = $month . '-01';
+    $to   = min(date('Y-m-t', strtotime($from)), $yesterday);
+    if ($to < $from) {
+        return [$month, $from, $from, true];   // 先の月・今日が1日の当月
+    }
+    return [$month, $from, $to, false];
+}
