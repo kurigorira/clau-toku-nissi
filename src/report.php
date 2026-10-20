@@ -127,18 +127,18 @@ function cols_touji(string $code): array
 /** 対象月の妥当性を確認して YYYY-MM を返す。 */
 function valid_month(?string $s): string
 {
-    return (is_string($s) && preg_match('/^\d{4}-\d{2}$/', $s) && (int)substr($s, 5, 2) >= 1
-            && (int)substr($s, 5, 2) <= 12)
-        ? $s : date('Y-m', strtotime('-1 month'));
+    return month_period($s)[0];
 }
 
 /**
- * 総括の集計期間。既定は「前日までの当月分」（今日が1日なら前月の1か月分）。
- * 今月を選んだら1日〜前日、過去の月は1日〜末日。画面・印刷・CSVで同じ期間にするため1か所にまとめる。
+ * 月ごとの画面（総括・平均在院日数・患者数統計表・病院報告）とCSVの集計期間。
+ * 既定は「前日までの当月分」（今日が1日なら前月の1か月分）。
+ * 今月を選んだら1日〜前日、過去の月は1日〜末日。月計・1日平均・稼働率などはこの期間の日数で計算する。
+ * どの画面も同じ期間になるよう1か所にまとめる。
  *
  * @return array [対象月 'Y-m', 開始日, 終了日, まだ集計できる日が無いか]
  */
-function soukatsu_period(?string $month, ?string $today = null): array
+function month_period(?string $month, ?string $today = null): array
 {
     $yesterday = date('Y-m-d', strtotime(($today ?? date('Y-m-d')) . ' -1 day'));
     if (!is_string($month) || !preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month)) {
@@ -150,4 +150,20 @@ function soukatsu_period(?string $month, ?string $today = null): array
         return [$month, $from, $from, true];   // 先の月・今日が1日の当月
     }
     return [$month, $from, $to, false];
+}
+
+/** 画面に出す集計期間の文。月の途中なら「（前日まで）」を付ける。 */
+function month_period_label(string $from, string $to): string
+{
+    $partial = $to < date('Y-m-t', strtotime($from));
+    return '集計期間　' . date('Y年n月j日', strtotime($from)) . '〜' . date('n月j日', strtotime($to))
+        . '（' . period_days($from, $to) . '日間' . ($partial ? '・前日まで' : '') . '）';
+}
+
+/** まだ集計できる日が無い月を選んだときの案内を出して終える。 */
+function month_period_nodata(string $from): void
+{
+    flash(date('Y年n月j日', strtotime($from)) . ' からの集計はまだできません（前日までの分を集計します）。', 'warn');
+    page_footer();
+    exit;
 }

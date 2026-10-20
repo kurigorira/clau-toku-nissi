@@ -16,9 +16,8 @@ if (!is_ijika($user)) {
 }
 
 $type  = $_GET['type'] ?? 'daily';
-$month = valid_month($_GET['month'] ?? null);
-$from  = $month . '-01';
-$to    = date('Y-m-t', strtotime($from));
+// 画面と同じ期間（前日までの当月分／過去の月は1か月）。src/report.php の month_period()
+[$month, $from, $to] = month_period($_GET['month'] ?? null);
 
 /** ファイル名を安全にする（改行やパス区切りを混ぜられないようにする）。 */
 function safe_filename(string $s): string
@@ -71,8 +70,6 @@ switch ($type) {
 
     // 各種業務量他総括。画面と同じ数字をそのまま出す
     case 'soukatsu':
-        // 総括は画面と同じ期間（前日までの当月分／過去の月は1か月）
-        [$month, $from, $to] = soukatsu_period($_GET['month'] ?? null);
         $v    = period_values($from, $to);
         $days = period_days($from, $to);
         $fy   = fiscal_year($to);

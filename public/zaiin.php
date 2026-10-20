@@ -5,6 +5,7 @@
  */
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/calc.php';
+require_once __DIR__ . '/../src/report.php';
 
 $user = require_login();
 if (!is_ijika($user) && $user['dept_id'] !== 'byoto') {
@@ -15,12 +16,8 @@ if (!is_ijika($user) && $user['dept_id'] !== 'byoto') {
     exit;
 }
 
-$month = $_GET['month'] ?? date('Y-m', strtotime('-1 month'));
-if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
-    $month = date('Y-m', strtotime('-1 month'));
-}
-$from  = $month . '-01';
-$to    = date('Y-m-t', strtotime($from));
+// 既定は前日までの当月分。過去の月は1か月（src/report.php の month_period()）
+[$month, $from, $to, $noData] = month_period($_GET['month'] ?? null);
 $wards = ['3' => '3階', '4' => '4階', '5' => '5階', 'all' => '合計'];
 
 page_header('平均在院日数統計　' . $month, $user);
@@ -29,6 +26,8 @@ page_header('平均在院日数統計　' . $month, $user);
   <label>対象月 <input type="month" name="month" value="<?= h($month) ?>"></label>
   <button type="submit">表示</button>
 </form>
+<?php if ($noData) { month_period_nodata($from); } ?>
+<p class="period-line"><strong><?= h(month_period_label($from, $to)) ?></strong></p>
 <p class="note">
   ※ 当日退院在院日数＝当日入院しその日のうちに退院した患者（実日数1日）<br>
   ※ 転入・転出は新規のみを計上し、同一患者による再転入・再転出は計上しない

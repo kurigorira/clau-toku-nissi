@@ -18,9 +18,8 @@ if (!is_ijika($user)) {
     exit;
 }
 
-$month = valid_month($_GET['month'] ?? null);
-$from  = $month . '-01';
-$to    = date('Y-m-t', strtotime($from));
+// 既定は前日までの当月分。過去の月は1か月（src/report.php の month_period()）
+[$month, $from, $to, $noData] = month_period($_GET['month'] ?? null);
 
 $v = period_values($from, $to);
 $g = fn(string $c) => $v[$c] ?? null;
@@ -42,6 +41,8 @@ page_header('病院報告（患者票）　' . $month, $user);
   <button type="submit">表示</button>
   <a href="export.php?type=byoin_houkoku&amp;month=<?= h($month) ?>">CSV出力</a>
 </form>
+<?php if ($noData) { month_period_nodata($from); } ?>
+<p class="period-line"><strong><?= h(month_period_label($from, $to)) ?></strong></p>
 
 <table class="report" style="margin-bottom:16px">
   <tr><th>都道府県</th><td>長崎県</td><th>保健所符号</th><td><?= h(config_value('hokenjo_fugou', $to, '')) ?></td></tr>
@@ -52,7 +53,7 @@ page_header('病院報告（患者票）　' . $month, $user);
 
 <h2>入院</h2>
 <table class="report">
-  <tr><th>区分</th><th>在院患者延数</th><th>月末在院患者数</th><th>新入院患者数</th><th>退院患者数</th></tr>
+  <tr><th>区分</th><th>在院患者延数</th><th><?= $to < date('Y-m-t', strtotime($from)) ? '前日の在院患者数' : '月末在院患者数' ?></th><th>新入院患者数</th><th>退院患者数</th></tr>
   <tr><th>総数</th>
     <td class="n"><?= num($g('byoto_zaiin_all')) ?></td>
     <td class="n"><?= num($monthEnd) ?></td>

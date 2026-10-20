@@ -19,10 +19,9 @@ if (!is_ijika($user)) {
     exit;
 }
 
-$month = valid_month($_GET['month'] ?? null);
+// 既定は前日までの当月分。過去の月は1か月（src/report.php の month_period()）
+[$month, $from, $to, $noData] = month_period($_GET['month'] ?? null);
 $sheet = $_GET['sheet'] ?? '2';
-$from  = $month . '-01';
-$to    = date('Y-m-t', strtotime($from));
 
 $sheets = [
     '1' => '① 外来数・営業活動',
@@ -43,6 +42,8 @@ page_header('患者数統計表　' . $month, $user);
   <button type="submit">表示</button>
   <a href="export.php?type=toukei&amp;sheet=<?= h($sheet) ?>&amp;month=<?= h($month) ?>">CSV出力</a>
 </form>
+<?php if ($noData) { month_period_nodata($from); } ?>
+<p class="period-line"><strong><?= h(month_period_label($from, $to)) ?></strong></p>
 
 <nav class="tabs noprint">
   <?php foreach ($sheets as $k => $label): ?>

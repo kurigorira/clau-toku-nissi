@@ -21,7 +21,7 @@ if (!is_ijika($user)) {
 
 // 集計期間。既定は「前日までの当月分」。実日数・平均・目標の延数はこの期間の日数で計算する（src/report.php）
 $print = isset($_GET['print']);
-[$month, $from, $to, $noData] = soukatsu_period($_GET['month'] ?? null);
+[$month, $from, $to, $noData] = month_period($_GET['month'] ?? null);
 $days = period_days($from, $to);
 $fy   = fiscal_year($to);
 
