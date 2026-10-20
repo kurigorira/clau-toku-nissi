@@ -197,6 +197,31 @@ if ($auMode === 'emr') {
 }
 line('情報', 'パラメータ名', $auParam . ' … 電子カルテのボタンの引数（例 ?staffId=$$INPCDN$$）と一字一句同じに');
 
+// ---- 病院日誌のPDF ----
+// サーバの Chrome / Edge でPDFを作る（src/pdf.php）。見つからなければ「PDFでダウンロード」は案内を出すだけになる
+echo $nl . "病院日誌のPDF" . $nl;
+if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
+    $root = dirname(dirname(__FILE__));
+    if (!function_exists('cfg')) {
+        // check_env は src/db.php を読まないので、pdf_browser() が使う cfg() をここで用意する
+        function cfg($key) { global $conf; return isset($conf) && is_array($conf) && isset($conf[$key]) ? $conf[$key] : null; }
+    }
+    require_once $root . '/src/pdf.php';
+    $pb = pdf_browser();
+    $pdfConf = isset($conf['pdf']['browser']) ? trim($conf['pdf']['browser']) : '';
+    if ($pb !== null) {
+        line('OK', 'PDFを作るブラウザ', $pb);
+    } elseif ($pdfConf !== '') {
+        line('注意', 'PDFを作るブラウザ', "config.php の pdf.browser に書いたパスがありません（{$pdfConf}）");
+    } else {
+        line('注意', 'PDFを作るブラウザ', 'Chrome も Edge も見つかりません。config.php の pdf.browser にパスを書く'
+            . '（無くても「印刷用」から PDF に保存はできる）');
+    }
+    if (!function_exists('proc_open')) {
+        line('注意', 'proc_open', '無効（php.ini の disable_functions）。PDFを作れません');
+    }
+}
+
 echo $nl . "バックアップ" . $nl;
 $bk = isset($conf) && isset($conf['backup']) ? $conf['backup'] : array();
 $bkDir = isset($bk['dir']) ? $bk['dir'] : '';

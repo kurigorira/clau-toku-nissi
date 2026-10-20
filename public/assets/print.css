@@ -59,3 +59,8 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .flash-warn ul { margin: 0.5mm 0 0 4mm; }
 .ncol.w20 { width: 20%; }
 .period-line { margin: 0 0 1.5mm; font-size: 9.5pt; }
+/* 病院日誌 外来患者数：備考を広く（表の幅の約4割）。table-layout: fixed で列幅をそのまま使う */
+.gairai-tbl { table-layout: fixed; }
+.gairai-tbl .c-label { width: 22%; } .gairai-tbl .c-num { width: 20%; }
+.gairai-tbl .c-new { width: 17%; } .gairai-tbl .c-biko { width: 41%; }
+.gairai-tbl td:last-child { min-width: 0; }

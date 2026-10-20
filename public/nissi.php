@@ -33,6 +33,7 @@ echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' 
   <span class="youbi">（<?= h(youbi($date)) ?>）</span>
   <button type="submit">表示</button>
   <a href="nissi.php?hizuke=<?= h($date) ?>&amp;print=1" target="_blank">印刷用</a>
+  <a href="nissi_pdf.php?hizuke=<?= h($date) ?>">PDFでダウンロード</a>
 </form>
 
 <p class="nissi-date"><strong><?= h(date('Y年n月j日', strtotime($date))) ?>（<?= h(youbi($date)) ?>）</strong>　天候：<?= h($tx('tenkou')) ?></p>
@@ -41,7 +42,9 @@ echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' 
 <div class="nissi-grid">
 <div class="nissi-row">
 <div class="ncol w34">
-<table class="nissi">
+<table class="nissi gairai-tbl">
+  <?php // 備考は印刷後に手で書き込めるよう広く取る ?>
+  <colgroup><col class="c-label"><col class="c-num"><col class="c-new"><col class="c-biko"></colgroup>
   <tr><th colspan="4" class="sec">外来患者数</th></tr>
   <tr><th>時間帯</th><th>患者数</th><th>新患</th><th>備考</th></tr>
   <?php // 午前は医科の午前＋日報の介護合計、計・延数・平均は医療介護合計（介護を含む）。新患は医科のみ

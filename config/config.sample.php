@@ -40,6 +40,14 @@ return [
         'idle_minutes' => 30,
     ],
 
+    // ---- 病院日誌のPDF ----------------------------------------------------
+    // サーバの Chrome か Edge でPDFを作る。空ならよくある場所を探す
+    // （C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe、Edge の msedge.exe など）。
+    // 見つからないときはここにパスを書く。例 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+    'pdf' => [
+        'browser' => '',
+    ],
+
     // ---- バックアップ ----------------------------------------------------
     // db/tools/backup.php が使う。復旧は db/tools/run_sql.php で流す。
     //

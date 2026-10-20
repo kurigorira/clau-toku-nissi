@@ -155,3 +155,6 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .app-user a { color: #dce8f4; margin: 0 6px; }
 .app-user a:hover { color: #fff; }
 .period-line { margin: 4px 0 8px; }
+/* 病院日誌 外来患者数：備考は印刷後に手書きするので広く */
+.gairai-tbl .c-biko { width: 140px; }
+.gairai-tbl td:last-child { min-width: 140px; }

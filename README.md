@@ -61,6 +61,7 @@ public/
   entry.php          部署別入力（項目マスタから自動生成）自部署のみ
   nippo.php          電子カルテ日報の転記（外来の入力はここ）外来・医事課・管理者
   nissi.php          病院日誌（?print=1 で印刷用・A4縦左とじ）全員
+  nissi_pdf.php      病院日誌のPDFダウンロード（サーバの Chrome / Edge で作る）全員
   qq_report.php      救急搬入受入統計（８時会・朝礼報告）全員
   soukatsu.php       各種業務量他総括（前日までの当月分・A4縦）医事課・管理者
   zaiin.php          平均在院日数統計                医事課・病棟
@@ -497,6 +498,16 @@ C:\php\php db\tools\run_sql.php db\seed_master.sql
   CSV出力も同じ期間。未提出・欠測のある部署は印刷にも1段落で残す
 - **月ごとの画面（総括・平均在院日数・患者数統計表・病院報告）とCSVは、すべて同じ期間**で開く（既定は前日までの当月分）。
   期間は画面の上に「集計期間 ○月1日〜○日（○日間・前日まで）」と出る（`src/report.php` の `month_period()`）
+
+## 病院日誌のPDF
+
+病院日誌の画面の「**PDFでダウンロード**」で、印刷と同じ A4縦・左とじ のPDF（`病院日誌_2026-10-18.pdf`）がダウンロードされる。
+
+- PDFは **サーバに入っている Chrome か Edge** を画面を出さずに起動して作る（`public/nissi_pdf.php`・`src/pdf.php`。PDFの部品は入れていない）
+- ブラウザはよくある場所（`C:\Program Files\Google\Chrome\Application\chrome.exe`、`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe` など）を探す。
+  別の場所なら `config/config.php` の `pdf.browser` にパスを書く。`C:\php\php tools\check_env.php` の「病院日誌のPDF」で確かめられる
+- 特記事項（患者氏名）は画面と同じく、見られる人のPDFにだけ入る。作業用の一時ファイルはダウンロードの前に消す
+- 作れないとき（ブラウザが無いなど）は理由が出る。そのときは「印刷用」を開き、Ctrl+P →送信先「PDFに保存」で保存できる
 
 ## よくある変更
 
