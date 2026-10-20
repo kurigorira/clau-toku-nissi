@@ -229,24 +229,24 @@ corona_yousei_shin_nyuin,陽性者新入院,kensa,corona,コロナ対策,input,,
 corona_taiin_keikai,陽性者退院 軽快,kensa,corona,コロナ対策,input,,int,名,2930,0,0,50,,⑧!P,,sum
 corona_taiin_tenin,陽性者退院 転院,kensa,corona,コロナ対策,input,,int,名,2940,0,0,50,,⑧!Q,,sum
 corona_taiin_shibou,陽性者退院 死亡,kensa,corona,コロナ対策,input,,int,名,2950,0,0,50,,⑧!R,,sum
-tenkou,天候,jimu,jimu,日誌 事務欄,input,,text,,3100,1,,,tenkou,,,sum
-toutyoku_ishi1,当直者 医師１,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3110,1,,,t1,,,sum
-toutyoku_ishi2,当直者 医師２,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3120,0,,,t2,,,sum
-toutyoku_kango,当直者 看護,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3130,1,,,t3,,,sum
-toutyoku_housha,当直者 放射線,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3140,0,,,t4,,,sum
-toutyoku_jimu,当直者 事務,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3150,0,,,t5,,,sum
-yobidashi_ishi,呼び出し 医師,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3160,0,,,y1,,,sum
-yobidashi_ope,呼び出し 手術室,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3170,0,,,y2,,,sum
-yobidashi_zaitaku,呼び出し 在宅,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3180,0,,,y3,,,sum
-yobidashi_kensa,呼び出し 検査,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3190,0,,,y4,,,sum
-yobidashi_housha,呼び出し 放射線,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3200,0,,,y5,,,sum
-yobidashi_yakkyoku,呼び出し 薬局,jimu,toutyoku_list,当直者・呼び出し,input,,text,,3210,0,,,y6,,,sum
-kaigi_jikoku1,会議 時刻（左）,jimu,kaigi,会議・行事・人事,input,,multiline,,3220,0,,,jikoku1,,,sum
-kaigi_name1,会議・委員会名（左）,jimu,kaigi,会議・行事・人事,input,,multiline,,3230,0,,,kaigi1,,,sum
-kaigi_jikoku2,会議 時刻（右）,jimu,kaigi,会議・行事・人事,input,,multiline,,3240,0,,,jikoku2,,,sum
-kaigi_name2,会議・委員会名（右）,jimu,kaigi,会議・行事・人事,input,,multiline,,3250,0,,,kaigi2,,,sum
-gyoji,行事,jimu,kaigi,会議・行事・人事,input,,multiline,,3260,0,,,gyoji,,,sum
-jinji,人事,jimu,kaigi,会議・行事・人事,input,,multiline,,3270,0,,,jinji,,,sum
+tenkou,天候,toutyoku,jimu,日誌 事務欄,input,,text,,3100,1,,,tenkou,,,sum
+toutyoku_ishi1,当直者 医師１,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3110,1,,,t1,,,sum
+toutyoku_ishi2,当直者 医師２,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3120,0,,,t2,,,sum
+toutyoku_kango,当直者 看護,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3130,1,,,t3,,,sum
+toutyoku_housha,当直者 放射線,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3140,0,,,t4,,,sum
+toutyoku_jimu,当直者 事務,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3150,0,,,t5,,,sum
+yobidashi_ishi,呼び出し 医師,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3160,0,,,y1,,,sum
+yobidashi_ope,呼び出し 手術室,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3170,0,,,y2,,,sum
+yobidashi_zaitaku,呼び出し 在宅,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3180,0,,,y3,,,sum
+yobidashi_kensa,呼び出し 検査,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3190,0,,,y4,,,sum
+yobidashi_housha,呼び出し 放射線,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3200,0,,,y5,,,sum
+yobidashi_yakkyoku,呼び出し 薬局,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3210,0,,,y6,,,sum
+kaigi_jikoku1,会議 時刻（左）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3220,0,,,jikoku1,,,sum
+kaigi_name1,会議・委員会名（左）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3230,0,,,kaigi1,,,sum
+kaigi_jikoku2,会議 時刻（右）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3240,0,,,jikoku2,,,sum
+kaigi_name2,会議・委員会名（右）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3250,0,,,kaigi2,,,sum
+gyoji,行事,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3260,0,,,gyoji,,,sum
+jinji,人事,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3270,0,,,jinji,,,sum
 byoto3_zaiin_avg,3階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:3,decimal,名,3300,0,,,,総括!N6,延患者数 ÷ 実日数,sum
 byoto4_zaiin_avg,4階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:4,decimal,名,3310,0,,,,総括!N8,,sum
 byoto5_zaiin_avg,5階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:5,decimal,名,3320,0,,,,総括!N10,,sum

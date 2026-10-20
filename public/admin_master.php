@@ -93,7 +93,7 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
         $cur[$r['item_code']] = $r['target_avg'];
     }
     // 総括表に出る数値項目だけを対象にする
-    $targets = array_filter(all_items(), fn($i) => $i['value_type'] === 'int' && $i['dept_id'] !== 'jimu');
+    $targets = array_filter(all_items(), fn($i) => $i['value_type'] === 'int');
 ?>
   <form method="get" class="datebar">
     <input type="hidden" name="tab" value="target">

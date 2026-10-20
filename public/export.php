@@ -100,7 +100,7 @@ switch ($type) {
         $rows[] = [];
         $rows[] = ['項目', '目標平均', '目標延数', '実績平均', '実績延数', '目標差平均', '目標差延数'];
         foreach (all_items($to) as $code => $it) {
-            if ($it['dept_id'] === 'jimu' || $it['value_type'] !== 'int') {
+            if ($it['value_type'] !== 'int') {   // 文字の項目（天候・当直者・会議など）は出さない
                 continue;
             }
             $act = $v[$code] ?? null;
