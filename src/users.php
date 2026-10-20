@@ -347,9 +347,9 @@ function emr_dept_guess(string $emrName, array $depts): string
         '病棟' => 'byoto', '薬剤' => 'yakuzai', '栄養' => 'eiyou', 'リハビリ' => 'rehab', '放射線' => 'housha',
         '検査' => 'kensa', '臨床工学' => 'touseki', '透析' => 'touseki', '外来' => 'gairai', '手術' => 'ope',
         '医事' => 'ijika', '総務' => 'jimu', '事務' => 'jimu',
-        '施設' => 'shisetsu', '地域医療連携' => 'renkei', '連携' => 'renkei',
+        '施設' => DEPT_VIEW_ONLY, '地域医療連携' => 'renkei', '連携' => 'renkei',
         '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
-        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kansen',
+        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => DEPT_VIEW_ONLY,   // 感染対策室・施設課は入力する項目が無い（コロナ対策は検査科）
     ];
     foreach ($rules as $word => $id) {
         if (mb_strpos($n, $word) !== false && ($id === DEPT_VIEW_ONLY || isset($depts[$id]))) {

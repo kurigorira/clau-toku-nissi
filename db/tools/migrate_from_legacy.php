@@ -101,10 +101,13 @@ foreach ($items as $code => $it) {
         $derivedCols[$it['legacy_column']] = $code;
     }
 }
-$unmapped = $unknown = [];
+//   retired … 統計をとらなくなった項目（水道光熱費。2026-10 に廃止）。移行しない
+$retiredCols = ['den1', 'den2', 'den3', 'gas1', 'gas2', 'gas3', 'sui1', 'sui2', 'sui3'];
+$unmapped = $unknown = $retired = [];
 foreach (array_diff($cols, array_keys($mapped), ['hizuke']) as $c) {
     if (isset($derivedCols[$c]))            { $unmapped[$c] = $derivedCols[$c]; }
     elseif (strpos($c, 'tokki') === 0)      { /* d_tokki へ移行する */ }
+    elseif (in_array($c, $retiredCols, true)) { $retired[] = $c; }
     else                                    { $unknown[] = $c; }
 }
 
@@ -120,6 +123,9 @@ if ($unmapped) {
         echo "    {$c} → {$code}（" . ($items[$code]['item_name'] ?? '') . "）\n";
     }
     echo "\n";
+}
+if ($retired) {
+    echo "■ 統計をとらなくなった項目（移行しない）" . count($retired) . " 件: " . implode(', ', $retired) . "（水道光熱費）\n\n";
 }
 if ($unknown) {
     echo "■ 対応先が決まっていない列 " . count($unknown) . " 件: " . implode(', ', $unknown) . "\n\n";

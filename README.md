@@ -31,8 +31,8 @@ db/
   schema.sqlite.sql     ↑から自動生成（開発時のSQLite動作確認用）
   seed_master.sql       ↓のCSVから自動生成
   master/               ★ここを直す
-    depts.csv           部署マスタ（19部署＋その他（閲覧のみ））
-    items.csv           項目マスタ（483項目。入力396 / 合算64 / 計算23）
+    depts.csv           部署マスタ（入力する17部署＋入力の無い部署：その他（閲覧のみ）・感染対策室・施設課）
+    items.csv           項目マスタ（473項目。入力387 / 合算63 / 計算23）
     config.csv          定床などの設定値
     staff_sample.csv    職員CSVの見本（見出し付きの形式）
   migrations/           動いているサーバに後から足すテーブル（002＝閲覧履歴、003＝職員の電子カルテ部署）

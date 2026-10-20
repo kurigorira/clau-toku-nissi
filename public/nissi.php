@@ -187,26 +187,6 @@ echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' 
 </div>
 </div>
 
-<div class="nissi-row">
-<div class="ncol w100">
-<table class="nissi wide">
-  <tr><th colspan="5" class="sec">水道光熱費</th></tr>
-  <tr><th></th><th>電気</th><th>ガス</th><th>水道（上＋下）</th><th></th></tr>
-  <tr><th>使用量</th><td class="n"><?= num($g('den_shiyou')) ?> Kw</td><td class="n"><?= num($g('gas_shiyou')) ?> m3</td><td class="n"><?= num($g('sui_shiyou')) ?> m3</td><td></td></tr>
-  <tr><th>料金</th><td class="n"><?= num($g('den_ryoukin')) ?> 円</td><td class="n"><?= num($g('gas_ryoukin')) ?> 円</td><td class="n"><?= num($g('sui_ryoukin')) ?> 円</td>
-      <td class="n">1日合計 <?= num($g('netu_ryoukin_total')) ?> 円</td></tr>
-  <tr><th>当月目標額</th><td class="n"><?= num($g('den_mokuhyou')) ?> 円</td><td class="n"><?= num($g('gas_mokuhyou')) ?> 円</td><td class="n"><?= num($g('sui_mokuhyou')) ?> 円</td><td></td></tr>
-  <tr><th>目標値対比</th>
-    <?php $diff = 0; foreach (['den','gas','sui'] as $k):
-        $d = ($g("{$k}_ryoukin") ?? null) === null || ($g("{$k}_mokuhyou") ?? null) === null
-             ? null : $g("{$k}_ryoukin") - $g("{$k}_mokuhyou");
-        $diff += (float)($d ?? 0); ?>
-      <td class="n"><?= num($d) ?> 円</td>
-    <?php endforeach; ?>
-    <td class="n">計 <?= num($diff) ?> 円</td></tr>
-</table>
-</div>
-</div>
 
 </div>
 
