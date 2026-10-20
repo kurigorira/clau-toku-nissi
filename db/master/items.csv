@@ -469,6 +469,7 @@ gr_houshin_total,訪問診療科 計,gairai,nippo_saikei,日報 再掲,sum,"gr_h
 gairai_ippan,外来患者数（ドック・健診・訪問診療科を除く）,gairai,gairai_cnt,外来患者数,func,diff:gairai_total-dock_ninzu-kenshin_ninzu-gr_houshin_total,int,名,5000,0,,,,①!C,医事統計表①の外来患者数。日報の医科合計からドック・健診・訪問診療科を引いた数（9/24は266−18−18−2＝228）,sum
 kaigo_nippo_total,介護 合計（日報）,gairai,nippo_kaigo,日報 介護,sum,"tsusho,nippo_kaigo_houkan,nippo_kaigo_houkai,kaigo_hourehab,kaigo_houeiyou,kaigo_houyaku,kaigo_kyotaku",int,件,5010,0,,,,①!AD,,sum
 iryou_kaigo_total,医療介護合計,gairai,nippo_kaigo,日報 介護,sum,"gairai_total,kaigo_nippo_total",int,名,5020,0,,,,①!AF,外来総合計（医療＋介護）,sum
+nissi_gairai_am,午前 患者数（介護合計を含む・病院日誌）,gairai,nippo_kaigo,日報 介護,sum,"gairai_am,kaigo_nippo_total",int,名,5030,0,,,,,病院日誌の外来患者数 午前の欄。医科の午前＋日報の介護合計（病院日誌の計は医療介護合計）,sum
 total_ex_tsusho,医療介護合計より通所リハを除いた数,gairai,nippo_kaigo,日報 介護,func,diff:iryou_kaigo_total-tsusho,int,名,5030,0,,,,①!AH,,sum
 kaigo_zaitaku,在宅患者数（介護保険）,gairai,nippo_kaigo,日報 介護,func,diff:kaigo_nippo_total-tsusho,int,名,5040,0,,,,,病院報告（患者票）の「在宅患者数（介護保険）」。介護合計から通所リハを除く,sum
 gairai_nobe,外来患者延数（病院報告）,gairai,nippo_kaigo,日報 介護,sum,"gairai_total,tsusho",int,名,5050,0,,,,病院報告!C14,"全外来患者数（医療介護合計）−在宅患者数（介護保険）。8月は4,612＋1,051＝5,663でExcelと一致",sum

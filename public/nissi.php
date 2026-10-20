@@ -44,15 +44,16 @@ echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' 
 <table class="nissi">
   <tr><th colspan="4" class="sec">外来患者数</th></tr>
   <tr><th>時間帯</th><th>患者数</th><th>新患</th><th>備考</th></tr>
-  <?php foreach ([['午前','gairai_am','gairai_am_new'],['午後','gairai_pm','gairai_pm_new'],
+  <?php // 午前は医科の午前＋日報の介護合計、計・延数・平均は医療介護合計（介護を含む）。新患は医科のみ
+  foreach ([['午前','nissi_gairai_am','gairai_am_new'],['午後','gairai_pm','gairai_pm_new'],
                   ['夜間','gairai_night','gairai_night_new'],['時間外１','gairai_ex1','gairai_ex1_new'],
                   ['時間外２','gairai_ex2','gairai_ex2_new']] as [$lab,$c,$cn]): ?>
     <tr><th><?= h($lab) ?></th><td class="n"><?= num($g($c)) ?></td><td class="n"><?= num($g($cn)) ?></td><td></td></tr>
   <?php endforeach; ?>
-  <tr><th>計</th><td class="n"><?= num($g('gairai_total')) ?></td><td class="n"><?= num($g('gairai_new_total')) ?></td><td></td></tr>
-  <tr><th>延数</th><td class="n"><?= num($gm('gairai_total')) ?></td><td class="n"><?= num($gm('gairai_new_total')) ?></td><td></td></tr>
+  <tr><th>計</th><td class="n"><?= num($g('iryou_kaigo_total')) ?></td><td class="n"><?= num($g('gairai_new_total')) ?></td><td></td></tr>
+  <tr><th>延数</th><td class="n"><?= num($gm('iryou_kaigo_total')) ?></td><td class="n"><?= num($gm('gairai_new_total')) ?></td><td></td></tr>
   <tr><th>平均</th>
-      <td class="n"><?= num($gm('gairai_total') === null ? null : $gm('gairai_total') / $mdays, 1) ?></td>
+      <td class="n"><?= num($gm('iryou_kaigo_total') === null ? null : $gm('iryou_kaigo_total') / $mdays, 1) ?></td>
       <td class="n"><?= num($gm('gairai_new_total') === null ? null : $gm('gairai_new_total') / $mdays, 1) ?></td><td></td></tr>
 </table>
 </div>
