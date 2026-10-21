@@ -160,6 +160,59 @@ function month_period_label(string $from, string $to): string
         . '（' . period_days($from, $to) . '日間' . ($partial ? '・前日まで' : '') . '）';
 }
 
+/**
+ * 「何月何日〜何月何日」で指定した集計期間（総括）。
+ *
+ * 終了日が前日より先なら前日に詰める（まだ入力が揃わない日を集計しないため）。
+ *
+ * @return array [開始日, 終了日, 案内の文|null, エラーか]
+ */
+function range_period(?string $from, ?string $to, ?string $today = null): array
+{
+    $yesterday = date('Y-m-d', strtotime(($today ?? date('Y-m-d')) . ' -1 day'));
+    $from = valid_date($from);
+    $to   = valid_date($to);
+    if ($from === null || $to === null) {
+        return [$from ?? $yesterday, $to ?? $yesterday, '開始日と終了日を正しく入れてください。', true];
+    }
+    $msg = null;
+    if ($to > $yesterday) {
+        $to  = $yesterday;
+        $msg = '終了日は前日（' . date('Y年n月j日', strtotime($yesterday)) . '）までにしました。';
+    }
+    if ($from > $to) {
+        return [$from, $to, '開始日が終了日より後になっています（集計できるのは前日まで）。', true];
+    }
+    if (period_days($from, $to) > 366) {
+        return [$from, $to, '期間は1年（366日）以内にしてください。', true];
+    }
+    return [$from, $to, $msg, false];
+}
+
+/**
+ * 総括の集計期間。from・to があれば期間指定、無ければ対象月（month_period）。画面とCSVで同じものを使う。
+ *
+ * @return array month, from, to, noData（まだ集計できる日が無い）, range（期間指定か）, message, error
+ */
+function soukatsu_period(array $get): array
+{
+    if (isset($get['from']) || isset($get['to'])) {
+        [$from, $to, $msg, $err] = range_period($get['from'] ?? null, $get['to'] ?? null);
+        return ['month' => substr($from, 0, 7), 'from' => $from, 'to' => $to, 'noData' => false,
+                'range' => true, 'message' => $msg, 'error' => $err];
+    }
+    [$month, $from, $to, $noData] = month_period($get['month'] ?? null);
+    return ['month' => $month, 'from' => $from, 'to' => $to, 'noData' => $noData,
+            'range' => false, 'message' => null, 'error' => false];
+}
+
+/** 集計期間の「2026年10月5日〜10月20日」。年をまたぐときは終わりにも年を付ける。 */
+function period_range_text(string $from, string $to): string
+{
+    return date('Y年n月j日', strtotime($from)) . '〜'
+        . date(substr($from, 0, 4) === substr($to, 0, 4) ? 'n月j日' : 'Y年n月j日', strtotime($to));
+}
+
 /** まだ集計できる日が無い月を選んだときの案内を出して終える。 */
 function month_period_nodata(string $from): void
 {

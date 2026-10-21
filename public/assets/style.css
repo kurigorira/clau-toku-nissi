@@ -42,6 +42,8 @@ h2 { font-size: 16px; margin: 20px 0 8px; }
 /* ---- 日付バー ---- */
 .datebar { margin: 8px 0 16px; padding: 8px 12px; background: #fff; border: 1px solid #d5d9de; border-radius: 4px; }
 .datebar .youbi { margin: 0 8px; color: #555; }
+.datebar-row { margin: 0; }
+.datebar-row + .datebar-row { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #d5d9de; }
 
 /* ---- 入力フォーム ---- */
 .entry-form fieldset {

@@ -19,11 +19,15 @@ if (!is_ijika($user)) {
     exit;
 }
 
-// 集計期間。既定は「前日までの当月分」。実日数・平均・目標の延数はこの期間の日数で計算する（src/report.php）
+// 集計期間。既定は「前日までの当月分」。「何月何日〜何月何日」でも指定できる（from・to）。
+// 実日数・平均・目標の延数はこの期間の日数で計算する（src/report.php）
 $print = isset($_GET['print']);
-[$month, $from, $to, $noData] = month_period($_GET['month'] ?? null);
+$per   = soukatsu_period($_GET);
+['month' => $month, 'from' => $from, 'to' => $to, 'noData' => $noData] = $per;
 $days = period_days($from, $to);
 $fy   = fiscal_year($to);
+// CSV・印刷用に今の期間を引き継ぐ
+$q = $per['range'] ? 'from=' . rawurlencode($from) . '&to=' . rawurlencode($to) : 'month=' . rawurlencode($month);
 
 $v = period_values($from, $to);
 $g = fn(string $c) => $v[$c] ?? null;
@@ -85,17 +89,29 @@ page_header('各種業務量他総括', $user);
 echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' : 'print') . '">';
 $ymd = fn(string $d) => date('Y年n月j日', strtotime($d));
 ?>
-<form method="get" class="datebar">
-  <label>対象月 <input type="month" name="month" value="<?= h($month) ?>"></label>
-  <button type="submit">表示</button>
-  <a href="export.php?type=soukatsu&amp;month=<?= h($month) ?>">CSV出力</a>
-  <a href="soukatsu.php?month=<?= h($month) ?>&amp;print=1" target="_blank">印刷用</a>
-</form>
-<?php if ($noData): ?>
+<div class="datebar">
+  <form method="get" class="datebar-row">
+    <label>対象月 <input type="month" name="month" value="<?= h($month) ?>"></label>
+    <button type="submit">表示</button>
+    <a href="export.php?type=soukatsu&amp;<?= h($q) ?>">CSV出力</a>
+    <a href="soukatsu.php?<?= h($q) ?>&amp;print=1" target="_blank">印刷用</a>
+  </form>
+  <form method="get" class="datebar-row">
+    <label>期間指定 <input type="date" name="from" value="<?= h($from) ?>"></label>〜<input type="date" name="to" value="<?= h($to) ?>">
+    <button type="submit">表示</button>
+    <span class="note">前日まで・1年以内</span>
+  </form>
+</div>
+<?php if ($per['message'] !== null): ?>
+  <p class="flash <?= $per['error'] ? 'flash-error' : 'flash-warn' ?>"><?= h($per['message']) ?></p>
+<?php endif;
+if ($per['error']) { page_footer(); exit; }
+if ($noData): ?>
   <p class="flash flash-warn"><?= h($ymd($from)) ?> からの集計はまだできません（前日までの分を集計します）。</p>
 <?php page_footer(); exit; endif; ?>
-<p class="soukatsu-period"><strong>集計期間　<?= h($ymd($from)) ?>〜<?= h(date('n月j日', strtotime($to))) ?>（<?= (int)$days ?>日間）</strong>
-  <span class="note"><?= (int)$fy ?>年度<?= $to < date('Y-m-t', strtotime($from)) ? '・前日までの当月分' : '' ?>　作成 <?= h(date('Y年n月j日 H:i')) ?></span></p>
+<p class="soukatsu-period"><strong>集計期間　<?= h(period_range_text($from, $to)) ?>（<?= (int)$days ?>日間）</strong>
+  <span class="note"><?= (int)$fy ?>年度<?= !$per['range'] && $to < date('Y-m-t', strtotime($from)) ? '・前日までの当月分' : '' ?><?=
+    fiscal_year($from) !== $fy ? '（年度をまたぐため、目標は' . (int)$fy . '年度の値で計算）' : '' ?>　作成 <?= h(date('Y年n月j日 H:i')) ?></span></p>
 
 <h2>病棟別 在院日数・稼働率・回転率</h2>
 <table class="report">

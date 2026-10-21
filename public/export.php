@@ -70,10 +70,19 @@ switch ($type) {
 
     // 各種業務量他総括。画面と同じ数字をそのまま出す
     case 'soukatsu':
+        // 総括は「何月何日〜何月何日」の期間指定もある（画面と同じ soukatsu_period）
+        $per = soukatsu_period($_GET);
+        if ($per['error'] || $per['noData']) {
+            http_response_code(400);
+            header('Content-Type: text/plain; charset=UTF-8');
+            exit($per['error'] ? $per['message'] : 'まだ集計できる日がありません。');
+        }
+        ['from' => $from, 'to' => $to] = $per;
+        $periodName = $per['range'] ? "{$from}_{$to}" : $month;
         $v    = period_values($from, $to);
         $days = period_days($from, $to);
         $fy   = fiscal_year($to);
-        $rows[] = ['各種業務量他総括', $month, "集計期間 {$from}〜{$to}", "実日数{$days}日"];
+        $rows[] = ['各種業務量他総括', $periodName, "集計期間 {$from}〜{$to}", "実日数{$days}日"];
         $rows[] = [];
         $rows[] = ['病棟', '定床', '延患者数', '算定対象延患者数', '新入院', '退院', '転入', '転出',
                    '1日平均患者数', '平均在院日数', '病床稼働率', '病床回転率'];
@@ -114,7 +123,7 @@ switch ($type) {
                 $tgt === null ? '' : round($act - $tgt * $days, 1),
             ];
         }
-        send_csv("各種業務量他総括_{$month}", $rows);
+        send_csv("各種業務量他総括_{$periodName}", $rows);
 
     // 患者数統計表。画面のタブと同じ内容を 日付×項目 で出す
     case 'toukei':
@@ -138,6 +147,7 @@ switch ($type) {
         ];
         if (!isset($codes[$sheet])) {
             http_response_code(400);
+            header('Content-Type: text/plain; charset=UTF-8');
             exit('シートの指定が不正です。');
         }
         $items = all_items($to);
