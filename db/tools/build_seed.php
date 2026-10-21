@@ -67,6 +67,8 @@ $items  = read_csv("$masterDir/items.csv");
 $config = read_csv("$masterDir/config.csv");
 // 消した部署・まとめた部署にいた職員の行き先（無ければ空）
 $moves  = is_file("$masterDir/dept_moves.csv") ? read_csv("$masterDir/dept_moves.csv") : [];
+// 削除した項目（入力済みの値・目標値も消す。無ければ空）
+$removed = is_file("$masterDir/items_removed.csv") ? read_csv("$masterDir/items_removed.csv") : [];
 
 // ---- 整合性チェック（不正なマスタで帳票が狂うのを防ぐ） -------------------
 $errors   = [];
@@ -135,6 +137,11 @@ foreach ($moves as $mv) {
         $errors[] = "dept_moves.csv: 行き先 '{$mv['to']}' が depts.csv にありません";
     }
 }
+foreach ($removed as $rm) {
+    if (isset($itemSet[$rm['item_code']])) {
+        $errors[] = "items_removed.csv: '{$rm['item_code']}' はまだ items.csv にあります（消した項目だけを書く）";
+    }
+}
 
 if ($errors) {
     fwrite(STDERR, "マスタに問題があります:\n - " . implode("\n - ", $errors) . "\n");
@@ -191,6 +198,19 @@ foreach ($moves as $mv) {
 }
 $sql[] = "UPDATE m_user SET dept_id = 'sonota' WHERE dept_id NOT IN (SELECT dept_id FROM m_dept);";
 $sql[] = "UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value NOT IN (SELECT dept_id FROM m_dept);";
+if ($moves) {
+    $sql[] = '-- 消した部署の提出記録';
+    $sql[] = 'DELETE FROM d_submission WHERE dept_id IN ('
+           . implode(',', array_map('q', array_column($moves, 'from'))) . ');';
+}
+if ($removed) {
+    // 変更履歴（d_audit）は「誰がいつ何を直したか」の記録なので残す
+    $in = implode(',', array_map('q', array_column($removed, 'item_code')));
+    $sql[] = '';
+    $sql[] = '-- 削除した項目の入力済みの値・目標値（db/master/items_removed.csv）';
+    $sql[] = "DELETE FROM d_daily_value WHERE item_code IN ({$in});";
+    $sql[] = "DELETE FROM m_target WHERE item_code IN ({$in});";
+}
 
 file_put_contents($outSql, implode("\n", $sql) . "\n");
 

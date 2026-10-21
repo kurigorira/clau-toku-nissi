@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-10-21 01:31:29
+-- 生成日時: 2026-10-21 01:34:54
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -253,7 +253,7 @@ INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('corona_taiin_keikai','陽性者退院 軽快','kensa','corona','コロナ対策','input',NULL,'int','sum','名',2930,0,0,50,'2000-01-01',NULL,NULL,'⑧!P','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('corona_taiin_tenin','陽性者退院 転院','kensa','corona','コロナ対策','input',NULL,'int','sum','名',2940,0,0,50,'2000-01-01',NULL,NULL,'⑧!Q','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('corona_taiin_shibou','陽性者退院 死亡','kensa','corona','コロナ対策','input',NULL,'int','sum','名',2950,0,0,50,'2000-01-01',NULL,NULL,'⑧!R','');
-INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('tenkou','天候','toutyoku','jimu','日誌 事務欄','input',NULL,'text','sum','',3100,1,NULL,NULL,'2000-01-01',NULL,'tenkou',NULL,'');
+INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('tenkou','天候','toutyoku','tenkou','天候','input',NULL,'text','sum','',3100,1,NULL,NULL,'2000-01-01',NULL,'tenkou',NULL,'');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('toutyoku_ishi1','当直者 医師１','toutyoku','toutyoku_list','当直者・呼び出し','input',NULL,'text','sum','',3110,1,NULL,NULL,'2000-01-01',NULL,'t1',NULL,'');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('toutyoku_ishi2','当直者 医師２','toutyoku','toutyoku_list','当直者・呼び出し','input',NULL,'text','sum','',3120,0,NULL,NULL,'2000-01-01',NULL,'t2',NULL,'');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('toutyoku_kango','当直者 看護','toutyoku','toutyoku_list','当直者・呼び出し','input',NULL,'text','sum','',3130,1,NULL,NULL,'2000-01-01',NULL,'t3',NULL,'');
@@ -520,3 +520,9 @@ UPDATE m_user SET dept_id = 'kensa' WHERE dept_id = 'kansen';
 UPDATE m_config SET config_value = 'kensa' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'kansen';
 UPDATE m_user SET dept_id = 'sonota' WHERE dept_id NOT IN (SELECT dept_id FROM m_dept);
 UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value NOT IN (SELECT dept_id FROM m_dept);
+-- 消した部署の提出記録
+DELETE FROM d_submission WHERE dept_id IN ('jimu','ijika','shisetsu','kansen');
+
+-- 削除した項目の入力済みの値・目標値（db/master/items_removed.csv）
+DELETE FROM d_daily_value WHERE item_code IN ('den_shiyou','den_ryoukin','den_mokuhyou','gas_shiyou','gas_ryoukin','gas_mokuhyou','sui_shiyou','sui_ryoukin','sui_mokuhyou','netu_ryoukin_total');
+DELETE FROM m_target WHERE item_code IN ('den_shiyou','den_ryoukin','den_mokuhyou','gas_shiyou','gas_ryoukin','gas_mokuhyou','sui_shiyou','sui_ryoukin','sui_mokuhyou','netu_ryoukin_total');

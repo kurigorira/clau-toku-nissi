@@ -50,7 +50,7 @@ function user_norm(string $s): string
 /**
  * 1人ぶんを確かめて揃える。
  *
- * 部署は部署ID（jimu）でも部署名（事務課）でもよい。役割も英字（ijika）でも日本語（医事課）でもよい。
+ * 部署は部署ID（toutyoku）でも部署名（当直）でもよい。役割も英字（ijika）でも日本語（医事課）でもよい。
  * 役割が空なら null（新規なら入力者、既存なら今の役割のまま）。
  *
  * @return array [揃えた行 ['user_id','user_name','dept_id','role'|null], エラー文|null]

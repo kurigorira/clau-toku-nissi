@@ -229,7 +229,7 @@ corona_yousei_shin_nyuin,陽性者新入院,kensa,corona,コロナ対策,input,,
 corona_taiin_keikai,陽性者退院 軽快,kensa,corona,コロナ対策,input,,int,名,2930,0,0,50,,⑧!P,,sum
 corona_taiin_tenin,陽性者退院 転院,kensa,corona,コロナ対策,input,,int,名,2940,0,0,50,,⑧!Q,,sum
 corona_taiin_shibou,陽性者退院 死亡,kensa,corona,コロナ対策,input,,int,名,2950,0,0,50,,⑧!R,,sum
-tenkou,天候,toutyoku,jimu,日誌 事務欄,input,,text,,3100,1,,,tenkou,,,sum
+tenkou,天候,toutyoku,tenkou,天候,input,,text,,3100,1,,,tenkou,,,sum
 toutyoku_ishi1,当直者 医師１,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3110,1,,,t1,,,sum
 toutyoku_ishi2,当直者 医師２,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3120,0,,,t2,,,sum
 toutyoku_kango,当直者 看護,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3130,1,,,t3,,,sum
