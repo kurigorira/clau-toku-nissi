@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-10-21 01:05:34
+-- 生成日時: 2026-10-21 01:31:29
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -21,7 +21,6 @@ INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('zaitaku','在宅部門',130,'18:00','12345',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('touseki','透析室',140,'18:00','123456',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('toutyoku','当直',150,'09:00','1234567',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('kansen','感染対策室',160,'18:00','',0);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('sonota','その他（閲覧のみ）',999,'18:00','',0);
 
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('gairai_am','午前 患者数','gairai','gairai_cnt','外来患者数','sum','gk_naika_am,gk_geka_am,gk_seikei_am,gk_noge_am,gk_shinryo_am,gk_keisei_am,gk_jinzo_am,gk_kenshin_am,gk_shoka_am,gk_kokyu_am,gk_shoni_am,gk_hinyo_am,gk_hifu_am,gk_ikou_am','int','sum','名',10,0,NULL,NULL,'2000-01-01',NULL,NULL,NULL,'電子カルテ日報の医科合計 午前（科別の合計）');
@@ -517,5 +516,7 @@ UPDATE m_user SET dept_id = 'toutyoku' WHERE dept_id = 'ijika';
 UPDATE m_config SET config_value = 'toutyoku' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'ijika';
 UPDATE m_user SET dept_id = 'sonota' WHERE dept_id = 'shisetsu';
 UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'shisetsu';
+UPDATE m_user SET dept_id = 'kensa' WHERE dept_id = 'kansen';
+UPDATE m_config SET config_value = 'kensa' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'kansen';
 UPDATE m_user SET dept_id = 'sonota' WHERE dept_id NOT IN (SELECT dept_id FROM m_dept);
 UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value NOT IN (SELECT dept_id FROM m_dept);

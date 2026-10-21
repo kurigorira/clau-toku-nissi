@@ -349,7 +349,7 @@ function emr_dept_guess(string $emrName, array $depts): string
         '医事' => 'toutyoku', '総務' => 'toutyoku', '事務' => 'toutyoku',   // 医事課・事務課は当直に統合した
         '施設' => DEPT_VIEW_ONLY, '地域医療連携' => 'renkei', '連携' => 'renkei',
         '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
-        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => DEPT_VIEW_ONLY,   // 感染対策室・施設課は入力する項目が無い（コロナ対策は検査科）
+        '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kensa',   // 感染対策室は検査科に統合（コロナ対策は検査科の画面）
     ];
     foreach ($rules as $word => $id) {
         if (mb_strpos($n, $word) !== false && ($id === DEPT_VIEW_ONLY || isset($depts[$id]))) {
