@@ -508,10 +508,22 @@ C:\php\php db\tools\run_sql.php db\seed_master.sql
 病院日誌の画面の「**PDFでダウンロード**」で、印刷と同じ A4縦・左とじ のPDF（`病院日誌_2026-10-18.pdf`）がダウンロードされる。
 
 - PDFは **サーバに入っている Chrome か Edge** を画面を出さずに起動して作る（`public/nissi_pdf.php`・`src/pdf.php`。PDFの部品は入れていない）
-- ブラウザはよくある場所（`C:\Program Files\Google\Chrome\Application\chrome.exe`、`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe` など）を探す。
-  別の場所なら `config/config.php` の `pdf.browser` にパスを書く。`C:\php\php tools\check_env.php` の「病院日誌のPDF」で確かめられる
+- ブラウザはよくある場所を **Edge → Chrome の順** に探す（`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`、
+  `C:\Program Files\Google\Chrome\Application\chrome.exe` など）。Windows 10/11 の Edge は自動で更新されて新しいので先に使う
+  （古い Chrome はPDFを作れない・終わらないことがある）。別のブラウザを使うときは `config/config.php` の `pdf.browser` にパスを書く
+- `C:\php\php tools\check_env.php` の「病院日誌のPDF」で、使うブラウザと、実際に小さなPDFを作れるか（かかった秒数）が分かる。
+  ただし check_env は自分のアカウントで動き、画面からは Apache のサービスのアカウントで動くので、ここで OK でも画面で作れないことはある
 - 特記事項（患者氏名）は画面と同じく、見られる人のPDFにだけ入る。作業用の一時ファイルはダウンロードの前に消す
-- 作れないとき（ブラウザが無いなど）は理由が出る。そのときは「印刷用」を開き、Ctrl+P →送信先「PDFに保存」で保存できる
+- 待つのは最長30秒。PDFができたのにブラウザが終わらないときは、PDFができた時点で打ち切る。時間切れや失敗のときもブラウザは子プロセスごと終わらせる
+- 作っている間も、同じ人が別のタブで他の画面を使える
+- 作れないとき（ブラウザが無い・時間切れなど）は理由が出る。そのときは「印刷用」を開き、Ctrl+P →送信先「PDFに保存」で保存できる。
+  理由の詳細は Apache の `logs\error.log` に「病院日誌PDF」で残る
+
+**押しても返ってこない・固まったとき**（版 2026-10-21.2 より前は、Windows で返ってこないことがあった）
+
+1. Apache を再起動する（固まったままの処理を終わらせる）
+2. タスクマネージャーの「詳細」で、ユーザー名が SYSTEM の `msedge.exe`・`chrome.exe` が残っていれば終了する
+3. 最新の版に置き直してから試す。それでも作れないときは、`pdf.browser` に Edge のパスを書いて試す
 
 ## よくある変更
 

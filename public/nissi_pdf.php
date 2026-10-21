@@ -23,6 +23,9 @@ $html = (string)ob_get_clean();
 // CSS（assets/print.css など）をファイルから読めるよう、公開フォルダの場所を base にする
 $html = preg_replace('/<head>/i', '<head><base href="' . h(pdf_file_url(__DIR__) . '/') . '">', $html, 1);
 
+// PDFを作っている間（数秒〜）も、同じ人が他の画面を開けるようにセッションを放す
+session_write_close();
+
 $r = html_to_pdf($html);
 if ($r['pdf'] !== null) {
     $name = '病院日誌_' . $date . '.pdf';

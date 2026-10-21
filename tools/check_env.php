@@ -219,6 +219,15 @@ if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
     }
     if (!function_exists('proc_open')) {
         line('注意', 'proc_open', '無効（php.ini の disable_functions）。PDFを作れません');
+    } elseif ($pb !== null) {
+        // 実際に小さなPDFを作ってみる。コマンドで動かすと、Apache（サービス）から動かすときとは
+        // 使うアカウントが違うので、ここで OK でも画面で作れないことはある（README「病院日誌のPDF」）
+        $tr = html_to_pdf('<!doctype html><meta charset="utf-8"><p>病院日誌 PDF の試し</p>');
+        if ($tr['pdf'] !== null) {
+            line('OK', 'PDFの試し作成', $tr['seconds'] . '秒で作れた');
+        } else {
+            line('注意', 'PDFの試し作成', $tr['error']);
+        }
     }
 }
 
