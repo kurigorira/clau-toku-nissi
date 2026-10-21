@@ -4,11 +4,12 @@
  *
  * 項目マスタの正本は db/master/items.csv で、通常はそちらを直して
  * build_seed.php で反映する（医事課がExcelでレビューできるようにするため）。
- * この画面は、年度の目標値の登録と、CSVを触らずに済ませたい軽微な変更
+ * この画面は、年度の目標値の登録（事業計画の Excel からの月別の目標の取り込みを含む）と、CSVを触らずに済ませたい軽微な変更
  * （表示順・必須・上下限・有効期限）のためのもの。
  */
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/repository.php';
+require_once __DIR__ . '/../src/target_import.php';
 
 $user = require_login();
 if (!has_role($user, 'admin')) {
@@ -21,10 +22,47 @@ if (!has_role($user, 'admin')) {
 
 $tab      = $_GET['tab'] ?? 'target';
 $messages = [];
+$preview  = null;     // 事業計画の Excel を読んだ結果（確認画面）
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $action = $_POST['action'] ?? '';
+
+    // 事業計画（月別の目標）の Excel を読む → 確認画面。登録は次の「この内容で登録」で
+    if ($action === 'plan_preview') {
+        $f  = $_FILES['plan_xlsx'] ?? null;
+        $fy = (int)($_POST['plan_fy'] ?? 0);
+        unset($_SESSION['plan_import']);
+        if (!is_array($f) || ($f['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            $messages[] = ['事業計画の Excel を選んでください。', 'error'];
+        } elseif ($f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
+            $messages[] = ['ファイルを受け取れませんでした（コード ' . (int)$f['error'] . '）。もう一度選んでください。', 'error'];
+        } else {
+            try {
+                $preview = target_parse(xlsx_read($f['tmp_name']), $fy >= 2000 && $fy <= 2100 ? $fy : null);
+                $preview['file'] = (string)$f['name'];
+                $_SESSION['plan_import'] = ['fy' => $preview['fy'],
+                    'items' => array_map(fn($x) => $x['months'], $preview['items'])];
+            } catch (RuntimeException $e) {
+                $messages[] = [(string)$f['name'] . '：' . $e->getMessage(), 'error'];
+            }
+        }
+    }
+    if ($action === 'plan_commit') {
+        $imp = $_SESSION['plan_import'] ?? null;
+        unset($_SESSION['plan_import']);
+        if (!is_array($imp)) {
+            $messages[] = ['取り込む内容がありません。もう一度 Excel を選んでください。', 'error'];
+        } else {
+            try {
+                $n = target_save((int)$imp['fy'], $imp['items'], $user['user_id']);
+                $messages[] = ["{$imp['fy']}年度の月別の目標を {$n} 項目登録しました。総括の目標・達成率に使われます。", 'ok'];
+            } catch (Throwable $e) {
+                error_log('事業計画の取り込み：' . $e->getMessage());
+                $messages[] = ['登録できませんでした。月別の目標のテーブルが無い場合は db/migrations/004_target_month.sql を流してください。', 'error'];
+            }
+        }
+    }
 
     if ($action === 'save_target') {
         $fy = (int)($_POST['fiscal_year'] ?? 0);
@@ -100,8 +138,91 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
     <label>年度 <input type="number" name="fy" value="<?= (int)$fy ?>" min="2000" max="2100" size="6"></label>
     <button type="submit">表示</button>
   </form>
+  <?php if ($preview !== null): $items = all_items(); ?>
+    <h2>事業計画の取り込み：確認（<?= (int)$preview['fy'] ?>年度・シート「<?= h($preview['sheet']) ?>」）</h2>
+    <p class="note"><?= h($preview['file']) ?> の「延数」の行を、月ごとの目標延数として登録します。
+      登録すると、その年度の月別の目標を項目ごとに入れ替え、下の「1日平均の目標」も年間合計÷年度の日数に更新します。</p>
+    <div class="table-scroll">
+    <table class="report">
+      <thead><tr><th>項目</th><th>Excel の行</th>
+        <?php foreach ([4,5,6,7,8,9,10,11,12,1,2,3] as $mo): ?><th><?= $mo ?>月</th><?php endforeach; ?><th>年間</th></tr></thead>
+      <tbody>
+      <?php foreach ($preview['items'] as $code => $x): ?>
+        <tr>
+          <th><?= h($items[$code]['item_name'] ?? $code) ?><?= isset($items[$code]) ? '' : '（項目なし・登録しない）' ?></th>
+          <td><?= h(implode('＋', $x['from'])) ?></td>
+          <?php foreach ([4,5,6,7,8,9,10,11,12,1,2,3] as $mo):
+              $ym = sprintf('%04d-%02d', $mo >= 4 ? $preview['fy'] : $preview['fy'] + 1, $mo); ?>
+            <td class="n"><?= isset($x['months'][$ym]) ? h(number_format($x['months'][$ym], 1)) : '' ?></td>
+          <?php endforeach; ?>
+          <td class="n"><?= h(number_format(array_sum($x['months']), 1)) ?></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    </div>
+    <?php if ($preview['notfound']): ?>
+      <p class="flash flash-warn">対応表（db/master/target_map.csv）にあるのに、Excel に見つからない見出し：<?= h(implode('、', $preview['notfound'])) ?></p>
+    <?php endif; ?>
+    <?php if ($preview['skipped']): ?>
+      <p class="note">取り込まない行（率・人数・合計など、システムの項目に当たらないもの）：
+        <?= h(implode('、', array_map(fn($k) => "{$k['label']}（{$k['row']}行目）", $preview['skipped']))) ?></p>
+    <?php endif; ?>
+    <form method="post" class="actions">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="plan_commit">
+      <button type="submit" class="primary">この内容で登録</button>
+      <a href="?tab=target&amp;fy=<?= (int)$preview['fy'] ?>">やめる</a>
+    </form>
+    <hr>
+  <?php endif; ?>
+
+  <h2>事業計画（月別の目標）の取り込み</h2>
+  <form method="post" enctype="multipart/form-data" class="datebar">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="plan_preview">
+    <label>Excel（.xlsx / .xlsm） <input type="file" name="plan_xlsx" accept=".xlsx,.xlsm"></label>
+    <label>年度 <select name="plan_fy"><option value="">Excel から読む</option>
+      <?php for ($y = $fy - 1; $y <= $fy + 1; $y++): ?><option value="<?= $y ?>"><?= $y ?>年度</option><?php endfor; ?></select></label>
+    <button type="submit">読み込む（確認画面へ）</button>
+  </form>
+  <p class="note">「4月」〜「3月」の見出しが並ぶ事業計画指標値のシートを読みます。どの行をどの項目にするかは
+    <code>db/master/target_map.csv</code> で決めています。総括の目標は、その月の目標÷月の日数×期間の日数で計算します。</p>
+
+  <?php
+  // 登録済みの月別の目標（確認用）
+  $monthly = [];
+  try {
+      foreach (db_all('SELECT item_code, ym, target_total FROM m_target_month WHERE ym BETWEEN ? AND ? ORDER BY item_code',
+                      [sprintf('%04d-04', $fy), sprintf('%04d-03', $fy + 1)]) as $r) {
+          $monthly[$r['item_code']][$r['ym']] = (float)$r['target_total'];
+      }
+  } catch (Throwable $e) {
+      echo '<p class="flash flash-warn">月別の目標のテーブルがありません。db/migrations/004_target_month.sql を流してください。</p>';
+  }
+  if ($monthly): $items = all_items(); ?>
+    <h2><?= (int)$fy ?>年度 月別の目標（登録済み・延数）</h2>
+    <div class="table-scroll">
+    <table class="report">
+      <thead><tr><th>項目</th><?php foreach ([4,5,6,7,8,9,10,11,12,1,2,3] as $mo): ?><th><?= $mo ?>月</th><?php endforeach; ?><th>年間</th></tr></thead>
+      <tbody>
+      <?php foreach ($items as $code => $it): if (!isset($monthly[$code])) { continue; } ?>
+        <tr><th><?= h($it['item_name']) ?></th>
+          <?php foreach ([4,5,6,7,8,9,10,11,12,1,2,3] as $mo):
+              $ym = sprintf('%04d-%02d', $mo >= 4 ? $fy : $fy + 1, $mo); ?>
+            <td class="n"><?= isset($monthly[$code][$ym]) ? h(number_format($monthly[$code][$ym], 1)) : '' ?></td>
+          <?php endforeach; ?>
+          <td class="n"><?= h(number_format(array_sum($monthly[$code]), 1)) ?></td></tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    </div>
+  <?php endif; ?>
+
+  <h2>1日平均の目標</h2>
   <p class="note">
-    総括表の「目標」列に使う1日平均の目標値です。空欄にすると目標なし（目標差も表示されません）。
+    総括表の「目標」列に使う1日平均の目標値です（月別の目標がある月はそちらを使い、無い月はこの値を使います）。
+    空欄にすると目標なし（目標差も表示されません）。
   </p>
   <form method="post">
     <?= csrf_field() ?>

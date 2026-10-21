@@ -1,0 +1,47 @@
+label,nth,item_code,note
+3F（回復期）,1,byoto3_zaiin,延患者数 3階（延数の行）
+4F（一般）,1,byoto4_zaiin,延患者数 4階
+5F（一般）,1,byoto5_zaiin,延患者数 5階
+合計,1,byoto_zaiin_all,延患者数 合計（1番目の「合計」）
+3F,1,byoto3_nyuin,新入院 3階（1番目の「3F」）
+4F,1,byoto4_nyuin,新入院 4階
+5F,1,byoto5_nyuin,新入院 5階
+合計,2,byoto_nyuin_all,新入院 合計（2番目の「合計」）
+3F,2,byoto3_taiin,退院 3階（2番目の「3F」）
+4F,2,byoto4_taiin,退院 4階
+5F,2,byoto5_taiin,退院 5階
+合計,3,byoto_taiin_all,退院 合計（3番目の「合計」）
+一般外来,1,gairai_ippan,
+①在宅医療 訪問看護,1,iryou_houkan,
+②在宅医療 訪問診療,1,iryou_houshin,
+③在宅医療 訪問リハビリ,1,iryou_hourehab_jin,
+健康診断,1,kenshin_ninzu,
+人間ドック,1,dock_ninzu,
+通所リハ,1,tsusho,
+①介護 訪問看護,1,kaigo_houkan_total,
+②居宅指導,1,kaigo_kyotaku,
+③介護 訪問リハビリ,1,kaigo_hourehab,
+訪問介護,1,houkai_total,
+介護 訪問看護合計①＋②＋③,1,kaigo_shoukei,総括の「介護合計」＝介護保険の小計。Excel の介護「合計」は通所リハを含むので使わず、訪問看護合計＋訪問介護
+訪問介護,1,kaigo_shoukei,（↑と足す）
+心エコー,1,shin_echo_total,
+腹部エコー,1,fuku_echo_total,
+検体検査,1,kentai_total,
+CT,1,ct_total,
+MRI,1,mri_total,
+一般単純,1,ippan_total,
+胃透視,1,itoushi_total,
+マンモグラフィー,1,mammo_total,
+CAG,1,cag_total,血管造影 入＋外
+入院透析,1,touseki_nyuin,
+外来透析,1,touseki_gairai,
+PT単位数,1,pt_total,
+OT単位数,1,ot_total,
+ST単位数,1,st_total,
+服薬指導,1,fukuyaku,
+栄養指導,1,eiyou_sum12,
+救急,1,qq_kanja,救急搬入 患者数
+手術,1,ope_total,
+胃カメラ,1,egd_total,
+大腸ファイバー,1,cf_total,
+紹介患者,1,shoukai,

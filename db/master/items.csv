@@ -187,6 +187,7 @@ reg_total,在宅サービス登録 合計,zaitaku,zaitaku_svc,在宅サービス
 tsusho,通所リハ,toutyoku,kaigo,介護保険,input,,int,名,2400,1,0,100,s2,在宅②!C,Excel①の通所リハビリ列は同じ値の転記,sum
 kaigo_houkan_over30,訪問看護（介護） 30分以上,toutyoku,kaigo,介護保険,input,,int,件,2410,0,0,100,,在宅②!E,,sum
 kaigo_houkan_under30,訪問看護（介護） 30分以内,toutyoku,kaigo,介護保険,input,,int,件,2420,0,0,100,,在宅②!F,,sum
+kaigo_houkan_total,訪問看護（介護） 計,toutyoku,kaigo,介護保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30",int,件,2425,0,,,,,総括の介護「訪問看護」。事業計画の目標（介護 訪問看護）を付ける,sum
 kaigo_houkai_over30,訪問介護 30分以上,toutyoku,kaigo,介護保険,input,,int,件,2430,0,0,100,,在宅②!G,,sum
 kaigo_houkai_under30,訪問介護 30分以内,toutyoku,kaigo,介護保険,input,,int,件,2440,0,0,100,,在宅②!H,,sum
 kaigo_kyotaku,居宅指導,toutyoku,kaigo,介護保険,input,,int,件,2450,0,0,100,s5,在宅②!I,,sum

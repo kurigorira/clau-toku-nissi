@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS d_access_log;
 DROP TABLE IF EXISTS d_tokki;
 DROP TABLE IF EXISTS d_submission;
 DROP TABLE IF EXISTS d_daily_value;
+DROP TABLE IF EXISTS m_target_month;
 DROP TABLE IF EXISTS m_target;
 DROP TABLE IF EXISTS m_config;
 DROP TABLE IF EXISTS m_item;
@@ -216,6 +217,21 @@ CREATE TABLE m_target (
   fiscal_year INT           NOT NULL,                -- 年度（4月始まり）
   target_avg  DECIMAL(12,2)     NULL,                -- 1日平均の目標値
   PRIMARY KEY (item_code, fiscal_year)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ------------------------------------------------------------
+--  m_target_month : 月別の目標値（事業計画の Excel から取り込む）
+--  月ごとの目標延数。期間の目標＝その月の延数÷月の日数×期間に掛かる日数。
+--  月別が無い月は m_target（年度の1日平均）で補う。
+-- ------------------------------------------------------------
+CREATE TABLE m_target_month (
+  item_code    VARCHAR(40)   NOT NULL,
+  ym           CHAR(7)       NOT NULL,                -- 'YYYY-MM'
+  target_total DECIMAL(12,2) NOT NULL,                -- その月の目標延数
+  updated_by   VARCHAR(32)   NOT NULL DEFAULT '',
+  updated_at   DATETIME          NULL,
+  PRIMARY KEY (item_code, ym)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

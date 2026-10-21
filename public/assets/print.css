@@ -66,6 +66,9 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .rank .bar { width: 38%; }
 .rank .track { height: 2.6mm; }
 .rank .fill { top: 0.4mm; height: 1.8mm; }
+/* 業務量は行が多い（入院・血管造影・外来透析・紹介患者を足した）ので、A4に収まるよう行間を詰める */
+.split .report th, .split .report td { padding: 0.1mm 1mm; line-height: 1.15; }
+.split .report thead th { line-height: 1.1; }
 .flash-warn { border: 0.5pt solid #888; background: #fff; padding: 1mm 2mm; margin: 1.5mm 0 0; font-size: 7.5pt; }
 .flash-warn ul { margin: 0.5mm 0 0 4mm; }
 .ncol.w20 { width: 20%; }

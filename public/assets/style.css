@@ -105,6 +105,7 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .report .block { background: #e8edf2; text-align: center; writing-mode: vertical-rl; }
 .report .itemname { min-width: 110px; }
 .report.narrow td.n { min-width: 56px; }
+.table-scroll { overflow-x: auto; max-width: 100%; }
 
 /* ---- 総括：表の右に目標達成率の順位（JavaScriptなし。gap を使わず表組みで並べる） ---- */
 .split { display: table; }
@@ -123,6 +124,8 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
               -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .rank .goal { position: absolute; top: -3px; bottom: -3px; border-left: 1px dashed #52514e; }
 .rank .v { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; color: #0b0b0b; }
+.rank thead th { font-size: 11px; color: #52514e; font-weight: normal; border-bottom: 1px solid #c7ccd2; }
+.rank thead th.v, .rank thead th.rk { text-align: right; }
 
 /* ---- 病院日誌 ---- */
 .nissi { border-collapse: collapse; background: #fff; font-size: 12px; }

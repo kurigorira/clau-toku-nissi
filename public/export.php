@@ -81,7 +81,6 @@ switch ($type) {
         $periodName = $per['range'] ? "{$from}_{$to}" : $month;
         $v    = period_values($from, $to);
         $days = period_days($from, $to);
-        $fy   = fiscal_year($to);
         $rows[] = ['各種業務量他総括', $periodName, "集計期間 {$from}〜{$to}", "実日数{$days}日"];
         $rows[] = [];
         $rows[] = ['病棟', '定床', '延患者数', '算定対象延患者数', '新入院', '退院', '転入', '転出',
@@ -104,23 +103,24 @@ switch ($type) {
             ];
         }
         $rows[] = [];
-        $rows[] = ['項目', '目標平均', '目標延数', '実績平均', '実績延数', '目標差平均', '目標差延数'];
-        foreach (all_items($to) as $code => $it) {
-            if ($it['value_type'] !== 'int') {   // 文字の項目（天候・当直者・会議など）は出さない
-                continue;
-            }
+        $rows[] = ['項目', '目標平均', '目標延数', '実績平均', '実績延数', '目標差平均', '目標差延数', '達成率(%)'];
+        $intItems = array_filter(all_items($to), fn($it) => $it['value_type'] === 'int');   // 文字の項目（天候・当直者・会議など）は出さない
+        // 目標＝月別の目標÷月の日数×期間の日数（無い月は年度の1日平均）。画面と同じ src/master.php
+        $targets  = targets_for_period(array_keys($intItems), $from, $to);
+        foreach ($intItems as $code => $it) {
             $act = $v[$code] ?? null;
             if ($act === null) {
                 continue;
             }
             $avg = $act / $days;
-            $tgt = target_value($code, $fy);
+            $sum = $targets[$code] ?? null;
             $rows[] = [
-                $it['item_name'], $tgt === null ? '' : round($tgt, 2),
-                $tgt === null ? '' : round($tgt * $days, 1),
+                $it['item_name'], $sum === null ? '' : round($sum / $days, 2),
+                $sum === null ? '' : round($sum, 1),
                 round($avg, 2), $act,
-                $tgt === null ? '' : round($avg - $tgt, 2),
-                $tgt === null ? '' : round($act - $tgt * $days, 1),
+                $sum === null ? '' : round($avg - $sum / $days, 2),
+                $sum === null ? '' : round($act - $sum, 1),
+                $sum === null || $sum <= 0 ? '' : round($act / $sum * 100, 1),
             ];
         }
         send_csv("各種業務量他総括_{$periodName}", $rows);

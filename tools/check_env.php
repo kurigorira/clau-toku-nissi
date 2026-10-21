@@ -175,6 +175,14 @@ if (!is_file($confPath)) {
         line($hasEmrDept ? 'OK' : '注意', '職員の電子カルテ部署',
              $hasEmrDept ? '列あり'
              : '未作成 … php db\\tools\\run_sql.php --user=root --pass=... db\\migrations\\003_user_emr_dept.sql');
+
+        // 月別の目標（事業計画の Excel の取り込み先。後から足したテーブル）
+        $hasTm = true;
+        try { $pdo->query('SELECT 1 FROM m_target_month LIMIT 1'); }
+        catch (Exception $e) { $hasTm = false; }
+        line($hasTm ? 'OK' : '注意', '月別の目標',
+             $hasTm ? 'テーブルあり'
+             : '未作成 … php db\\tools\\run_sql.php --user=root --pass=... db\\migrations\\004_target_month.sql');
     } catch (Exception $e) {
         line('NG', 'DB接続', '失敗: ' . $e->getMessage());
     }

@@ -34,6 +34,11 @@ $g = fn(string $c) => $v[$c] ?? null;
 
 // 各種業務量。左が表示名、右が項目コード
 $blocks = [
+    '入院' => [
+        ['延患者数',   'byoto_zaiin_all'],
+        ['新入院',     'byoto_nyuin_all'],
+        ['退院',       'byoto_taiin_all'],
+    ],
     '外来' => [
         ['一般外来',   'gairai_ippan'],
         ['訪問看護',   'iryou_houkan'],
@@ -44,7 +49,7 @@ $blocks = [
     ],
     '介護' => [
         ['通所リハ',   'tsusho'],
-        ['訪問看護',   'houkan_kaigo_disp'],
+        ['訪問看護',   'kaigo_houkan_total'],
         ['居宅指導',   'kaigo_kyotaku'],
         ['訪問リハ',   'kaigo_hourehab'],
         ['訪問介護',   'houkai_total'],
@@ -61,6 +66,7 @@ $blocks = [
         ['一般単純',     'ippan_total'],
         ['胃透視',       'itoushi_total'],
         ['マンモ',       'mammo_total'],
+        ['血管造影',     'cag_total'],
     ],
     '内視鏡' => [
         ['胃カメラ',        'egd_total'],
@@ -75,12 +81,17 @@ $blocks = [
         ['手術',       'ope_total'],
         ['服薬指導',   'fukuyaku'],
         ['栄養指導',   'eiyou_sum12'],
-        ['透析',       'touseki_nyuin'],
+        ['入院透析',   'touseki_nyuin'],
+        ['外来透析',   'touseki_gairai'],
         ['救急搬入',   'qq_kanja'],
+        ['紹介患者',   'shoukai'],
     ],
 ];
-// 介護の訪問看護は介護分（30分以上＋以内）で見る。Excel総括のG列と同じ括り
-$v['houkan_kaigo_disp'] = ($g('kaigo_houkan_over30') ?? 0) + ($g('kaigo_houkan_under30') ?? 0);
+// 期間の目標延数（月別の目標÷月の日数×期間の日数。無い月は年度の1日平均。src/master.php）
+$targets = targets_for_period(array_merge(...array_map(fn($r) => array_column($r, 1), array_values($blocks))), $from, $to);
+// 年度累計（4月1日〜前日）。年度の進捗を見るためのリンク
+$fyFrom = sprintf('%04d-04-01', fiscal_year(date('Y-m-d', strtotime('-1 day'))));
+$fyTo   = date('Y-m-d', strtotime('-1 day'));
 
 $wards = ['3' => '3階', '4' => '4階', '5' => '5階', 'all' => '総合計'];
 
@@ -100,6 +111,7 @@ $ymd = fn(string $d) => date('Y年n月j日', strtotime($d));
     <label>期間指定 <input type="date" name="from" value="<?= h($from) ?>"></label>〜<input type="date" name="to" value="<?= h($to) ?>">
     <button type="submit">表示</button>
     <span class="note">前日まで・1年以内</span>
+    <a href="soukatsu.php?from=<?= h($fyFrom) ?>&amp;to=<?= h($fyTo) ?>">年度累計（<?= h(date('n月j日', strtotime($fyFrom))) ?>〜前日）</a>
   </form>
 </div>
 <?php if ($per['message'] !== null): ?>
@@ -110,8 +122,7 @@ if ($noData): ?>
   <p class="flash flash-warn"><?= h($ymd($from)) ?> からの集計はまだできません（前日までの分を集計します）。</p>
 <?php page_footer(); exit; endif; ?>
 <p class="soukatsu-period"><strong>集計期間　<?= h(period_range_text($from, $to)) ?>（<?= (int)$days ?>日間）</strong>
-  <span class="note"><?= (int)$fy ?>年度<?= !$per['range'] && $to < date('Y-m-t', strtotime($from)) ? '・前日までの当月分' : '' ?><?=
-    fiscal_year($from) !== $fy ? '（年度をまたぐため、目標は' . (int)$fy . '年度の値で計算）' : '' ?>　作成 <?= h(date('Y年n月j日 H:i')) ?></span></p>
+  <span class="note"><?= (int)$fy ?>年度<?= !$per['range'] && $to < date('Y-m-t', strtotime($from)) ? '・前日までの当月分' : '' ?>　作成 <?= h(date('Y年n月j日 H:i')) ?></span></p>
 
 <h2>病棟別 在院日数・稼働率・回転率</h2>
 <table class="report">
@@ -168,8 +179,8 @@ $noTarget = 0;
     <?php foreach ($rows as [$label, $code]):
         $act    = $v[$code] ?? null;
         $actAvg = $act === null ? null : $act / $days;
-        $tgtAvg = target_value($code, $fy);
-        $tgtSum = $tgtAvg === null ? null : $tgtAvg * $days;
+        $tgtSum = $targets[$code] ?? null;
+        $tgtAvg = $tgtSum === null ? null : $tgtSum / $days;
         if ($tgtSum === null || $tgtSum <= 0) {
             $noTarget++;
         } elseif ($act !== null) {
@@ -199,17 +210,20 @@ usort($rank, fn($a, $b) => $b['rate'] <=> $a['rate']);
 // 目盛りの右端：120％〜200％（20％刻み）。200％を超える棒は右端まで伸ばし、数字で本当の値を出す
 $scale = $rank ? min(200, max(120, (int)ceil(max(array_column($rank, 'rate')) / 20) * 20)) : 120;
 $pct = fn(float $x) => round(min($x, $scale) / $scale * 100, 2);
+// 差（実績−目標の延数）。マイナスは「−」で示す（色ではなく符号で）
+$diff = fn(float $x) => ($x >= 0 ? '+' : '−') . number_format(abs($x), 1);
 ?>
   <h3 class="rank-title">目標達成率の順位</h3>
   <?php if (!$rank): ?>
-    <p class="note">年度の目標値が登録されていないため、表示できません。<br>
-      マスタ →「年度目標値」で <?= (int)$fy ?>年度の目標（1日平均）を登録すると、ここに達成率の高い順に並びます。</p>
+    <p class="note">この期間の目標値が登録されていないため、表示できません。<br>
+      マスタ →「年度目標値」で事業計画の Excel を取り込む（または1日平均の目標を登録する）と、ここに達成率の高い順に並びます。</p>
   <?php else: ?>
-    <p class="note rank-note">達成率＝実績延数÷目標延数（<?= (int)$days ?>日分）。点線が100％</p>
+    <p class="note rank-note">達成率＝実績延数÷目標延数（<?= (int)$days ?>日分）。点線が100％。差＝実績−目標</p>
     <table class="rank" aria-label="目標達成率の順位">
+      <thead><tr><th class="rk">順位</th><th>項目</th><th class="bar"></th><th class="v">達成率</th><th class="v">差</th></tr></thead>
       <tbody>
       <?php foreach ($rank as $i => $r): ?>
-        <tr title="<?= h($r['label']) ?>：達成率 <?= h(number_format($r['rate'], 1)) ?>％（実績 <?= h(num($r['act'])) ?>／目標 <?= h(number_format($r['tgt'], 1)) ?>）">
+        <tr title="<?= h($r['label']) ?>：達成率 <?= h(number_format($r['rate'], 1)) ?>％（実績 <?= h(num($r['act'])) ?>／目標 <?= h(number_format($r['tgt'], 1)) ?>／差 <?= h($diff($r['act'] - $r['tgt'])) ?>）">
           <td class="rk"><?= $i + 1 ?></td>
           <th><?= h($r['label']) ?></th>
           <td class="bar"><div class="track">
@@ -217,6 +231,7 @@ $pct = fn(float $x) => round(min($x, $scale) / $scale * 100, 2);
             <span class="goal" style="left:<?= $pct(100) ?>%"></span>
           </div></td>
           <td class="v"><?= h(number_format($r['rate'], 1)) ?>%</td>
+          <td class="v"><?= h($diff($r['act'] - $r['tgt'])) ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>
@@ -225,7 +240,8 @@ $pct = fn(float $x) => round(min($x, $scale) / $scale * 100, 2);
   <?php endif; ?>
 </div>
 </div>
-<p class="note">目標値が空欄の項目は、まだ <code>m_target</code> に年度の目標が登録されていません（マスタ →「年度目標値」で登録します）。</p>
+<p class="note">目標＝事業計画の月別の目標÷月の日数×期間の日数（月別が無い月は年度の1日平均）。
+  空欄の項目は目標が登録されていません（マスタ →「年度目標値」で事業計画の Excel を取り込みます）。</p>
 
 <h2>救急搬入・紹介</h2>
 <table class="report narrow">

@@ -90,6 +90,64 @@ function target_value(string $itemCode, int $fiscalYear): ?float
     return $r === null || $r['target_avg'] === null ? null : (float)$r['target_avg'];
 }
 
+/**
+ * 期間の目標延数（項目ごと）。総括の「目標延数」と達成率に使う。
+ *
+ * 日ごとの目標＝その月の目標延数（m_target_month）÷その月の日数。期間に掛かる日数ぶん足す
+ * （10/1〜10/20 なら 10月の目標×20/31。月・年度をまたいでもそのまま正しい）。
+ * 月別が無い月は、年度の1日平均（m_target）×日数で補う。どちらも無い月がある項目は入れない。
+ *
+ * @return array item_code => 目標延数
+ */
+function targets_for_period(array $codes, string $from, string $to): array
+{
+    if (!$codes) {
+        return [];
+    }
+    // 期間に掛かる月ごとの日数
+    $months = [];
+    for ($d = new DateTimeImmutable($from), $end = new DateTimeImmutable($to); $d <= $end; $d = $d->modify('+1 day')) {
+        $ym = $d->format('Y-m');
+        $months[$ym] = ($months[$ym] ?? 0) + 1;
+    }
+    $ph = implode(',', array_fill(0, count($codes), '?'));
+    $monthly = [];
+    try {
+        foreach (db_all("SELECT item_code, ym, target_total FROM m_target_month
+                          WHERE item_code IN ($ph) AND ym BETWEEN ? AND ?",
+                        array_merge(array_values($codes), [substr($from, 0, 7), substr($to, 0, 7)])) as $r) {
+            $monthly[$r['item_code']][$r['ym']] = (float)$r['target_total'];
+        }
+    } catch (Throwable $e) {
+        // 004_target_month.sql を流していないサーバ。年度の1日平均だけで計算する
+    }
+    $annual = [];
+    $fys = array_unique(array_map(fn($ym) => fiscal_year($ym . '-01'), array_keys($months)));
+    foreach (db_all("SELECT item_code, fiscal_year, target_avg FROM m_target
+                      WHERE item_code IN ($ph) AND fiscal_year IN (" . implode(',', array_map('intval', $fys)) . ')',
+                    array_values($codes)) as $r) {
+        if ($r['target_avg'] !== null) {
+            $annual[$r['item_code']][(int)$r['fiscal_year']] = (float)$r['target_avg'];
+        }
+    }
+    $out = [];
+    foreach ($codes as $code) {
+        // 期間のどこかの月に目標が無ければ、その項目は目標なし（一部の月だけで比べると達成率が狂う）
+        $sum = 0.0;
+        foreach ($months as $ym => $n) {
+            if (isset($monthly[$code][$ym])) {
+                $sum += $monthly[$code][$ym] / (int)date('t', strtotime($ym . '-01')) * $n;
+            } elseif (isset($annual[$code][fiscal_year($ym . '-01')])) {
+                $sum += $annual[$code][fiscal_year($ym . '-01')] * $n;
+            } else {
+                continue 2;
+            }
+        }
+        $out[$code] = $sum;
+    }
+    return $out;
+}
+
 /** 日付が属する年度（4月始まり）。 */
 function fiscal_year(string $date): int
 {

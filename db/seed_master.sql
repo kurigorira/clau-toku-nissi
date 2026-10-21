@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-10-21 01:34:54
+-- 生成日時: 2026-10-21 05:17:42
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -211,6 +211,7 @@ INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('tsusho','通所リハ','toutyoku','kaigo','介護保険','input',NULL,'int','sum','名',2400,1,0,100,'2000-01-01',NULL,'s2','在宅②!C','Excel①の通所リハビリ列は同じ値の転記');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('kaigo_houkan_over30','訪問看護（介護） 30分以上','toutyoku','kaigo','介護保険','input',NULL,'int','sum','件',2410,0,0,100,'2000-01-01',NULL,NULL,'在宅②!E','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('kaigo_houkan_under30','訪問看護（介護） 30分以内','toutyoku','kaigo','介護保険','input',NULL,'int','sum','件',2420,0,0,100,'2000-01-01',NULL,NULL,'在宅②!F','');
+INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('kaigo_houkan_total','訪問看護（介護） 計','toutyoku','kaigo','介護保険','sum','kaigo_houkan_over30,kaigo_houkan_under30','int','sum','件',2425,0,NULL,NULL,'2000-01-01',NULL,NULL,NULL,'総括の介護「訪問看護」。事業計画の目標（介護 訪問看護）を付ける');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('kaigo_houkai_over30','訪問介護 30分以上','toutyoku','kaigo','介護保険','input',NULL,'int','sum','件',2430,0,0,100,'2000-01-01',NULL,NULL,'在宅②!G','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('kaigo_houkai_under30','訪問介護 30分以内','toutyoku','kaigo','介護保険','input',NULL,'int','sum','件',2440,0,0,100,'2000-01-01',NULL,NULL,'在宅②!H','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('kaigo_kyotaku','居宅指導','toutyoku','kaigo','介護保険','input',NULL,'int','sum','件',2450,0,0,100,'2000-01-01',NULL,'s5','在宅②!I','');
