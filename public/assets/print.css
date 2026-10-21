@@ -55,6 +55,17 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .report td.n, .report.narrow td.n { min-width: 0; }
 .report .itemname { min-width: 0; }
 .report .block { writing-mode: horizontal-tb; width: 12mm; font-size: 7.5pt; }
+/* 総括：業務量の表（左）と達成率の順位（右）を横に並べる */
+.split { display: table; width: 100%; }
+.split-main { width: 60%; }
+.split-side { padding-left: 3mm; min-width: 0; }
+.rank-title { font-size: 8.5pt; margin: 0 0 0.5mm; }
+.rank-note { font-size: 6.5pt; }
+.rank { width: 100%; font-size: 7.5pt; }
+.rank td, .rank th { padding: 0 0.8mm; height: auto; line-height: 1.25; }
+.rank .bar { width: 38%; }
+.rank .track { height: 2.6mm; }
+.rank .fill { top: 0.4mm; height: 1.8mm; }
 .flash-warn { border: 0.5pt solid #888; background: #fff; padding: 1mm 2mm; margin: 1.5mm 0 0; font-size: 7.5pt; }
 .flash-warn ul { margin: 0.5mm 0 0 4mm; }
 .ncol.w20 { width: 20%; }

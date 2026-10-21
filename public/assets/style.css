@@ -106,6 +106,24 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .report .itemname { min-width: 110px; }
 .report.narrow td.n { min-width: 56px; }
 
+/* ---- 総括：表の右に目標達成率の順位（JavaScriptなし。gap を使わず表組みで並べる） ---- */
+.split { display: table; }
+.split-main, .split-side { display: table-cell; vertical-align: top; }
+.split-side { padding-left: 24px; min-width: 300px; }
+.rank-title { margin: 8px 0 2px; font-size: 14px; }
+.rank-note { margin: 0 0 4px; }
+.rank { border-collapse: collapse; font-size: 12px; }
+.rank td, .rank th { padding: 2px 4px; height: 20px; }
+.rank .rk { text-align: right; color: #52514e; width: 1.6em; }
+.rank th { font-weight: normal; text-align: left; white-space: nowrap; color: #0b0b0b; }
+.rank .bar { width: 180px; }
+.rank .track { position: relative; height: 14px; border-left: 1px solid #8a8986; }
+/* 棒は1色。根元は四角、先端だけ丸める。印刷でも色が出るように */
+.rank .fill { position: absolute; left: 0; top: 2px; height: 10px; background: #2a78d6; border-radius: 0 4px 4px 0;
+              -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rank .goal { position: absolute; top: -3px; bottom: -3px; border-left: 1px dashed #52514e; }
+.rank .v { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; color: #0b0b0b; }
+
 /* ---- 病院日誌 ---- */
 .nissi { border-collapse: collapse; background: #fff; font-size: 12px; }
 .nissi th, .nissi td { border: 1px solid #999; padding: 2px 5px; }

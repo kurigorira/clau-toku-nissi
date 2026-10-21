@@ -151,6 +151,14 @@ if ($noData): ?>
 </p>
 
 <h2>各種業務量</h2>
+<?php
+// 目標達成率（実績延数÷目標延数）。右のグラフで高い順に並べる。目標が無い項目は入れない
+$labelCount = array_count_values(array_merge(...array_map(fn($r) => array_column($r, 0), array_values($blocks))));
+$rank = [];
+$noTarget = 0;
+?>
+<div class="split">
+<div class="split-main">
 <table class="report">
   <thead>
     <tr><th>区分</th><th>項目</th><th>目標<br>平均</th><th>目標<br>延数</th><th>実績<br>平均</th><th>実績<br>延数</th><th>目標差<br>平均</th><th>目標差<br>延数</th></tr>
@@ -162,6 +170,13 @@ if ($noData): ?>
         $actAvg = $act === null ? null : $act / $days;
         $tgtAvg = target_value($code, $fy);
         $tgtSum = $tgtAvg === null ? null : $tgtAvg * $days;
+        if ($tgtSum === null || $tgtSum <= 0) {
+            $noTarget++;
+        } elseif ($act !== null) {
+            // 外来と介護に同じ名前（訪問看護・訪問リハ）があるので、重なる名前には区分を付ける
+            $rank[] = ['label' => $labelCount[$label] > 1 ? "{$label}（{$blockName}）" : $label,
+                       'rate' => $act / $tgtSum * 100, 'act' => $act, 'tgt' => $tgtSum];
+        }
     ?>
     <tr>
       <?php if ($first): ?><th rowspan="<?= count($rows) ?>" class="block"><?= h($blockName) ?></th><?php $first = false; endif; ?>
@@ -177,7 +192,40 @@ if ($noData): ?>
   <?php endforeach; ?>
   </tbody>
 </table>
-<p class="note">目標値が空欄の項目は、まだ <code>m_target</code> に年度の目標が登録されていません（管理画面から登録します）。</p>
+</div>
+<div class="split-side">
+<?php
+usort($rank, fn($a, $b) => $b['rate'] <=> $a['rate']);
+// 目盛りの右端：120％〜200％（20％刻み）。200％を超える棒は右端まで伸ばし、数字で本当の値を出す
+$scale = $rank ? min(200, max(120, (int)ceil(max(array_column($rank, 'rate')) / 20) * 20)) : 120;
+$pct = fn(float $x) => round(min($x, $scale) / $scale * 100, 2);
+?>
+  <h3 class="rank-title">目標達成率の順位</h3>
+  <?php if (!$rank): ?>
+    <p class="note">年度の目標値が登録されていないため、表示できません。<br>
+      マスタ →「年度目標値」で <?= (int)$fy ?>年度の目標（1日平均）を登録すると、ここに達成率の高い順に並びます。</p>
+  <?php else: ?>
+    <p class="note rank-note">達成率＝実績延数÷目標延数（<?= (int)$days ?>日分）。点線が100％</p>
+    <table class="rank" aria-label="目標達成率の順位">
+      <tbody>
+      <?php foreach ($rank as $i => $r): ?>
+        <tr title="<?= h($r['label']) ?>：達成率 <?= h(number_format($r['rate'], 1)) ?>％（実績 <?= h(num($r['act'])) ?>／目標 <?= h(number_format($r['tgt'], 1)) ?>）">
+          <td class="rk"><?= $i + 1 ?></td>
+          <th><?= h($r['label']) ?></th>
+          <td class="bar"><div class="track">
+            <span class="fill" style="width:<?= $pct($r['rate']) ?>%"></span>
+            <span class="goal" style="left:<?= $pct(100) ?>%"></span>
+          </div></td>
+          <td class="v"><?= h(number_format($r['rate'], 1)) ?>%</td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php if ($noTarget): ?><p class="note rank-note">目標が未登録の <?= (int)$noTarget ?> 項目は入っていません。</p><?php endif; ?>
+  <?php endif; ?>
+</div>
+</div>
+<p class="note">目標値が空欄の項目は、まだ <code>m_target</code> に年度の目標が登録されていません（マスタ →「年度目標値」で登録します）。</p>
 
 <h2>救急搬入・紹介</h2>
 <table class="report narrow">
