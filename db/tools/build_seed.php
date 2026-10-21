@@ -65,6 +65,8 @@ function n($v, $default = 'NULL'): string
 $depts  = read_csv("$masterDir/depts.csv");
 $items  = read_csv("$masterDir/items.csv");
 $config = read_csv("$masterDir/config.csv");
+// 消した部署・まとめた部署にいた職員の行き先（無ければ空）
+$moves  = is_file("$masterDir/dept_moves.csv") ? read_csv("$masterDir/dept_moves.csv") : [];
 
 // ---- 整合性チェック（不正なマスタで帳票が狂うのを防ぐ） -------------------
 $errors   = [];
@@ -125,6 +127,15 @@ foreach ($items as $it) {
     }
 }
 
+foreach ($moves as $mv) {
+    if (isset($deptSet[$mv['from']])) {
+        $errors[] = "dept_moves.csv: '{$mv['from']}' はまだ depts.csv にあります（消した部署だけを書く）";
+    }
+    if (!isset($deptSet[$mv['to']])) {
+        $errors[] = "dept_moves.csv: 行き先 '{$mv['to']}' が depts.csv にありません";
+    }
+}
+
 if ($errors) {
     fwrite(STDERR, "マスタに問題があります:\n - " . implode("\n - ", $errors) . "\n");
     exit(1);
@@ -167,6 +178,19 @@ foreach ($config as $c) {
     $sql[] = 'INSERT INTO m_config (config_key,valid_from,config_value,note) VALUES ('
         . q($c['config_key']) . ',' . q($c['valid_from']) . ',' . q($c['config_value']) . ',' . q($c['note']) . ');';
 }
+
+// ---- 消した部署・まとめた部署の職員を付け替える ---------------------------
+// 職員の「入力する画面」（m_user.dept_id）と、電子カルテの部署の対応表（m_config の emr_dept:…）。
+// 最後に、どの部署にも当たらないものは「その他（閲覧のみ）」へ（安全網）。
+$sql[] = '';
+$sql[] = '-- 消した部署・まとめた部署にいた職員の付け替え（db/master/dept_moves.csv）';
+foreach ($moves as $mv) {
+    $sql[] = 'UPDATE m_user SET dept_id = ' . q($mv['to']) . ' WHERE dept_id = ' . q($mv['from']) . ';';
+    $sql[] = "UPDATE m_config SET config_value = " . q($mv['to'])
+        . " WHERE config_key LIKE 'emr_dept:%' AND config_value = " . q($mv['from']) . ';';
+}
+$sql[] = "UPDATE m_user SET dept_id = 'sonota' WHERE dept_id NOT IN (SELECT dept_id FROM m_dept);";
+$sql[] = "UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value NOT IN (SELECT dept_id FROM m_dept);";
 
 file_put_contents($outSql, implode("\n", $sql) . "\n");
 

@@ -8,7 +8,7 @@
  * 部署ごとにまとめて登録したいときはこちらのほうが早い。
  *
  * 使い方:
- *   php db/tools/add_user.php --id=kurihara --dept=jimu --role=admin --password=＜8文字以上＞ --name=栗原
+ *   php db/tools/add_user.php --id=kurihara --dept=toutyoku --role=admin --password=＜8文字以上＞ --name=栗原
  *   php db/tools/add_user.php --list
  *   php db/tools/add_user.php --csv=staff.csv        （user_id,user_name,dept_id,role,password の順）
  *

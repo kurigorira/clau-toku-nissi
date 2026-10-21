@@ -30,8 +30,8 @@ $pdo->exec(file_get_contents($root . '/db/seed_master.sql'));
 $now   = date('Y-m-d H:i:s');
 $hash  = password_hash('test1234', PASSWORD_DEFAULT);
 $users = [
-    ['kurihara', '栗原',       'jimu',     'admin'],
-    ['ijika01',  '医事課 太郎', 'ijika',    'ijika'],
+    ['kurihara', '栗原',       'toutyoku', 'admin'],
+    ['ijika01',  '医事課 太郎', 'toutyoku', 'ijika'],
     ['gairai01', '外来 花子',   'gairai',   'entry'],
     ['housha01', '放射線 一郎', 'housha',   'entry'],
     ['byoto01',  '病棟 二郎',   'byoto',    'entry'],

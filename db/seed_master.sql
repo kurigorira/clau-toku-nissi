@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-10-20 01:03:21
+-- 生成日時: 2026-10-21 01:05:34
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -22,9 +22,6 @@ INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('touseki','透析室',140,'18:00','123456',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('toutyoku','当直',150,'09:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('kansen','感染対策室',160,'18:00','',0);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('shisetsu','施設課',170,'18:00','',0);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('jimu','事務課',180,'18:00','',0);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('ijika','医事課',190,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('sonota','その他（閲覧のみ）',999,'18:00','',0);
 
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('gairai_am','午前 患者数','gairai','gairai_cnt','外来患者数','sum','gk_naika_am,gk_geka_am,gk_seikei_am,gk_noge_am,gk_shinryo_am,gk_keisei_am,gk_jinzo_am,gk_kenshin_am,gk_shoka_am,gk_kokyu_am,gk_shoni_am,gk_hinyo_am,gk_hifu_am,gk_ikou_am','int','sum','名',10,0,NULL,NULL,'2000-01-01',NULL,NULL,NULL,'電子カルテ日報の医科合計 午前（科別の合計）');
@@ -512,3 +509,13 @@ INSERT INTO m_config (config_key,valid_from,config_value,note) VALUES ('hospital
 INSERT INTO m_config (config_key,valid_from,config_value,note) VALUES ('hospital_address','2000-01-01','長崎市滑石1-12-5','病院報告（患者票）に使う');
 INSERT INTO m_config (config_key,valid_from,config_value,note) VALUES ('hokenjo_fugou','2000-01-01','4262','保健所符号。病院報告（患者票）に使う');
 INSERT INTO m_config (config_key,valid_from,config_value,note) VALUES ('seiri_bangou','2000-01-01','1426420177','整理番号。病院報告（患者票）に使う');
+
+-- 消した部署・まとめた部署にいた職員の付け替え（db/master/dept_moves.csv）
+UPDATE m_user SET dept_id = 'toutyoku' WHERE dept_id = 'jimu';
+UPDATE m_config SET config_value = 'toutyoku' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'jimu';
+UPDATE m_user SET dept_id = 'toutyoku' WHERE dept_id = 'ijika';
+UPDATE m_config SET config_value = 'toutyoku' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'ijika';
+UPDATE m_user SET dept_id = 'sonota' WHERE dept_id = 'shisetsu';
+UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value = 'shisetsu';
+UPDATE m_user SET dept_id = 'sonota' WHERE dept_id NOT IN (SELECT dept_id FROM m_dept);
+UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value NOT IN (SELECT dept_id FROM m_dept);

@@ -277,11 +277,13 @@ function can_elevate(array $user): bool
  * その部署の入力ができるか。
  * 自部署のみ入力可。医事課と管理者は全部署を代行入力できる（パスワード確認後）。
  *
- * 当直（在宅②の訪問系・通所リハ）の欄は医事課の職員が入力する運用なので、
- * 所属が医事課の職員はパスワード確認なしで入力できる。役割が当直者の人も入力できる。
+ * 当直（在宅②の訪問系・通所リハ、病院日誌の天候・当直者・会議など）の欄は医事課の職員が入力する運用。
+ * 医事課・事務課は当直に統合したので、入力する画面が当直の職員はパスワード確認なしで入力できる。
+ * 役割が当直者の人も入力できる。
  */
 function can_edit_dept(array $user, string $deptId): bool
 {
+    // 医事課・事務課は 2026-10 に当直へ統合した（職員の入力する画面は当直）。残っていた ijika は念のため当直と同じに扱う
     return is_ijika($user)
         || $user['dept_id'] === $deptId
         || ($deptId === 'toutyoku' && ($user['dept_id'] === 'ijika' || $user['role'] === 'toutyoku'));
@@ -290,7 +292,8 @@ function can_edit_dept(array $user, string $deptId): bool
 /** 当直の欄を入力する人か（ヘッダに「当直入力」を出すかに使う）。 */
 function does_toutyoku(array $user): bool
 {
-    return $user['dept_id'] !== 'toutyoku' && can_edit_dept($user, 'toutyoku');
+    // 入力する画面が当直の職員（医事課・事務課から統合した人）にも出す
+    return can_edit_dept($user, 'toutyoku');
 }
 
 /** ログイン中の職員IDを返す（保存時の created_by / updated_by に使う）。 */
