@@ -263,7 +263,7 @@ page_header('電子カルテ日報の転記', $user);
     <table class="nippo">
       <caption><?= h($title) ?></caption>
       <tr><th>科名</th>
-        <?php foreach (nippo_slots() as $s => $sn): ?><th><?= h($sn) ?></th><?php endforeach; ?>
+        <?php foreach (nippo_slots() as $s => $sn): ?><th><?= h($sn) ?><?= isset(nippo_slot_sub()[$s]) ? '<br><small>' . h(nippo_slot_sub()[$s]) . '</small>' : '' ?></th><?php endforeach; ?>
         <th class="ctlh">合計<br><small>任意</small></th></tr>
       <?php foreach (nippo_ka() as $ka => $kn): ?>
       <tr><th class="rowh"><?= h($kn) ?></th>
@@ -289,7 +289,7 @@ page_header('電子カルテ日報の転記', $user);
   <div class="nippo-pair">
     <table class="nippo">
       <caption>再掲</caption>
-      <tr><th></th><?php foreach (nippo_slots() as $s => $sn): ?><th><?= h($sn) ?></th><?php endforeach; ?></tr>
+      <tr><th></th><?php foreach (nippo_slots() as $s => $sn): ?><th><?= h($sn) ?><?= isset(nippo_slot_sub()[$s]) ? '<br><small>' . h(nippo_slot_sub()[$s]) . '</small>' : '' ?></th><?php endforeach; ?></tr>
       <?php foreach (nippo_saikei() as $k => $kn): ?>
       <tr><th class="rowh"><?= h($kn) ?></th>
         <?php foreach (nippo_slots() as $s => $sn): ?><td><?= $cell("gr_{$k}_{$s}", "{$kn} {$sn}") ?></td><?php endforeach; ?></tr>

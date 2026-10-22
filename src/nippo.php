@@ -24,6 +24,12 @@ function nippo_slots(): array
     return ['s0008' => '00〜08', 'am' => '午前', 'pm' => '午後', 'night' => '夜間', 's2024' => '20〜24'];
 }
 
+/** 病院日誌での呼び方（時間外）。紙は 00〜08 が左端だが、時間外１は 20〜24 の方。転記画面の見出しに添える。 */
+function nippo_slot_sub(): array
+{
+    return ['s0008' => '時間外２', 's2024' => '時間外１'];
+}
+
 /** 外来の診療科。紙の上から順。 */
 function nippo_ka(): array
 {
