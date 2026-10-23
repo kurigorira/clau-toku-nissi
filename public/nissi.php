@@ -40,11 +40,8 @@ foreach (['3', '4', '5'] as $w) {
     $teisho[$w] = config_value("teisho_byoto{$w}", $date, '');
 }
 
-// 特記事項（定員超過報告）は患者ID・氏名を含むため、閲覧できる役割を絞る
-$canSeeTokki = is_ijika($user) || $user['dept_id'] === 'byoto';
-$tokki = $canSeeTokki
-    ? db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL ORDER BY sort_no, tokki_id', [$date])
-    : [];
+// 特記事項（定員超過報告）はログインした全員に出す（2026-10 栗原様の判断。誰が見たかは閲覧履歴に残る）
+$tokki = db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL ORDER BY sort_no, tokki_id', [$date]);
 ?>
 <form method="get" class="datebar noprint">
   <label>日付 <input type="date" name="hizuke" value="<?= h($date) ?>"></label>
@@ -244,9 +241,7 @@ $tokki = $canSeeTokki
   <tr>
     <td class="nf-full nf-tokki">
       <div class="nf-tokki-h">特記事項等：定員超過報告</div>
-      <?php if (!$canSeeTokki): ?>
-        <p class="note">患者氏名を含むため、病棟・医事課・管理者のみ表示します。</p>
-      <?php elseif (!$tokki): ?>
+      <?php if (!$tokki): ?>
         <p class="nf-none">特記なし</p>
       <?php else: ?>
         <table class="nf-t">
