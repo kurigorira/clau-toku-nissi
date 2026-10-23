@@ -127,18 +127,50 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .rank thead th { font-size: 11px; color: #52514e; font-weight: normal; border-bottom: 1px solid #c7ccd2; }
 .rank thead th.v, .rank thead th.rk { text-align: right; }
 
-/* ---- 病院日誌 ---- */
-.nissi { border-collapse: collapse; background: #fff; font-size: 12px; }
-.nissi th, .nissi td { border: 1px solid #999; padding: 2px 5px; }
-.nissi th { background: #ececec; font-weight: normal; }
-.nissi .sec { background: #dfe6ee; text-align: center; font-weight: bold; }
-.nissi td.n { text-align: right; font-variant-numeric: tabular-nums; }
-.nissi .memo { min-width: 200px; vertical-align: top; white-space: pre-wrap; }
-.nissi-grid { display: block; }
-.nissi-row { display: flex; flex-wrap: wrap; align-items: flex-start; }
-.nissi-row > .ncol { margin: 0 10px 10px 0; }
-.nissi.wide { margin-bottom: 10px; }
-.nissi .kaigi-h { width: 120px; }
+/* ---- 病院日誌（今までの紙の様式に合わせる。表組みだけで組む） ---- */
+.nf { width: 1000px; max-width: 100%; background: #fff; color: #000; font-size: 13px; padding: 10px 12px; }
+.nf table { border-collapse: collapse; }
+.nf-head { width: 100%; margin-bottom: 4px; }
+.nf-head td { vertical-align: bottom; padding: 0; }
+.nf-title { font-family: "MS Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 34px; font-weight: bold;
+            letter-spacing: 6px; padding: 0 0 4px 40px; }
+.nf-date { font-size: 15px; padding: 0 0 2px 4px; }
+.nf-stampcell { width: 340px; }
+.nf-stamp { table-layout: fixed; width: 100%; }
+.nf-stamp th, .nf-stamp td { border: 1.5px solid #000; text-align: center; white-space: nowrap; }
+.nf-stamp th { font-weight: normal; font-size: 13px; padding: 2px 0; }
+.nf-stamp td { height: 60px; }
+/* 段：外枠は太線。中の表は枠いっぱい */
+.nf-row { width: 100%; border: 2px solid #000; margin: 0 0 -2px; }
+.nf-row > tbody > tr > td, .nf-row > tr > td { vertical-align: top; padding: 0; border: 2px solid #000; }
+.nf-c1 { width: 25%; } .nf-c2 { width: 23%; } .nf-c3 { width: 27%; } .nf-c4 { width: 25%; }
+.nf-kaigicell { width: 64%; } .nf-touchokucell { width: 36%; }
+.nf-t { width: 100%; }
+.nf-t th, .nf-t td { border: 1px solid #000; padding: 2px 4px; line-height: 1.3; }
+.nf-t tr:first-child > * { border-top: 0; }
+.nf-t tr > *:first-child { border-left: 0; }
+.nf-t tr > *:last-child { border-right: 0; }
+.nf-t th { font-weight: normal; white-space: nowrap; text-align: center; }
+.nf-t th.lft { text-align: left; }
+.nf-t .sec { font-size: 14px; letter-spacing: 2px; }
+.nf-t th small { font-size: 10px; }
+.nf-t td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nf-t td.n .v { display: inline-block; min-width: 2.5em; text-align: right; }
+.nf-t td.n .u { display: inline-block; width: 2.2em; text-align: right; font-size: 11px; }
+.nf-t tr.tall > * { height: 36px; }
+.nf-t .tate { width: 1.4em; line-height: 1.15; padding: 2px 1px; vertical-align: middle; }
+.nf-t .tate-sub { font-size: 10px; }
+.nf-t .shade > th:not(.tate), .nf-t .shade > td { background: #c8c8c8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.nf-t .opename { font-size: 12px; white-space: nowrap; overflow: hidden; max-width: 0; }
+.nf-t .memo { vertical-align: top; text-align: left; white-space: pre-wrap; height: 54px; }
+.nf-t .kj { width: 12%; }
+.nf-kaigi tr:first-child th { height: 1px; }
+.nf-kaigi tr:last-child .memo { height: 110px; }
+.nf-t .name { min-width: 4em; }
+.nf-note { margin: 2px 4px; font-size: 10px; }
+.nf-tokki { padding: 3px 6px !important; height: 70px; }
+.nf-tokki-h { font-size: 12px; margin-bottom: 2px; }
+.nf-none { margin: 0 0 0 4em; }
 /* 印刷だけに出すもの（print.css で表示する） */
 .printonly { display: none; }
 .updaters { margin-top: 14px; font-size: 12px; }
@@ -178,6 +210,3 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .app-user a { color: #dce8f4; margin: 0 6px; }
 .app-user a:hover { color: #fff; }
 .period-line { margin: 4px 0 8px; }
-/* 病院日誌 外来患者数：備考は印刷後に手書きするので広く */
-.gairai-tbl .c-biko { width: 140px; }
-.gairai-tbl td:last-child { min-width: 140px; }

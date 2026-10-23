@@ -94,8 +94,21 @@ function youbi(string $date): string
     return ['日', '月', '火', '水', '木', '金', '土'][(int)date('w', strtotime($date))];
 }
 
-/** 画面の共通ヘッダ。 */
-function page_header(string $title, ?array $user = null): void
+/**
+ * 和暦の日付（病院日誌の様式に合わせる）。令和は 2019-05-01 から、それより前は平成。
+ * 例 2026-10-22 → 令和8年10月22日
+ */
+function wareki(string $date): string
+{
+    $t = strtotime($date);
+    $y = (int)date('Y', $t);
+    [$era, $base] = date('Y-m-d', $t) >= '2019-05-01' ? ['令和', 2018] : ['平成', 1988];
+    $n = $y - $base;
+    return $era . ($n === 1 ? '元' : (string)$n) . '年' . date('n', $t) . '月' . date('j', $t) . '日';
+}
+
+/** 画面の共通ヘッダ。$showTitle=false のときは見出し（h1）を出さない（病院日誌は様式の中に表題がある）。 */
+function page_header(string $title, ?array $user = null, bool $showTitle = true): void
 {
     ?><!DOCTYPE html>
 <html lang="ja">
@@ -145,7 +158,7 @@ function page_header(string $title, ?array $user = null): void
   <?php endif; ?>
 </header>
 <main>
-<h1><?= h($title) ?></h1>
+<?php if ($showTitle): ?><h1><?= h($title) ?></h1><?php endif; ?>
 <?php
 }
 

@@ -24,27 +24,35 @@ table { page-break-inside: avoid; }
   main { width: 178mm; margin: 6mm auto; padding: 10mm 8mm; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.25); }
 }
 
-/* ---- 病院日誌 ---- */
-/* 見出しと日付は1行に並べて、表に高さを回す */
+/* ---- 病院日誌（紙の様式。style.css の .nf を A4 の大きさに詰める） ---- */
 h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
-.nissi-date, .soukatsu-period { display: inline-block; vertical-align: baseline; }
-.nissi-date { margin: 0 0 1.5mm; font-size: 10pt; }
-.nissi-grid { display: block; }
-.nissi-row { display: table; width: 100%; table-layout: fixed; margin: 0 0 1.5mm; }
-.nissi-row > .ncol { display: table-cell; vertical-align: top; padding-right: 1.5mm; margin: 0; }
-.nissi-row > .ncol:last-child { padding-right: 0; }
-.ncol.w33 { width: 33%; } .ncol.w34 { width: 34%; }
-.ncol.w40 { width: 40%; } .ncol.w60 { width: 60%; }
-.ncol.w100 { width: 100%; }
-.nissi { width: 100%; font-size: 8.4pt; border-collapse: collapse; }
-.nissi th, .nissi td { padding: 0.4mm 1mm; border: 0.5pt solid #555; line-height: 1.25; }
-.nissi th { background: #eee; white-space: nowrap; }
-.nissi .sec { background: #d9d9d9; }
-.nissi .memo { min-width: 0; }
-.nissi.wide { margin: 0 0 1.5mm; }
-.nissi .kaigi-h { width: 22mm; }
-.nissi-h2 { font-size: 9pt; margin: 1.5mm 0 0.5mm; }
-.nissi-status { margin: 1.5mm 0 0; font-size: 7.5pt; color: #333; }
+.soukatsu-period { display: inline-block; vertical-align: baseline; }
+.nf { width: 100%; padding: 0; font-size: 8.8pt; }
+.nf-title { font-size: 22pt; letter-spacing: 5mm; padding: 0 0 2mm 8mm; }
+.nf-date { font-size: 10.5pt; padding: 0 0 0.8mm 1mm; }
+.nf-stampcell { width: 72mm; }
+.nf-stamp th, .nf-stamp td { border-width: 1pt; }
+.nf-stamp th { font-size: 8.5pt; padding: 0.5mm 0; }
+.nf-stamp td { height: 13mm; }
+.nf-row { border-width: 1.5pt; margin: 0 0 -1.5pt; }
+.nf-row > tbody > tr > td, .nf-row > tr > td { border-width: 1.5pt; }
+/* A4 の縦いっぱいを使う（紙の様式と同じくらいの行の高さ） */
+.nf-t th, .nf-t td { border-width: 0.5pt; padding: 0.8mm 0.8mm; line-height: 1.25; }
+.nf-t .sec { font-size: 10pt; letter-spacing: 1mm; }
+.nf-t th small { font-size: 6.8pt; }
+.nf-t td.n .u { font-size: 7pt; }
+.nf-t tr.tall > * { height: 8.2mm; }
+.nf-t .tate { padding: 0.3mm 0.2mm; }
+.nf-t .tate-sub { font-size: 7pt; }
+.nf-t .opename { font-size: 8.2pt; }
+.nf-t .memo { height: 12mm; }
+.nf-kaigi tr:last-child .memo { height: 24mm; }
+.nf-gyoji .memo { height: 15mm; }
+.nf-note { margin: 0.5mm 0.8mm; font-size: 6.8pt; }
+.nf-tokki { height: 30mm; padding: 0.8mm 1.5mm !important; }
+.nf-tokki-h { font-size: 8.5pt; margin-bottom: 0.5mm; }
+.nf-tokki .nf-t th, .nf-tokki .nf-t td { padding: 0.25mm 0.8mm; }
+.nissi-status { margin: 1.2mm 0 0; font-size: 7.5pt; color: #333; }
 
 /* ---- 総括 ---- */
 .soukatsu-period { font-size: 9.5pt; margin: 0 0 1.5mm; }
@@ -71,10 +79,4 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .split .report thead th { line-height: 1.1; }
 .flash-warn { border: 0.5pt solid #888; background: #fff; padding: 1mm 2mm; margin: 1.5mm 0 0; font-size: 7.5pt; }
 .flash-warn ul { margin: 0.5mm 0 0 4mm; }
-.ncol.w20 { width: 20%; }
 .period-line { margin: 0 0 1.5mm; font-size: 9.5pt; }
-/* 病院日誌 外来患者数：備考を広く（表の幅の約4割）。table-layout: fixed で列幅をそのまま使う */
-.gairai-tbl { table-layout: fixed; }
-.gairai-tbl .c-label { width: 22%; } .gairai-tbl .c-num { width: 20%; }
-.gairai-tbl .c-new { width: 17%; } .gairai-tbl .c-biko { width: 41%; }
-.gairai-tbl td:last-child { min-width: 0; }
