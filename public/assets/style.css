@@ -1,0 +1,212 @@
+/* 病院日誌・医事統計 共通スタイル
+   電子カルテ端末のブラウザで見る前提。装飾より一覧性を優先する。
+
+   【flexbox の gap は使わないこと】
+   院内端末のChromeは gap（Chrome 84 / 2020年〜）に対応していない世代があり、
+   対応していないブラウザでは gap が丸ごと無視されて、項目が詰まって表示される。
+   マージンに落ちてくれないので、間隔は必ず margin で取る。 */
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Meiryo", "メイリオ", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: 14px; color: #222; background: #f4f5f7;
+}
+a { color: #06c; }
+
+.app-header {
+  display: flex; align-items: center;
+  padding: 8px 16px; background: #2c5578; color: #fff;
+}
+.app-title { margin-right: 24px; }
+.app-title a { color: #fff; font-weight: bold; text-decoration: none; font-size: 16px; }
+.app-nav { display: flex; flex-wrap: wrap; }
+.app-nav a { color: #dce8f4; text-decoration: none; margin-right: 16px; }
+.app-nav a:last-child { margin-right: 0; }
+.app-nav a:hover { color: #fff; text-decoration: underline; }
+.app-user { margin-left: auto; font-size: 13px; }
+
+main { padding: 16px 20px 60px; }
+h1 { font-size: 20px; margin: 8px 0 16px; }
+h2 { font-size: 16px; margin: 20px 0 8px; }
+.app-footer { padding: 12px 20px; color: #777; font-size: 12px; }
+
+/* ---- 通知 ---- */
+.flash { padding: 8px 12px; border-radius: 4px; margin: 8px 0; }
+.flash-ok    { background: #e3f4e3; border: 1px solid #8bc98b; }
+.flash-info  { background: #e7f0f8; border: 1px solid #8fb8d8; }
+.flash-warn  { background: #fdf3d8; border: 1px solid #dbb95a; }
+.flash-error { background: #fae3e3; border: 1px solid #d98b8b; }
+.flash ul { margin: 4px 0 0 20px; }
+
+/* ---- 日付バー ---- */
+.datebar { margin: 8px 0 16px; padding: 8px 12px; background: #fff; border: 1px solid #d5d9de; border-radius: 4px; }
+.datebar .youbi { margin: 0 8px; color: #555; }
+.datebar-row { margin: 0; }
+.datebar-row + .datebar-row { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #d5d9de; }
+
+/* ---- 入力フォーム ---- */
+.entry-form fieldset {
+  background: #fff; border: 1px solid #d5d9de; border-radius: 4px;
+  margin: 0 0 14px; padding: 8px 14px 12px;
+}
+.entry-form legend { font-weight: bold; padding: 0 6px; color: #2c5578; }
+.entry-table { border-collapse: collapse; width: 100%; }
+.entry-table th {
+  text-align: left; font-weight: normal; padding: 3px 10px 3px 0;
+  width: 260px; vertical-align: top;
+}
+.entry-table th.req::after { content: " ※"; color: #c33; }
+.entry-table td { padding: 3px 0; }
+.entry-table input.num { text-align: right; }
+.entry-table .unit { margin-left: 6px; color: #555; }
+.note { color: #888; font-size: 12px; margin-left: 8px; }
+
+.actions { margin: 16px 0; }
+button { padding: 6px 18px; font-size: 14px; cursor: pointer; }
+button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; font-weight: bold; }
+.lastupdate { color: #555; font-size: 13px; border-top: 1px solid #d5d9de; padding-top: 8px; }
+
+.login-form { max-width: 320px; background: #fff; padding: 20px; border: 1px solid #d5d9de; border-radius: 4px; }
+
+/* ---- 入力状況ボード ---- */
+.pending-list { list-style: none; padding: 0; margin: 0; }
+.pending-list li { padding: 4px 0; border-bottom: 1px dotted #ccc; }
+.pending-list .missing { color: #a55; font-size: 12px; margin-left: 8px; }
+
+.board-scroll { overflow-x: auto; }         /* 横に長い表はこの中だけスクロールさせる */
+.board { border-collapse: collapse; background: #fff; }
+.board th, .board td { border: 1px solid #cfd4da; }
+.board thead th { padding: 3px 4px; font-size: 12px; text-align: center; background: #eef1f4; }
+.board thead th.weekend { background: #f6ecec; }
+.board td { width: 26px; height: 24px; padding: 0; }
+.board td a { display: block; width: 100%; height: 100%; }
+.board .dept-col { width: 150px; text-align: left; padding: 2px 8px; background: #eef1f4; white-space: nowrap; }
+
+.st-none      { background: #f2a6a6; }
+.st-partial   { background: #f6dd8e; }
+.st-submitted { background: #a8d8a8; }
+.st-confirmed { background: #5aa45a; }
+.st-off       { background: #e3e5e8; }
+
+.badge { display: inline-block; padding: 1px 8px; border-radius: 3px; font-size: 12px; }
+.legend { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; }
+.legend > * { margin-right: 10px; }
+.legend > :last-child { margin-right: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---- 帳票（総括・統計表） ---- */
+.report { border-collapse: collapse; background: #fff; margin: 8px 0 4px; }
+.report th, .report td { border: 1px solid #c7ccd2; padding: 3px 8px; }
+.report thead th { background: #eef1f4; font-size: 12px; text-align: center; }
+.report tbody th { background: #f6f8fa; font-weight: normal; text-align: left; white-space: nowrap; }
+.report td.n { text-align: right; font-variant-numeric: tabular-nums; min-width: 68px; }
+.report .total-row { background: #eef4ee; font-weight: bold; }
+.report .block { background: #e8edf2; text-align: center; writing-mode: vertical-rl; }
+.report .itemname { min-width: 110px; }
+.report.narrow td.n { min-width: 56px; }
+.table-scroll { overflow-x: auto; max-width: 100%; }
+
+/* ---- 総括：表の右に目標達成率の順位（JavaScriptなし。gap を使わず表組みで並べる） ---- */
+.split { display: table; }
+.split-main, .split-side { display: table-cell; vertical-align: top; }
+.split-side { padding-left: 24px; min-width: 300px; }
+.rank-title { margin: 8px 0 2px; font-size: 14px; }
+.rank-note { margin: 0 0 4px; }
+.rank { border-collapse: collapse; font-size: 12px; }
+.rank td, .rank th { padding: 2px 4px; height: 20px; }
+.rank .rk { text-align: right; color: #52514e; width: 1.6em; }
+.rank th { font-weight: normal; text-align: left; white-space: nowrap; color: #0b0b0b; }
+.rank .bar { width: 180px; }
+.rank .track { position: relative; height: 14px; border-left: 1px solid #8a8986; }
+/* 棒は1色。根元は四角、先端だけ丸める。印刷でも色が出るように */
+.rank .fill { position: absolute; left: 0; top: 2px; height: 10px; background: #2a78d6; border-radius: 0 4px 4px 0;
+              -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rank .goal { position: absolute; top: -3px; bottom: -3px; border-left: 1px dashed #52514e; }
+.rank .v { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; color: #0b0b0b; }
+.rank thead th { font-size: 11px; color: #52514e; font-weight: normal; border-bottom: 1px solid #c7ccd2; }
+.rank thead th.v, .rank thead th.rk { text-align: right; }
+
+/* ---- 病院日誌（今までの紙の様式に合わせる。表組みだけで組む） ---- */
+.nf { width: 1000px; max-width: 100%; background: #fff; color: #000; font-size: 13px; padding: 10px 12px; }
+.nf table { border-collapse: collapse; }
+.nf-head { width: 100%; margin-bottom: 4px; }
+.nf-head td { vertical-align: bottom; padding: 0; }
+.nf-title { font-family: "MS Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 34px; font-weight: bold;
+            letter-spacing: 6px; padding: 0 0 4px 40px; }
+.nf-date { font-size: 15px; padding: 0 0 2px 4px; }
+.nf-stampcell { width: 340px; }
+.nf-stamp { table-layout: fixed; width: 100%; }
+.nf-stamp th, .nf-stamp td { border: 1.5px solid #000; text-align: center; white-space: nowrap; }
+.nf-stamp th { font-weight: normal; font-size: 13px; padding: 2px 0; }
+.nf-stamp td { height: 60px; }
+/* 段：外枠は太線。中の表は枠いっぱい */
+.nf-row { width: 100%; border: 2px solid #000; margin: 0 0 -2px; }
+.nf-row > tbody > tr > td, .nf-row > tr > td { vertical-align: top; padding: 0; border: 2px solid #000; }
+.nf-c1 { width: 25%; } .nf-c2 { width: 23%; } .nf-c3 { width: 27%; } .nf-c4 { width: 25%; }
+.nf-kaigicell { width: 64%; } .nf-touchokucell { width: 36%; }
+.nf-t { width: 100%; }
+.nf-t th, .nf-t td { border: 1px solid #000; padding: 2px 4px; line-height: 1.3; }
+.nf-t tr:first-child > * { border-top: 0; }
+.nf-t tr > *:first-child { border-left: 0; }
+.nf-t tr > *:last-child { border-right: 0; }
+.nf-t th { font-weight: normal; white-space: nowrap; text-align: center; }
+.nf-t th.lft { text-align: left; }
+.nf-t .sec { font-size: 14px; letter-spacing: 2px; }
+.nf-t th small { font-size: 10px; }
+.nf-t td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nf-t td.n .v { display: inline-block; min-width: 2.5em; text-align: right; }
+.nf-t td.n .u { display: inline-block; width: 2.2em; text-align: right; font-size: 11px; }
+.nf-t tr.tall > * { height: 36px; }
+.nf-t .tate { width: 1.4em; line-height: 1.15; padding: 2px 1px; vertical-align: middle; }
+.nf-t .tate-sub { font-size: 10px; }
+.nf-t .shade > th:not(.tate), .nf-t .shade > td { background: #c8c8c8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.nf-t .opename { font-size: 12px; white-space: nowrap; overflow: hidden; max-width: 0; }
+.nf-t .memo { vertical-align: top; text-align: left; white-space: pre-wrap; height: 54px; }
+.nf-t .kj { width: 12%; }
+.nf-kaigi tr:first-child th { height: 1px; }
+.nf-kaigi tr:last-child .memo { height: 110px; }
+.nf-t .name { min-width: 4em; }
+.nf-note { margin: 2px 4px; font-size: 10px; }
+.nf-tokki { padding: 3px 6px !important; height: 70px; }
+.nf-tokki-h { font-size: 12px; margin-bottom: 2px; }
+.nf-none { margin: 0 0 0 4em; }
+/* 印刷だけに出すもの（print.css で表示する） */
+.printonly { display: none; }
+.updaters { margin-top: 14px; font-size: 12px; }
+.updaters td, .updaters th { border: 1px solid #ccc; padding: 2px 8px; }
+
+/* ---- タブ ---- */
+.tabs { display: flex; margin: 10px 0; flex-wrap: wrap; }
+.tabs a { padding: 5px 14px; background: #e6eaee; border: 1px solid #c7ccd2; border-bottom: none;
+          border-radius: 4px 4px 0 0; text-decoration: none; color: #345;
+          margin: 0 4px 4px 0; }
+.tabs a.active { background: #fff; font-weight: bold; color: #2c5578; }
+.report.daily { font-size: 12px; }
+.report.daily th, .report.daily td { padding: 1px 5px; }
+.report.daily td.n { min-width: 40px; }
+.report.daily tr.weekend td { background: #fbf6f6; }
+.report tr.inactive { opacity: .5; }
+.report tr.inactive th, .report tr.inactive td { background: #f2f2f2; }
+
+/* ---- 電子カルテ日報の転記（nippo.php） ----
+   紙と同じ並びにするため、表を横に並べる。gap は使わず inline-block ＋ margin で離す。
+   左の表を打ち終えてから右の表へ進むよう、表は別々にしてある（タブキーの順＝紙の順）。 */
+.nippo-pair { margin-bottom: 8px; }
+.nippo-pair > table { display: inline-table; vertical-align: top; margin: 0 16px 12px 0; }
+.nippo { border-collapse: collapse; background: #fff; }
+.nippo caption { text-align: left; font-weight: bold; color: #2c5578; padding: 2px 0 4px; }
+.nippo th, .nippo td { border: 1px solid #c7ccd2; padding: 1px 3px; }
+.nippo th { background: #eef1f4; font-size: 12px; font-weight: normal; text-align: center; }
+.nippo th.rowh { text-align: left; white-space: nowrap; }
+.nippo input.num { width: 3.6em; text-align: right; }
+.nippo input.ng, .entry-table input.ng { background: #fae3e3; border: 2px solid #c33; }
+.nippo .ctlh, .nippo .ctlc { background: #f7f3e6; }      /* 紙の合計を打つ照合用の欄 */
+.nippo .sumrow th { background: #f0e9d2; }
+.nippo small { color: #777; font-size: 10px; }
+.nippo-load { margin: 0 0 12px; padding: 8px 12px; background: #fff; border: 1px dashed #8fb8d8; border-radius: 4px; }
+.nippo-load button { margin: 0 8px; }
+.nippo-load label { margin-right: 16px; }
+.app-user a { color: #dce8f4; margin: 0 6px; }
+.app-user a:hover { color: #fff; }
+.period-line { margin: 4px 0 8px; }
