@@ -97,7 +97,7 @@ $wards = ['3' => '3階', '4' => '4階', '5' => '5階', 'all' => '総合計'];
 
 page_header('各種業務量他総括', $user);
 // 印刷はいつでも A4縦・左とじ（print.css）。「印刷用」で開いたときは画面でも同じ見た目にする
-echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' : 'print') . '">';
+echo '<link rel="stylesheet" href="' . h(asset_url('assets/print.css')) . '" media="' . ($print ? 'all' : 'print') . '">';
 $ymd = fn(string $d) => date('Y年n月j日', strtotime($d));
 ?>
 <div class="datebar">

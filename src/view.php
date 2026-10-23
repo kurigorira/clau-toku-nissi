@@ -107,6 +107,16 @@ function wareki(string $date): string
     return $era . ($n === 1 ? '元' : (string)$n) . '年' . date('n', $t) . '月' . date('j', $t) . '日';
 }
 
+/**
+ * CSS などのURLに、ファイルの更新時刻を付ける（assets/style.css?v=1761200000）。
+ * ブラウザが前の版のCSSを覚えたまま使い、新しい画面が崩れて見えるのを防ぐ（ファイルが変わるとURLも変わる）。
+ */
+function asset_url(string $path): string
+{
+    $mtime = @filemtime(dirname(__DIR__) . '/public/' . $path);
+    return $path . '?v=' . rawurlencode($mtime ? (string)$mtime : (defined('APP_VERSION') ? APP_VERSION : '0'));
+}
+
 /** 画面の共通ヘッダ。$showTitle=false のときは見出し（h1）を出さない（病院日誌は様式の中に表題がある）。 */
 function page_header(string $title, ?array $user = null, bool $showTitle = true): void
 {
@@ -116,7 +126,7 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= h($title) ?>｜病院日誌・医事統計</title>
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="<?= h(asset_url('assets/style.css')) ?>">
 </head>
 <body>
 <header class="app-header">

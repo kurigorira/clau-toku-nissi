@@ -29,7 +29,7 @@ $mdays  = period_days($monthStart, $date);
 
 page_header('病　院　日　誌', $user, false);
 // 印刷はいつでも A4縦・左とじ（print.css）。「印刷用」で開いたときは画面でも同じ見た目にする
-echo '<link rel="stylesheet" href="assets/print.css" media="' . ($print ? 'all' : 'print') . '">';
+echo '<link rel="stylesheet" href="' . h(asset_url('assets/print.css')) . '" media="' . ($print ? 'all' : 'print') . '">';
 
 // 縦書きの見出し：writing-mode は古いChromeで崩れるので、1文字ずつ改行して並べる
 $tate = fn(string $s) => implode('<br>', array_map('h', mb_str_split($s)));
