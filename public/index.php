@@ -41,6 +41,7 @@ page_header('入力状況', $user);
 <form method="get" class="datebar">
   <label>表示終了日 <input type="date" name="to" value="<?= h($to) ?>"></label>
   <button type="submit">表示</button>
+  <?php if (is_ijika($user)): ?><a href="bulk_entry.php">過去の日をまとめて入力（1日分・全部署）</a><?php endif; ?>
 </form>
 
 <section class="pending">

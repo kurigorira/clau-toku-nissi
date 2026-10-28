@@ -263,3 +263,14 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
   .gm-card { break-inside: avoid; page-break-inside: avoid; }
   .gm-svg .gm-bar, .gm-key-bar, .gm-key-partial { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---- まとめて入力（1日分・全部署。bulk_entry.php） ---- */
+.bulk-empty { margin: 4px 0 10px; line-height: 1.9; }
+.bulk-empty a { display: inline-block; margin: 0 8px 0 0; }
+.bulk-empty a.cur { font-weight: bold; color: #0b0b0b; text-decoration: none; }
+.bulk-dept { margin: 14px 0 6px; padding: 6px 10px 2px; background: #fff; border: 1px solid #d5d9de; border-radius: 4px; }
+.bulk-dept h2 { margin: 2px 0 6px; font-size: 16px; }
+.bulk-dept h2 .badge, .bulk-dept h2 .note { font-size: 12px; font-weight: normal; margin-left: 8px; }
+.bulk-actions { position: sticky; bottom: 0; background: #f3f4f6; padding: 8px 0; border-top: 1px solid #d5d9de; }
+.bulk-jump { margin: 0 0 6px; font-size: 13px; }
+.bulk-jump a { display: inline-block; margin: 0 10px 2px 0; }

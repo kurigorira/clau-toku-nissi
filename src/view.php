@@ -137,6 +137,7 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <a href="qq_report.php">救急搬入</a>
     <?php if ($user && (in_array($user['role'], ['ijika', 'admin'], true) || $user['dept_id'] === 'gairai')): ?>
       <a href="nippo.php">日報転記</a>
+      <?php if (in_array($user['role'], ['ijika', 'admin'], true)): ?><a href="bulk_entry.php">まとめて入力</a><?php endif; ?>
     <?php endif; ?>
     <?php if ($user && function_exists('does_toutyoku') && does_toutyoku($user)): ?>
       <a href="entry.php?dept=toutyoku">当直入力</a>
