@@ -132,7 +132,7 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nf table { border-collapse: collapse; }
 .nf-head { width: 100%; margin-bottom: 4px; }
 .nf-head td { vertical-align: bottom; padding: 0; }
-.nf-title { font-family: "MS Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 34px; font-weight: bold;
+.nf-title { white-space: nowrap; font-family: "MS Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 34px; font-weight: bold;
             letter-spacing: 6px; padding: 0 0 4px 40px; }
 .nf-date { font-size: 15px; padding: 0 0 2px 4px; }
 .nf-stampcell { width: 340px; }
@@ -141,8 +141,9 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nf-stamp th { font-weight: normal; font-size: 13px; padding: 2px 0; }
 .nf-stamp td { height: 60px; }
 /* 段：外枠は太線。中の表は枠いっぱい */
-.nf-row { width: 100%; border: 2px solid #000; margin: 0 0 -2px; }
-.nf-row > tbody > tr > td, .nf-row > tr > td { vertical-align: top; padding: 0; border: 2px solid #000; }
+/* 段の表は列の幅を固定し、中身（字幅の広いフォントなど）で枠が右へ広がらないようにする */
+.nf-row { width: 100%; border: 2px solid #000; margin: 0 0 -2px; table-layout: fixed; }
+.nf-row > tbody > tr > td, .nf-row > tr > td { vertical-align: top; padding: 0; border: 2px solid #000; overflow: hidden; }
 .nf-c1 { width: 25%; } .nf-c2 { width: 23%; } .nf-c3 { width: 27%; } .nf-c4 { width: 25%; }
 .nf-kaigicell { width: 64%; } .nf-touchokucell { width: 36%; }
 .nf-t { width: 100%; }
@@ -164,6 +165,14 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nf-t .opename { font-size: 12px; white-space: nowrap; overflow: hidden; max-width: 0; }
 .nf-t .memo { vertical-align: top; text-align: left; white-space: pre-wrap; height: 54px; }
 .nf-t .kj { width: 12%; }
+/* 中段（特殊検査・他）：10列の幅を固定。項目名は1行のまま、収まらない分は隠す */
+.nf-kensa { table-layout: fixed; }
+.nf-kensa th, .nf-kensa td { overflow: hidden; }
+.nf-kensa th { letter-spacing: -0.03em; }
+.nf-kensa .k-tate { width: 3%; }
+.nf-kensa .k-lab-a { width: 14%; } .nf-kensa .k-lab-b { width: 12%; } .nf-kensa .k-lab-c { width: 15%; }
+.nf-kensa .k-lab-d { width: 17%; } .nf-kensa .k-val { width: 8%; } .nf-kensa .k-val-c { width: 12%; }
+.nf-kensa td.n .v { min-width: 0; }
 .nf-kaigi tr:first-child th { height: 1px; }
 .nf-kaigi tr:last-child .memo { height: 110px; }
 .nf-t .name { min-width: 4em; }

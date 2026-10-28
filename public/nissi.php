@@ -157,6 +157,9 @@ $tokki = db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL O
   <tr>
     <td class="nf-full">
       <table class="nf-t nf-kensa">
+        <?php // 列の幅を決めておく（字幅の広いフォントでも表が右へ広がらないように。table-layout: fixed） ?>
+        <colgroup><col class="k-tate"><col class="k-lab-a"><col class="k-val"><col class="k-lab-b"><col class="k-val">
+          <col class="k-lab-c"><col class="k-val-c"><col class="k-tate"><col class="k-lab-d"><col class="k-val"></colgroup>
         <?php
         $colA = [['ＣＴ', 'ct_total', '件'], ['ＭＲＩ', 'mri_total', '件'], ['一般単純撮影', 'ippan_total', '件'],
                  ['血管造影', 'cag_total', '件'], ['血管造影手術', 'cag_ope', '件'], ['マンモグラフィー', 'mammo_total', '件'],

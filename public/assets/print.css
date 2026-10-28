@@ -18,17 +18,18 @@ h2 { font-size: 9.5pt; margin: 2.5mm 0 1mm; }
 a { color: #000; text-decoration: none; }
 table { page-break-inside: avoid; }
 
-/* 「印刷用」を画面で見たとき：A4の紙の幅（210mm − 左22mm − 右10mm）に合わせて見せる */
+/* 「印刷用」を画面で見たとき：A4の紙の幅（210mm − 左22mm − 右10mm ＝ 中身178mm）に合わせて見せる。
+   box-sizing: border-box なので、幅は中身178mm＋左右の余白で指定する（中身が紙より狭いと表題が折り返す） */
 @media screen {
   body { background: #e9ebee; }
-  main { width: 178mm; margin: 6mm auto; padding: 10mm 8mm; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.25); }
+  main { width: 210mm; margin: 6mm auto; padding: 10mm 10mm 10mm 22mm; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.25); }
 }
 
 /* ---- 病院日誌（紙の様式。style.css の .nf を A4 の大きさに詰める） ---- */
 h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .soukatsu-period { display: inline-block; vertical-align: baseline; }
 .nf { width: 100%; padding: 0; font-size: 8.8pt; }
-.nf-title { font-size: 22pt; letter-spacing: 5mm; padding: 0 0 2mm 8mm; }
+.nf-title { font-size: 22pt; letter-spacing: 3mm; padding: 0 0 2mm 6mm; }
 .nf-date { font-size: 10.5pt; padding: 0 0 0.8mm 1mm; }
 .nf-stampcell { width: 72mm; }
 .nf-stamp th, .nf-stamp td { border-width: 1pt; }
@@ -45,6 +46,8 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .nf-t .tate { padding: 0.3mm 0.2mm; }
 .nf-t .tate-sub { font-size: 7pt; }
 .nf-t .opename { font-size: 8.2pt; }
+.nf-kensa { font-size: 8pt; }
+.nf-kensa th, .nf-kensa td { padding-left: 0.5mm; padding-right: 0.5mm; }
 .nf-t .memo { height: 12mm; }
 .nf-kaigi tr:last-child .memo { height: 24mm; }
 .nf-gyoji .memo { height: 15mm; }
