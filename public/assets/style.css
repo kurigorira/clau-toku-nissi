@@ -180,6 +180,10 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nf-tokki { padding: 3px 6px !important; height: 70px; }
 .nf-tokki-h { font-size: 12px; margin-bottom: 2px; }
 .nf-none { margin: 0 0 0 4em; }
+.nf-tokki-memo { margin: 0 0 4px 1em; }
+.nf-tokki-in { width: 100%; }
+.nf-tokki-in > tbody > tr > td, .nf-tokki-in > tr > td { vertical-align: top; padding: 0; }
+.nf-tokki-l { width: 32%; padding-right: 8px !important; }
 /* 印刷だけに出すもの（print.css で表示する） */
 .printonly { display: none; }
 .updaters { margin-top: 14px; font-size: 12px; }

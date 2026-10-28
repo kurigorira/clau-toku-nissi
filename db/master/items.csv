@@ -33,6 +33,7 @@ byoto5_touhi,5階 当日退院 在院日数,byoto,byoto_idou,病棟別 在院・
 byoto3_tenshutsu_zaiin,3階 転出 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,380,0,0,999,,H!G,,sum
 byoto4_tenshutsu_zaiin,4階 転出 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,390,0,0,999,,H!Q,,sum
 byoto5_tenshutsu_zaiin,5階 転出 在院日数,byoto,byoto_idou,病棟別 在院・異動,input,,int,名,400,0,0,999,,H!AA,,sum
+tokki_memo,特記事項,byoto,tokki,特記事項等,input,,multiline,,9000,0,,,,,病院日誌の最下段「特記事項等」に出る。オーバーベッドの患者は下の「定数超過報告」に入力,sum
 byoto3_zaiin_total,3階 延患者数合計,byoto,byoto_calc,病棟 集計,sum,"byoto3_zaiin,byoto3_touhi,byoto3_tenshutsu_zaiin",int,名,410,0,,,,H!J,,sum
 byoto4_zaiin_total,4階 延患者数合計,byoto,byoto_calc,病棟 集計,sum,"byoto4_zaiin,byoto4_touhi,byoto4_tenshutsu_zaiin",int,名,420,0,,,,H!T,,sum
 byoto5_zaiin_total,5階 延患者数合計,byoto,byoto_calc,病棟 集計,sum,"byoto5_zaiin,byoto5_touhi,byoto5_tenshutsu_zaiin",int,名,430,0,,,,H!AD,,sum

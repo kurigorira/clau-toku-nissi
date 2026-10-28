@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-10-22 06:56:18
+-- 生成日時: 2026-10-28 01:24:10
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -57,6 +57,7 @@ INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto3_tenshutsu_zaiin','3階 転出 在院日数','byoto','byoto_idou','病棟別 在院・異動','input',NULL,'int','sum','名',380,0,0,999,'2000-01-01',NULL,NULL,'H!G','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto4_tenshutsu_zaiin','4階 転出 在院日数','byoto','byoto_idou','病棟別 在院・異動','input',NULL,'int','sum','名',390,0,0,999,'2000-01-01',NULL,NULL,'H!Q','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto5_tenshutsu_zaiin','5階 転出 在院日数','byoto','byoto_idou','病棟別 在院・異動','input',NULL,'int','sum','名',400,0,0,999,'2000-01-01',NULL,NULL,'H!AA','');
+INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('tokki_memo','特記事項','byoto','tokki','特記事項等','input',NULL,'multiline','sum','',9000,0,NULL,NULL,'2000-01-01',NULL,NULL,NULL,'病院日誌の最下段「特記事項等」に出る。オーバーベッドの患者は下の「定数超過報告」に入力');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto3_zaiin_total','3階 延患者数合計','byoto','byoto_calc','病棟 集計','sum','byoto3_zaiin,byoto3_touhi,byoto3_tenshutsu_zaiin','int','sum','名',410,0,NULL,NULL,'2000-01-01',NULL,NULL,'H!J','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto4_zaiin_total','4階 延患者数合計','byoto','byoto_calc','病棟 集計','sum','byoto4_zaiin,byoto4_touhi,byoto4_tenshutsu_zaiin','int','sum','名',420,0,NULL,NULL,'2000-01-01',NULL,NULL,'H!T','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto5_zaiin_total','5階 延患者数合計','byoto','byoto_calc','病棟 集計','sum','byoto5_zaiin,byoto5_touhi,byoto5_tenshutsu_zaiin','int','sum','名',430,0,NULL,NULL,'2000-01-01',NULL,NULL,'H!AD','');

@@ -40,7 +40,7 @@ foreach (['3', '4', '5'] as $w) {
     $teisho[$w] = config_value("teisho_byoto{$w}", $date, '');
 }
 
-// 特記事項（定員超過報告）はログインした全員に出す（2026-10 栗原様の判断。誰が見たかは閲覧履歴に残る）
+// 特記事項・定数超過報告はログインした全員に出す（2026-10 栗原様の判断。誰が見たかは閲覧履歴に残る）
 $tokki = db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL ORDER BY sort_no, tokki_id', [$date]);
 ?>
 <form method="get" class="datebar noprint">
@@ -243,18 +243,31 @@ $tokki = db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL O
   </tr>
   <tr>
     <td class="nf-full nf-tokki">
-      <div class="nf-tokki-h">特記事項等：定員超過報告</div>
-      <?php if (!$tokki): ?>
-        <p class="nf-none">特記なし</p>
-      <?php else: ?>
-        <table class="nf-t">
-          <tr><th>病棟</th><th>ＩＤ</th><th>氏名</th><th>入院経路</th><th>病名</th></tr>
-          <?php foreach ($tokki as $r): ?>
-            <tr><td><?= h($r['ward']) ?></td><td><?= h($r['patient_id']) ?></td><td><?= h($r['patient_name']) ?></td>
-                <td><?= h($r['route']) ?></td><td><?= h($r['diagnosis']) ?></td></tr>
-          <?php endforeach; ?>
-        </table>
-      <?php endif; ?>
+      <?php // 紙の様式どおり、左に特記事項（自由記述・病棟の入力画面）、右にオーバーベッドの日の定数超過報告（最大6名） ?>
+      <table class="nf-tokki-in">
+        <tr>
+          <td class="nf-tokki-l">
+            <div class="nf-tokki-h">特記事項等：</div>
+            <?php if ($tx('tokki_memo') !== ''): ?>
+              <div class="nf-tokki-memo"><?= nl2br(h($tx('tokki_memo'))) ?></div>
+            <?php elseif (!$tokki): ?>
+              <p class="nf-none">特記なし</p>
+            <?php endif; ?>
+          </td>
+          <td class="nf-tokki-r">
+            <?php if ($tokki): ?>
+              <div class="nf-tokki-h">定数超過報告（近隣受入不可のため）</div>
+              <table class="nf-t">
+                <tr><th>病棟</th><th>ＩＤ</th><th>氏名</th><th>入院経路</th><th>病名</th></tr>
+                <?php foreach ($tokki as $r): ?>
+                  <tr><td><?= h($r['ward']) ?></td><td><?= h($r['patient_id']) ?></td><td><?= h($r['patient_name']) ?></td>
+                      <td><?= h($r['route']) ?></td><td><?= h($r['diagnosis']) ?></td></tr>
+                <?php endforeach; ?>
+              </table>
+            <?php endif; ?>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

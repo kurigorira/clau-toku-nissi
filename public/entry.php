@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/repository.php';
 require_once __DIR__ . '/../src/calc.php';
+require_once __DIR__ . '/../src/tokki.php';
 
 $user = require_login();
 
@@ -55,6 +56,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $res      = save_dept_entries($date, $deptId, $_POST['v'] ?? [], $user['user_id']);
         $warnings = $res['warnings'];
+        // 病棟は定数超過報告（オーバーベッドの患者・最大6名）も一緒に保存する
+        if ($deptId === 'byoto' && isset($_POST['tokki']) && is_array($_POST['tokki'])) {
+            db()->beginTransaction();
+            try {
+                $tr = tokki_save($date, $_POST['tokki'], $user['user_id']);
+                db()->commit();
+            } catch (Throwable $e) {
+                db()->rollBack();
+                throw $e;
+            }
+            $warnings = array_merge($warnings, $tr['warnings']);
+        }
         if (($_POST['action'] ?? '') === 'submit') {
             touch_submission($date, $deptId, 'submitted', $user['user_id']);
             $messages[] = ["{$res['saved']}件を保存し、提出しました。", 'ok'];
@@ -144,6 +157,47 @@ page_header($dept['dept_name'] . '　入力', $user);
       </table>
     </fieldset>
   <?php endforeach; ?>
+
+  <?php if ($deptId === 'byoto'):
+      // 定数超過報告（オーバーベッド）。紙の様式どおり最大6名。在院が定床を超えた日は入力を促す
+      $tokkiNow = tokki_rows($date);
+      $zaiin = [];
+      foreach (['3', '4', '5'] as $w) {
+          $e = $entries["byoto{$w}_zaiin"] ?? null;
+          $zaiin[$w] = $e === null || $e['value_num'] === null ? null : (int)$e['value_num'];
+      }
+      $over = tokki_overbed($zaiin, $date); ?>
+    <fieldset>
+      <legend>定数超過報告（近隣受入不可のため）</legend>
+      <?php if ($over !== ''): ?>
+        <p class="flash flash-warn">在院患者数が定床を超えています（<?= h($over) ?>）。オーバーベッドの患者を入力してください。</p>
+      <?php endif; ?>
+      <table class="entry-table tokki-table">
+        <tr><th></th><th>病棟</th><th>ＩＤ</th><th>氏名</th><th>入院経路</th><th>病名</th></tr>
+        <?php for ($i = 0; $i < TOKKI_MAX; $i++):
+            $r = $tokkiNow[$i] ?? []; $f = fn(string $k) => h($r[$k] ?? ''); $ro = $locked ? ' readonly' : ''; ?>
+          <tr>
+            <th><?= $i + 1 ?></th>
+            <td><select name="tokki[<?= $i ?>][ward]"<?= $locked ? ' disabled' : '' ?>>
+                  <option value=""></option>
+                  <?php foreach (tokki_wards() as $wn): ?>
+                    <option<?= ($r['ward'] ?? '') === $wn ? ' selected' : '' ?>><?= h($wn) ?></option>
+                  <?php endforeach; ?>
+                  <?php if (($r['ward'] ?? '') !== '' && !in_array($r['ward'], tokki_wards(), true)): ?>
+                    <option selected><?= $f('ward') ?></option>
+                  <?php endif; ?>
+                </select></td>
+            <td><input type="text" name="tokki[<?= $i ?>][patient_id]" value="<?= $f('patient_id') ?>" size="9" maxlength="16"<?= $ro ?>></td>
+            <td><input type="text" name="tokki[<?= $i ?>][patient_name]" value="<?= $f('patient_name') ?>" size="12" maxlength="64"<?= $ro ?>></td>
+            <td><input type="text" name="tokki[<?= $i ?>][route]" value="<?= $f('route') ?>" size="9" maxlength="32" list="tokki-routes"<?= $ro ?>></td>
+            <td><input type="text" name="tokki[<?= $i ?>][diagnosis]" value="<?= $f('diagnosis') ?>" size="20" maxlength="128"<?= $ro ?>></td>
+          </tr>
+        <?php endfor; ?>
+      </table>
+      <datalist id="tokki-routes"><?php foreach (tokki_routes() as $rt): ?><option value="<?= h($rt) ?>"><?php endforeach; ?></datalist>
+      <p class="note">最大6名。行を消すときは、その行の欄を空にして保存します。病院日誌の最下段「特記事項等」に出ます。</p>
+    </fieldset>
+  <?php endif; ?>
 
   <?php if (!$locked): ?>
   <p class="actions">

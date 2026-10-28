@@ -42,18 +42,20 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .nf-t .sec { font-size: 10pt; letter-spacing: 1mm; }
 .nf-t th small { font-size: 6.8pt; }
 .nf-t td.n .u { font-size: 7pt; }
-.nf-t tr.tall > * { height: 8.2mm; }
+.nf-t tr.tall > * { height: 7.6mm; }
 .nf-t .tate { padding: 0.3mm 0.2mm; }
 .nf-t .tate-sub { font-size: 7pt; }
 .nf-t .opename { font-size: 8.2pt; }
 .nf-kensa { font-size: 8pt; }
 .nf-kensa th, .nf-kensa td { padding-left: 0.5mm; padding-right: 0.5mm; }
 .nf-t .memo { height: 12mm; }
-.nf-kaigi tr:last-child .memo { height: 24mm; }
-.nf-gyoji .memo { height: 15mm; }
+.nf-kaigi tr:last-child .memo { height: 20mm; }
+.nf-gyoji .memo { height: 13mm; }
 .nf-note { margin: 0.5mm 0.8mm; font-size: 6.8pt; }
-.nf-tokki { height: 30mm; padding: 0.8mm 1.5mm !important; }
+.nf-tokki { height: 26mm; padding: 0.8mm 1.5mm !important; }
 .nf-tokki-h { font-size: 8.5pt; margin-bottom: 0.5mm; }
+.nf-tokki-memo { margin: 0 0 0.6mm 1em; font-size: 8.5pt; }
+.nf-tokki-l { padding-right: 1.5mm !important; }
 .nf-tokki .nf-t th, .nf-tokki .nf-t td { padding: 0.25mm 0.8mm; }
 .nissi-status { margin: 1.2mm 0 0; font-size: 7.5pt; color: #333; }
 
