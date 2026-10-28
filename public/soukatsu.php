@@ -10,14 +10,7 @@ require_once __DIR__ . '/../src/calc.php';
 require_once __DIR__ . '/../src/report.php';
 require_once __DIR__ . '/../src/repository.php';
 
-$user = require_login();
-if (!is_ijika($user)) {
-    http_response_code(403);
-    page_header('権限がありません', $user);
-    flash('総括表は医事課と管理者のみ閲覧できます。', 'error');
-    page_footer();
-    exit;
-}
+$user = require_login();   // ログインした人なら誰でも見られる（CSV出力は医事課・管理者のみ）
 
 // 集計期間。既定は「前日までの当月分」。「何月何日〜何月何日」でも指定できる（from・to）。
 // 実日数・平均・目標の延数はこの期間の日数で計算する（src/report.php）
@@ -51,7 +44,7 @@ $ymd = fn(string $d) => date('Y年n月j日', strtotime($d));
   <form method="get" class="datebar-row">
     <label>対象月 <input type="month" name="month" value="<?= h($month) ?>"></label>
     <button type="submit">表示</button>
-    <a href="export.php?type=soukatsu&amp;<?= h($q) ?>">CSV出力</a>
+    <?php if (is_ijika($user)): ?><a href="export.php?type=soukatsu&amp;<?= h($q) ?>">CSV出力</a><?php endif; ?>
     <a href="soukatsu.php?<?= h($q) ?>&amp;print=1" target="_blank">印刷用</a>
     <a href="gyomu_month.php?fy=<?= (int)$fy ?>">各種業務量の月別グラフ</a>
   </form>

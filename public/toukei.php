@@ -10,14 +10,7 @@
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/report.php';
 
-$user = require_login();
-if (!is_ijika($user)) {
-    http_response_code(403);
-    page_header('権限がありません', $user);
-    flash('患者数統計表は医事課と管理者のみ閲覧できます。', 'error');
-    page_footer();
-    exit;
-}
+$user = require_login();   // ログインした人なら誰でも見られる（CSV出力は医事課・管理者のみ）
 
 // 既定は前日までの当月分。過去の月は1か月（src/report.php の month_period()）
 [$month, $from, $to, $noData] = month_period($_GET['month'] ?? null);
@@ -40,7 +33,7 @@ page_header('患者数統計表　' . $month, $user);
   <label>対象月 <input type="month" name="month" value="<?= h($month) ?>"></label>
   <input type="hidden" name="sheet" value="<?= h($sheet) ?>">
   <button type="submit">表示</button>
-  <a href="export.php?type=toukei&amp;sheet=<?= h($sheet) ?>&amp;month=<?= h($month) ?>">CSV出力</a>
+  <?php if (is_ijika($user)): ?><a href="export.php?type=toukei&amp;sheet=<?= h($sheet) ?>&amp;month=<?= h($month) ?>">CSV出力</a><?php endif; ?>
 </form>
 <?php if ($noData) { month_period_nodata($from); } ?>
 <p class="period-line"><strong><?= h(month_period_label($from, $to)) ?></strong></p>

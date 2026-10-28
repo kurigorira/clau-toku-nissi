@@ -135,6 +135,10 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <a href="index.php">入力状況</a>
     <a href="nissi.php">病院日誌</a>
     <a href="qq_report.php">救急搬入</a>
+    <a href="soukatsu.php">総括</a>
+    <a href="gyomu_month.php">月別グラフ</a>
+    <a href="toukei.php">患者数統計表</a>
+    <a href="byoin_houkoku.php">病院報告</a>
     <?php if ($user && (in_array($user['role'], ['ijika', 'admin'], true) || $user['dept_id'] === 'gairai')): ?>
       <a href="nippo.php">日報転記</a>
       <?php if (in_array($user['role'], ['ijika', 'admin'], true)): ?><a href="bulk_entry.php">まとめて入力</a><?php endif; ?>
@@ -143,11 +147,7 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
       <a href="entry.php?dept=toutyoku">当直入力</a>
     <?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
-      <a href="soukatsu.php">総括</a>
-      <a href="gyomu_month.php">月別グラフ</a>
       <a href="zaiin.php">平均在院日数</a>
-      <a href="toukei.php">患者数統計表</a>
-      <a href="byoin_houkoku.php">病院報告</a>
       <a href="audit.php">変更履歴</a>
     <?php elseif ($user && $user['dept_id'] === 'byoto'): ?>
       <a href="zaiin.php">平均在院日数</a>

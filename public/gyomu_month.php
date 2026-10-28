@@ -10,14 +10,7 @@ require_once __DIR__ . '/../src/calc.php';
 require_once __DIR__ . '/../src/report.php';
 require_once __DIR__ . '/../src/repository.php';
 
-$user = require_login();
-if (!is_ijika($user)) {
-    http_response_code(403);
-    page_header('権限がありません', $user);
-    flash('業務量の月別グラフは医事課と管理者のみ閲覧できます。', 'error');
-    page_footer();
-    exit;
-}
+$user = require_login();   // ログインした人なら誰でも見られる
 
 $yesterday = date('Y-m-d', strtotime('-1 day'));
 $fyNow = fiscal_year($yesterday);
