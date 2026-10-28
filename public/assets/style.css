@@ -232,3 +232,34 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .entry-table .kaigi-side th { width: auto; padding: 1px 4px; }
 .entry-table .kaigi-side th:first-child { width: 1.6em; text-align: right; }
 .entry-table .kaigi-side th.kaigi-side-h { width: auto; text-align: left; padding-left: 2em; }
+
+/* ---- 各種業務量の月別グラフ（gyomu_month.php）。小さなグラフを表組みなしで並べる（inline-block。gap は使わない） ---- */
+.gm-legend { margin: 6px 0 4px; font-size: 13px; color: #0b0b0b; }
+.gm-key { display: inline-block; width: 14px; height: 10px; margin: 0 4px 0 12px; vertical-align: middle; }
+.gm-key-bar { background: #2a78d6; border-radius: 2px 2px 0 0; }
+.gm-key-partial { background: #2a78d6; opacity: .45; border-radius: 2px 2px 0 0; }
+.gm-key-tgt { height: 0; border-top: 2px solid #0b0b0b; }
+.gm-block { margin: 18px 0 6px; font-size: 15px; }
+.gm-cards { font-size: 0; }
+.gm-card { display: inline-block; vertical-align: top; width: 316px; margin: 0 10px 10px 0; padding: 6px 8px 2px;
+           background: #fff; border: 1px solid #d5d9de; border-radius: 4px; font-size: 13px; }
+.gm-title { font-weight: bold; color: #0b0b0b; }
+.gm-sum { display: block; font-weight: normal; font-size: 11px; color: #52514e; }
+.gm-svg { display: block; }
+.gm-svg .gm-grid { stroke: #e3e5e8; stroke-width: 1; }
+.gm-svg .gm-base { stroke: #8a8986; }
+.gm-svg .gm-ylab { font-size: 10px; fill: #52514e; text-anchor: end; }
+.gm-svg .gm-xlab { font-size: 10px; fill: #52514e; text-anchor: middle; }
+.gm-svg .gm-bar { fill: #2a78d6; }
+.gm-svg .gm-partial { fill-opacity: .45; }
+.gm-svg .gm-tgt { stroke: #0b0b0b; stroke-width: 2; }
+.gm-svg .gm-hit { fill: transparent; }
+.gm-svg g:hover .gm-hit { fill: #2a78d6; fill-opacity: .06; }
+.gm-table th small { font-size: 10px; font-weight: normal; }
+.gm-table .gm-kind { font-size: 11px; color: #52514e; }
+.gm-table .gm-tgtrow td { color: #52514e; }
+.gm-table td.n { min-width: 52px; }
+@media print {
+  .gm-card { break-inside: avoid; page-break-inside: avoid; }
+  .gm-svg .gm-bar, .gm-key-bar, .gm-key-partial { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -220,3 +220,65 @@ function month_period_nodata(string $from): void
     page_footer();
     exit;
 }
+
+/**
+ * 各種業務量の項目（総括の表・順位グラフと、月別のグラフ gyomu_month.php で共通）。
+ * 区分 => [[表示名, 項目コード], ...]
+ */
+function gyomu_blocks(): array
+{
+    return [
+        '入院' => [
+            ['延患者数',   'byoto_zaiin_all'],
+            ['新入院',     'byoto_nyuin_all'],
+            ['退院',       'byoto_taiin_all'],
+        ],
+        '外来' => [
+            ['一般外来',   'gairai_ippan'],
+            ['訪問看護',   'iryou_houkan'],
+            ['訪問診療',   'iryou_houshin'],
+            ['訪問リハ',   'iryou_hourehab_jin'],
+            ['ドック',     'dock_ninzu'],
+            ['健診',       'kenshin_ninzu'],
+        ],
+        '介護' => [
+            ['通所リハ',   'tsusho'],
+            ['訪問看護',   'kaigo_houkan_total'],
+            ['居宅指導',   'kaigo_kyotaku'],
+            ['訪問リハ',   'kaigo_hourehab'],
+            ['訪問介護',   'houkai_total'],
+            ['介護合計',   'kaigo_shoukei'],
+        ],
+        '検査' => [
+            ['心エコー',     'shin_echo_total'],
+            ['腹部エコー',   'fuku_echo_total'],
+            ['検体検査',     'kentai_total'],
+        ],
+        '画像' => [
+            ['CT',           'ct_total'],
+            ['MRI',          'mri_total'],
+            ['一般単純',     'ippan_total'],
+            ['胃透視',       'itoushi_total'],
+            ['マンモ',       'mammo_total'],
+            ['血管造影',     'cag_total'],
+        ],
+        '内視鏡' => [
+            ['胃カメラ',        'egd_total'],
+            ['大腸ﾌｧｲﾊﾞｰ',     'cf_total'],
+        ],
+        'リハビリ' => [
+            ['理学療法',   'pt_total'],
+            ['作業療法',   'ot_total'],
+            ['言語療法',   'st_total'],
+        ],
+        'その他' => [
+            ['手術',       'ope_total'],
+            ['服薬指導',   'fukuyaku'],
+            ['栄養指導',   'eiyou_sum12'],
+            ['入院透析',   'touseki_nyuin'],
+            ['外来透析',   'touseki_gairai'],
+            ['救急搬入',   'qq_kanja'],
+            ['紹介患者',   'shoukai'],
+        ],
+        ];
+}

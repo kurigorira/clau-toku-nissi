@@ -143,6 +143,7 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
       <a href="soukatsu.php">総括</a>
+      <a href="gyomu_month.php">月別グラフ</a>
       <a href="zaiin.php">平均在院日数</a>
       <a href="toukei.php">患者数統計表</a>
       <a href="byoin_houkoku.php">病院報告</a>
