@@ -173,8 +173,7 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .nf-kensa .k-lab-a { width: 14%; } .nf-kensa .k-lab-b { width: 12%; } .nf-kensa .k-lab-c { width: 15%; }
 .nf-kensa .k-lab-d { width: 17%; } .nf-kensa .k-val { width: 8%; } .nf-kensa .k-val-c { width: 12%; }
 .nf-kensa td.n .v { min-width: 0; }
-.nf-kaigi tr:first-child th { height: 1px; }
-.nf-kaigi tr:last-child .memo { height: 110px; }
+.nf-kaigi tr.kr > td { height: 22px; }
 .nf-t .name { min-width: 4em; }
 .nf-note { margin: 2px 4px; font-size: 10px; }
 .nf-tokki { padding: 3px 6px !important; height: 70px; }
@@ -223,3 +222,13 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .app-user a { color: #dce8f4; margin: 0 6px; }
 .app-user a:hover { color: #fff; }
 .period-line { margin: 4px 0 8px; }
+/* 当直入力：会議は「時刻＋会議・委員会名」の組を、病院日誌の左右の欄ごとに並べる（gap を使わず表で並べる） */
+.kaigi-entry { border-collapse: collapse; }
+.kaigi-entry > tbody > tr > td, .kaigi-entry > tr > td { vertical-align: top; padding: 0 16px 4px 0; }
+.kaigi-side { border-collapse: collapse; }
+.kaigi-side th { font-weight: normal; font-size: 12px; color: #555; padding: 1px 4px; text-align: left; }
+.kaigi-side th.kaigi-side-h { color: #2c4a6e; font-weight: bold; }
+.kaigi-side td { padding: 1px 2px; }
+.entry-table .kaigi-side th { width: auto; padding: 1px 4px; }
+.entry-table .kaigi-side th:first-child { width: 1.6em; text-align: right; }
+.entry-table .kaigi-side th.kaigi-side-h { width: auto; text-align: left; padding-left: 2em; }

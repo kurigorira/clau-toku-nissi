@@ -49,7 +49,7 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .nf-kensa { font-size: 8pt; }
 .nf-kensa th, .nf-kensa td { padding-left: 0.5mm; padding-right: 0.5mm; }
 .nf-t .memo { height: 12mm; }
-.nf-kaigi tr:last-child .memo { height: 20mm; }
+.nf-kaigi tr.kr > td { height: 4.6mm; }
 .nf-gyoji .memo { height: 13mm; }
 .nf-note { margin: 0.5mm 0.8mm; font-size: 6.8pt; }
 .nf-tokki { height: 26mm; padding: 0.8mm 1.5mm !important; }

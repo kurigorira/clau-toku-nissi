@@ -13,6 +13,7 @@
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/calc.php';
 require_once __DIR__ . '/../src/repository.php';
+require_once __DIR__ . '/../src/kaigi.php';
 
 $user  = require_login();
 $date  = valid_date($_GET['hizuke'] ?? null) ?? date('Y-m-d', strtotime('-1 day'));
@@ -201,13 +202,20 @@ $tokki = db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL O
 <table class="nf-row">
   <tr>
     <td class="nf-kaigicell">
+      <?php
+      // 1件を1行に（時刻と会議・委員会名がずれない）。行数は右の当直者・呼び出しと同じ6行以上
+      $kL = kaigi_pairs($tx('kaigi_jikoku1'), $tx('kaigi_name1'));
+      $kR = kaigi_pairs($tx('kaigi_jikoku2'), $tx('kaigi_name2'));
+      $kN = max(6, count($kL), count($kR)); ?>
       <table class="nf-t nf-kaigi">
-        <tr><th rowspan="2" class="tate"><?= $tate('会議・勉強・委員会等') ?></th>
+        <tr><th rowspan="<?= $kN + 1 ?>" class="tate"><?= $tate('会議・勉強・委員会等') ?></th>
           <th class="kj">時　刻</th><th>会議・委員会名</th><th class="kj">時　刻</th><th>会議・委員会名</th></tr>
-        <tr>
-          <td class="memo kj"><?= nl2br(h($tx('kaigi_jikoku1'))) ?></td><td class="memo"><?= nl2br(h($tx('kaigi_name1'))) ?></td>
-          <td class="memo kj"><?= nl2br(h($tx('kaigi_jikoku2'))) ?></td><td class="memo"><?= nl2br(h($tx('kaigi_name2'))) ?></td>
-        </tr>
+        <?php for ($i = 0; $i < $kN; $i++): ?>
+          <tr class="kr">
+            <td class="kj"><?= h($kL[$i][0] ?? '') ?></td><td><?= h($kL[$i][1] ?? '') ?></td>
+            <td class="kj"><?= h($kR[$i][0] ?? '') ?></td><td><?= h($kR[$i][1] ?? '') ?></td>
+          </tr>
+        <?php endfor; ?>
       </table>
     </td>
     <td class="nf-touchokucell">
