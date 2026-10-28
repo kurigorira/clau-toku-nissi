@@ -63,9 +63,9 @@ walkin4_nyuin,時間外ウォークイン 区分4 うち入院,kyukyu,walkin,時
 walkin_total,時間外ウォークイン 合計,kyukyu,walkin,時間外ウォークイン,sum,"walkin1,walkin2,walkin3,walkin4",int,名,680,0,,,,⑨!S,,sum
 walkin_nyuin_total,時間外ウォークイン うち入院 合計,kyukyu,walkin,時間外ウォークイン,sum,"walkin1_nyuin,walkin2_nyuin,walkin3_nyuin,walkin4_nyuin",int,名,690,0,,,,⑨!U,,sum
 dock_ninzu,人間ドック 人数,dock,dock,人間ドック・健康診断,sum,"gr_dock_s0008,gr_dock_am,gr_dock_pm,gr_dock_night,gr_dock_s2024",int,人,700,0,,,,③!C / ①!M,電子カルテ日報のドック行の合計,sum
-dock_kensu,人間ドック 件数,dock,dock,人間ドック・健康診断,input,,int,件,710,1,0,300,s11,③!E,,sum
+dock_kensu,人間ドック 件数,dock,dock,人間ドック・健康診断,input,,int,人,710,1,0,300,s11,③!E,,sum
 kenshin_ninzu,健康診断 人数,dock,dock,人間ドック・健康診断,sum,"gr_kenshin_s0008,gr_kenshin_am,gr_kenshin_pm,gr_kenshin_night,gr_kenshin_s2024",int,人,720,0,,,,③!G / ①!O,電子カルテ日報の健診行の合計,sum
-kenshin_kensu,健康診断 件数,dock,dock,人間ドック・健康診断,input,,int,件,730,1,0,500,s12,③!I,,sum
+kenshin_kensu,健康診断 件数,dock,dock,人間ドック・健康診断,input,,int,人,730,1,0,500,s12,③!I,,sum
 egd_nyuin,EGD 入院,naishikyo,naishikyo,内視鏡,input,,int,件,800,1,0,100,,③!K,,sum
 egd_gairai,EGD 外来,naishikyo,naishikyo,内視鏡,input,,int,件,810,1,0,100,,③!L,,sum
 egd_total,EGD 入＋外,naishikyo,naishikyo,内視鏡,sum,"egd_nyuin,egd_gairai",int,件,820,0,,,k14,③!M,病院日誌のＥＧＤはこの合計,sum
