@@ -8,6 +8,7 @@
  *
  * 保存すると、外来・病棟・当直の各部署に「下書き」として値が入る。
  * 各部署は普段の入力画面で確かめて提出する。外来の提出はこの画面から行う。
+ * 入力するのは当直者（入力する画面が当直・役割が当直者の人）と医事課・管理者（src/auth.php can_edit_dept）。
  *
  * JavaScriptは使わない（院内端末のChromeが古いため）。照合はサーバ側で行う。
  */
@@ -20,7 +21,7 @@ $user = require_login();
 if (!can_edit_dept($user, 'gairai')) {
     http_response_code(403);
     page_header('権限がありません', $user);
-    flash('日報の転記は外来・医事課・管理者のみ行えます。', 'error');
+    flash('日報の転記は当直者・医事課・管理者が行います。', 'error');
     page_footer();
     exit;
 }

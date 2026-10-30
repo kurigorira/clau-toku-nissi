@@ -337,7 +337,7 @@ function emr_dept_guess(string $emrName, array $depts): string
 {
     $n = user_norm($emrName);
     foreach ($depts as $id => $d) {
-        if ($id !== DEPT_VIEW_ONLY && user_norm($d['dept_name']) === $n) {
+        if ($id !== DEPT_VIEW_ONLY && $id !== 'gairai' && user_norm($d['dept_name']) === $n) {
             return $id;     // 名前がそのまま同じ（栄養科・医事課 など）
         }
     }
@@ -345,7 +345,8 @@ function emr_dept_guess(string $emrName, array $depts): string
     $rules = [
         '医師事務' => DEPT_VIEW_ONLY, '秘書' => DEPT_VIEW_ONLY,
         '病棟' => 'byoto', '薬剤' => 'yakuzai', '栄養' => 'eiyou', 'リハビリ' => 'rehab', '放射線' => 'housha',
-        '検査' => 'kensa', '臨床工学' => 'touseki', '透析' => 'touseki', '外来' => 'gairai', '手術' => 'ope',
+        '検査' => 'kensa', '臨床工学' => 'touseki', '透析' => 'touseki', '手術' => 'ope',
+        '外来' => DEPT_VIEW_ONLY,   // 外来の日報転記は当直者が入力する（外来の職員は閲覧のみ）
         '医事' => 'toutyoku', '総務' => 'toutyoku', '事務' => 'toutyoku',   // 医事課・事務課は当直に統合した
         '施設' => DEPT_VIEW_ONLY, '地域医療連携' => 'renkei', '連携' => 'renkei',
         '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',

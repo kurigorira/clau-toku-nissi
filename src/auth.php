@@ -280,9 +280,14 @@ function can_elevate(array $user): bool
  * 当直（在宅②の訪問系・通所リハ、病院日誌の天候・当直者・会議など）の欄は医事課の職員が入力する運用。
  * 医事課・事務課は当直に統合したので、入力する画面が当直の職員はパスワード確認なしで入力できる。
  * 役割が当直者の人も入力できる。
+ * 外来（電子カルテ日報の転記 nippo.php）も当直と同じ人が入力する（当直者・医事課・管理者）。
  */
 function can_edit_dept(array $user, string $deptId): bool
 {
+    // 外来（電子カルテ日報の転記）は当直者が入力する。入力する画面が外来の職員は入力しない（2026-10〜）
+    if ($deptId === 'gairai') {
+        return can_edit_dept($user, 'toutyoku');
+    }
     // 医事課・事務課は 2026-10 に当直へ統合した（職員の入力する画面は当直）。残っていた ijika は念のため当直と同じに扱う
     return is_ijika($user)
         || $user['dept_id'] === $deptId

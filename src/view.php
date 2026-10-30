@@ -139,7 +139,7 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <a href="gyomu_month.php">月別グラフ</a>
     <a href="toukei.php">患者数統計表</a>
     <a href="byoin_houkoku.php">病院報告</a>
-    <?php if ($user && (in_array($user['role'], ['ijika', 'admin'], true) || $user['dept_id'] === 'gairai')): ?>
+    <?php if ($user && function_exists('can_edit_dept') && can_edit_dept($user, 'gairai')): ?>
       <a href="nippo.php">日報転記</a>
       <?php if (in_array($user['role'], ['ijika', 'admin'], true)): ?><a href="bulk_entry.php">まとめて入力</a><?php endif; ?>
     <?php endif; ?>
