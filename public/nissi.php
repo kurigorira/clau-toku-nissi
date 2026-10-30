@@ -170,7 +170,7 @@ $tokki = db_all('SELECT * FROM d_tokki WHERE hizuke = ? AND deleted_at IS NULL O
                  ['ＣＳ', 'cf_total', '件'], ['癌化学療法', 'gairai_ganchemo', '件']];
         $colC = [['服薬指導件数', 'fukuyaku', '件'], ['調剤件数（入院）', 'chouzai_nyuin', '件'], ['調剤件数（外来）', 'chouzai_gairai', '件'],
                  ['栄養指導件数', 'eiyou_sum12', '件'], ['理学療法単位数', 'pt_total', '単位'], ['作業療法単位数', 'ot_total', '単位'],
-                 ['言語療法単位数', 'st_total', '単位'], null];
+                 ['言語療法単位数', 'st_total', '単位'], ['その他', 'shidou_other', '件']];   // リハビリ科の入力欄「指導 その他」
         for ($i = 0; $i < 8; $i++): ?>
           <tr>
             <?php if ($i === 0): ?><th rowspan="8" class="tate"><?= $tate('特殊検査・他') ?></th><?php endif; ?>
