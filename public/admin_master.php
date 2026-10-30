@@ -90,10 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'save_dept') {
         foreach ($_POST['d'] ?? [] as $id => $d) {
-            $days = preg_replace('/[^1-7]/', '', (string)($d['entry_days'] ?? ''));
             $time = preg_match('/^\d{2}:\d{2}$/', (string)($d['deadline_time'] ?? '')) ? $d['deadline_time'] : '18:00';
-            db_exec('UPDATE m_dept SET deadline_time = ?, entry_days = ?, is_active = ? WHERE dept_id = ?',
-                    [$time, $days === '' ? '1234567' : $days, empty($d['is_active']) ? 0 : 1, $id]);
+            db_exec('UPDATE m_dept SET deadline_time = ?, is_active = ? WHERE dept_id = ?',
+                    [$time, empty($d['is_active']) ? 0 : 1, $id]);
         }
         $messages[] = ['部署マスタを更新しました。', 'ok'];
     }
@@ -245,14 +244,13 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
 
 <?php elseif ($tab === 'dept'): ?>
   <p class="note">
-    入力対象曜日は 1=月 … 7=日 を並べて指定します（例 12345 なら平日のみ）。
-    対象外の曜日は入力状況ボードで灰色になり、未提出として数えません。
+    全部署・毎日が入力の対象です（休みの日は 0 を入れて提出します）。入力期限は時:分で指定します。
   </p>
   <form method="post">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save_dept">
     <table class="report">
-      <tr><th>部署ID</th><th>部署名</th><th>入力期限</th><th>入力対象曜日</th><th>有効</th><th>項目数</th></tr>
+      <tr><th>部署ID</th><th>部署名</th><th>入力期限</th><th>有効</th><th>項目数</th></tr>
       <?php
       $counts = [];
       foreach (db_all("SELECT dept_id, COUNT(*) c FROM m_item WHERE calc_type = 'input' GROUP BY dept_id") as $r) {
@@ -263,7 +261,6 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
           <td><code><?= h($id) ?></code></td>
           <th><?= h($d['dept_name']) ?></th>
           <td><input type="text" name="d[<?= h($id) ?>][deadline_time]" size="5" value="<?= h($d['deadline_time']) ?>"></td>
-          <td><input type="text" name="d[<?= h($id) ?>][entry_days]" size="8" value="<?= h($d['entry_days']) ?>"></td>
           <td><input type="checkbox" name="d[<?= h($id) ?>][is_active]" value="1" <?= $d['is_active'] ? 'checked' : '' ?>></td>
           <td class="n"><?= (int)($counts[$id] ?? 0) ?></td>
         </tr>

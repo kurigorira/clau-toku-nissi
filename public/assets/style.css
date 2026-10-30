@@ -87,7 +87,6 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .st-partial   { background: #f6dd8e; }
 .st-submitted { background: #a8d8a8; }
 .st-confirmed { background: #5aa45a; }
-.st-off       { background: #e3e5e8; }
 
 .badge { display: inline-block; padding: 1px 8px; border-radius: 3px; font-size: 12px; }
 .legend { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; }

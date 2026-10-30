@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-10-28 01:31:57
+-- 生成日時: 2026-10-30 02:10:21
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -9,17 +9,17 @@ DELETE FROM m_dept;
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('gairai','外来',10,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('byoto','病棟',20,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('kyukyu','救急',30,'18:00','1234567',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('dock','健診センター',40,'18:00','12345',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('naishikyo','内視鏡室',50,'18:00','12345',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('dock','健診センター',40,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('naishikyo','内視鏡室',50,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('housha','放射線科',60,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('kensa','検査科',70,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('yakuzai','薬剤科',80,'18:00','1234567',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('eiyou','栄養科',90,'18:00','12345',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('rehab','リハビリテーション科',100,'18:00','123456',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('ope','手術室',110,'18:00','12345',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('renkei','地域医療連携室',120,'18:00','12345',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('zaitaku','在宅部門',130,'18:00','12345',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('touseki','透析室',140,'18:00','123456',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('eiyou','栄養科',90,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('rehab','リハビリテーション科',100,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('ope','手術室',110,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('renkei','地域医療連携室',120,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('zaitaku','在宅部門',130,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('touseki','透析室',140,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('toutyoku','当直',150,'09:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('sonota','その他（閲覧のみ）',999,'18:00','',0);
 

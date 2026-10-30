@@ -117,7 +117,6 @@ page_header('まとめて入力（1日分）', $user);
     <section class="bulk-dept" id="d-<?= h($id) ?>">
       <h2><?= h($d['dept_name']) ?>
         <span class="badge <?= h(['none' => 'st-none', 'draft' => 'st-partial', 'submitted' => 'st-submitted', 'confirmed' => 'st-confirmed'][$sub['status'] ?? 'none'] ?? 'st-none') ?>"><?= h($label[$sub['status'] ?? 'none'] ?? '') ?></span>
-        <?php if (!is_entry_day($d, $date)): ?><span class="note">（<?= h(youbi($date)) ?>曜日は入力対象外）</span><?php endif; ?>
       </h2>
       <?php entry_form_fields($id, $date, dept_entries($date, $id), false); ?>
     </section>

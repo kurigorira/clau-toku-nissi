@@ -20,7 +20,6 @@ $board = entry_status($from, $to);
 $focus = date('Y-m-d', strtotime("$to -1 day"));
 
 $labels = [
-    'off'       => ['対象外', 'st-off'],
     'none'      => ['未入力', 'st-none'],
     'partial'   => ['途中',   'st-partial'],
     'submitted' => ['提出済', 'st-submitted'],
@@ -100,6 +99,5 @@ page_header('入力状況', $user);
   <span class="badge st-partial">途中・欠測あり</span>
   <span class="badge st-submitted">提出済</span>
   <span class="badge st-confirmed">医事課確定</span>
-  <span class="badge st-off">入力対象外</span>
 </p>
 <?php page_footer();

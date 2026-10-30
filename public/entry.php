@@ -94,9 +94,6 @@ page_header($dept['dept_name'] . '　入力', $user);
   </div>
 <?php endif; ?>
 
-<?php if (!is_entry_day($dept, $date)): ?>
-  <p class="flash flash-info"><?= h($dept['dept_name']) ?>は<?= h(youbi($date)) ?>曜日が入力対象外に設定されています。必要であれば入力できます。</p>
-<?php endif; ?>
 
 <?php if ($confirmed): ?>
   <p class="flash flash-<?= $locked ? 'error' : 'warn' ?>">

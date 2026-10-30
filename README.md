@@ -594,7 +594,7 @@ C:\php\php db\tools\run_sql.php db\seed_master.sql
 過去の帳票は当時の定床で再現される。
 
 **部署を増やす**
-`db/master/depts.csv` に1行足す。`entry_days` で入力対象曜日、`deadline_time` で入力期限を指定する。
+`db/master/depts.csv` に1行足す。`deadline_time` で入力期限を指定する（全部署・毎日が入力の対象。`entry_days` は互換のため残している列で、使っていない）。
 
 ## 旧データの移行
 

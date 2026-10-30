@@ -174,18 +174,10 @@ function touch_submission(string $date, string $deptId, string $status, string $
     }
 }
 
-/** その部署がその日に入力すべきか（曜日で判定）。 */
-function is_entry_day(array $dept, string $date): bool
-{
-    $w = (int)date('N', strtotime($date)); // 1=月 … 7=日
-    return strpos($dept['entry_days'], (string)$w) !== false;
-}
-
 /**
- * 入力状況を返す。入力漏れ判定の中核。
+ * 入力状況を返す。入力漏れ判定の中核。全部署・毎日が入力の対象（曜日による対象外は無い）。
  *
  * 戻り値の status:
- *   off        その部署の入力対象日ではない
  *   none       未入力
  *   partial    入力途中、または提出済みだが必須項目に欠測がある
  *   submitted  提出済
@@ -228,11 +220,6 @@ function entry_status(string $from, string $to): array
         foreach ($depts as $id => $dept) {
             $sub  = $subs[$date][$id] ?? null;
             $have = $filled[$date][$id] ?? [];
-
-            if (!is_entry_day($dept, $date)) {
-                $out[$date][$id] = ['status' => 'off', 'missing' => [], 'sub' => $sub];
-                continue;
-            }
 
             $missing = [];
             foreach ($required[$id] ?? [] as $code) {
