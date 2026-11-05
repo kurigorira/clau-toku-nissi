@@ -240,6 +240,7 @@ function gyomu_blocks(): array
             ['訪問リハ',   'iryou_hourehab_jin'],
             ['ドック',     'dock_ninzu'],
             ['健診',       'kenshin_ninzu'],
+            ['外来合計',   'gairai_soukatsu_total'],   // 上の6行の合計（事業計画の外来の合計と同じ）
         ],
         '介護' => [
             ['通所リハ',   'tsusho'],
@@ -247,7 +248,7 @@ function gyomu_blocks(): array
             ['居宅指導',   'kaigo_kyotaku'],
             ['訪問リハ',   'kaigo_hourehab'],
             ['訪問介護',   'houkai_total'],
-            ['介護合計',   'kaigo_shoukei'],
+            ['介護合計',   'kaigo_soukatsu_total'],    // 上の5行の合計。通所リハを含む（事業計画の介護「合計」と同じ）
         ],
         '検査' => [
             ['心エコー',     'shin_echo_total'],

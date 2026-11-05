@@ -130,7 +130,7 @@ $noTarget = 0;
                        'rate' => $act / $tgtSum * 100, 'act' => $act, 'tgt' => $tgtSum];
         }
     ?>
-    <tr>
+    <tr<?= str_ends_with($label, '合計') ? ' class="total-row"' : '' ?>>
       <?php if ($first): ?><th rowspan="<?= count($rows) ?>" class="block"><?= h($blockName) ?></th><?php $first = false; endif; ?>
       <th class="itemname"><?= h($label) ?></th>
       <td class="n"><?= num($tgtAvg, 2) ?></td>

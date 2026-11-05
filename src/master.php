@@ -96,10 +96,11 @@ function target_value(string $itemCode, int $fiscalYear): ?float
  * 日ごとの目標＝その月の目標延数（m_target_month）÷その月の日数。期間に掛かる日数ぶん足す
  * （10/1〜10/20 なら 10月の目標×20/31。月・年度をまたいでもそのまま正しい）。
  * 月別が無い月は、年度の1日平均（m_target）×日数で補う。どちらも無い月がある項目は入れない。
+ * 目標の無い合算項目は、元の項目の目標の合計（$depth は合算の入れ子の深さ。循環しないよう打ち切る）。
  *
  * @return array item_code => 目標延数
  */
-function targets_for_period(array $codes, string $from, string $to): array
+function targets_for_period(array $codes, string $from, string $to, int $depth = 0): array
 {
     if (!$codes) {
         return [];
@@ -144,6 +145,22 @@ function targets_for_period(array $codes, string $from, string $to): array
             }
         }
         $out[$code] = $sum;
+    }
+
+    // 目標が登録されていない合算項目（総括の外来合計・介護合計など）は、元の項目の目標の合計にする。
+    // 元の項目のどれかに目標が無ければ目標なし（一部の項目だけで比べると達成率が狂う）
+    if ($depth < 5) {
+        $items = all_items();
+        foreach ($codes as $code) {
+            if (isset($out[$code]) || ($items[$code]['calc_type'] ?? '') !== 'sum') {
+                continue;
+            }
+            $src = array_values(array_filter(array_map('trim', explode(',', (string)$items[$code]['calc_source']))));
+            $t   = targets_for_period($src, $from, $to, $depth + 1);
+            if ($src && count($t) === count(array_unique($src))) {
+                $out[$code] = array_sum($t);
+            }
+        }
     }
     return $out;
 }
