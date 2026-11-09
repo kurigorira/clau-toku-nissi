@@ -68,7 +68,7 @@ if ($noData): ?>
 <h2>病棟別 在院日数・稼働率・回転率</h2>
 <table class="report">
   <thead>
-    <tr><th>病棟</th><th>定床</th><th>延患者数</th><th>算定対象<br>延患者数</th><th>新入院</th><th>退院</th>
+    <tr><th>病棟</th><th>定床</th><th>延患者数</th><th>当日退院<br>在院日数</th><th>転出<br>在院日数</th><th>算定対象<br>延患者数</th><th>新入院</th><th>退院</th>
         <th>転入</th><th>転出</th><th>1日平均<br>患者数</th><th>平均在院<br>日数</th><th>病床<br>稼働率</th><th>病床<br>回転率</th></tr>
   </thead>
   <tbody>
@@ -80,11 +80,15 @@ if ($noData): ?>
           $beds += (int)config_value("teisho_byoto{$x}", $to, 0);
       }
       $key = fn(string $k) => $w === 'all' ? "byoto_{$k}_all" : "byoto{$w}_{$k}";
+      // 算定対象の内訳（当日退院・転出の在院日数）。総合計は3階＋4階＋5階
+      $part = fn(string $k) => $w === 'all' ? byoto_ward_sum($v, $k) : $g("byoto{$w}_{$k}");
   ?>
     <tr<?= $w === 'all' ? ' class="total-row"' : '' ?>>
       <th><?= h($label) ?></th>
       <td class="n"><?= $beds ?: '' ?></td>
       <td class="n"><?= num($g($w === 'all' ? 'byoto_zaiin_all' : "byoto{$w}_zaiin")) ?></td>
+      <td class="n"><?= num($part('touhi')) ?></td>
+      <td class="n"><?= num($part('tenshutsu_zaiin')) ?></td>
       <td class="n"><?= num($g($w === 'all' ? 'byoto_zaiin_total_all' : "byoto{$w}_zaiin_total")) ?></td>
       <td class="n"><?= num($g($key('nyuin'))) ?></td>
       <td class="n"><?= num($g($key('taiin'))) ?></td>
@@ -99,7 +103,8 @@ if ($noData): ?>
   </tbody>
 </table>
 <p class="note">
-  病床稼働率＝(延患者数＋退院)×100÷(実日数×定床)　／　平均在院日数＝算定対象延患者数÷((新入院＋転入＋退院＋転出)÷2)　／　病床回転率＝実日数÷平均在院日数×100
+  算定対象延患者数＝延患者数＋当日退院在院日数＋転出在院日数　／　病床稼働率＝(延患者数＋退院)×100÷(実日数×定床)　／
+  平均在院日数＝算定対象延患者数÷((新入院＋転入＋退院＋転出)÷2)　／　病床回転率＝当月の日数（<?= period_month_days($from, $to) ?>日）÷平均在院日数×100
 </p>
 
 <h2>各種業務量</h2>

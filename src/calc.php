@@ -139,12 +139,40 @@ function period_days(string $from, string $to): int
 }
 
 /**
+ * 3階＋4階＋5階 の合計（byoto3_{$k}＋byoto4_{$k}＋byoto5_{$k}）。合計の項目が無い欄（当日退院・転出の在院日数）に使う。
+ * どの病棟も空なら空。
+ */
+function byoto_ward_sum(array $vals, string $k): ?float
+{
+    $s = null;
+    foreach (['3', '4', '5'] as $w) {
+        if (($vals["byoto{$w}_{$k}"] ?? null) !== null) {
+            $s = ($s ?? 0) + $vals["byoto{$w}_{$k}"];
+        }
+    }
+    return $s;
+}
+
+/**
+ * 当月の日数。期間が掛かる月の日数の合計（病床回転率に使う）。
+ * 11/1〜11/8 なら30、10/5〜10/15 なら31、4/1〜11/8 なら4月〜11月の244。
+ */
+function period_month_days(string $from, string $to): int
+{
+    $days = 0;
+    for ($m = substr($from, 0, 7) . '-01'; $m <= $to; $m = date('Y-m-d', strtotime("$m +1 month"))) {
+        $days += (int)date('t', strtotime($m));
+    }
+    return $days;
+}
+
+/**
  * 名前付きの計算関数。Excelの数式をそのまま移したもの。
  *
  *  nichi_avg:W   1日平均患者数   = 延患者数 ÷ 実日数                      （総括 N列）
  *  avg_days:W    平均在院日数     = 延患者数合計 ÷ ((新入院+転入+退院+転出)÷2)（総括 O列 / H!K）
  *  kadou:W       病床稼働率       = (延患者数+退院) × 100 ÷ (実日数 × 定床)  （総括 P列）
- *  kaiten:W      病床回転率       = 実日数 ÷ 平均在院日数 × 100             （H!L = ($F$5/K)*100）
+ *  kaiten:W      病床回転率       = 当月の日数 ÷ 平均在院日数 × 100         （H!L = ($F$5/K)*100。当月の日数は period_month_days）
  *  ratio:A/B     A ÷ B × 100
  *  diff:A-B-C    A − B − C（B以降が空なら0とみなす。A が空なら空）
  *                例: 医事統計表①の外来患者数 = 医科合計 − ドック − 健診 − 訪問診療科
@@ -200,8 +228,9 @@ function call_calc_func(string $spec, array $items, array &$vals, string $from, 
             return ($beds === 0 || $days === 0) ? null : ($z + (float)($t ?? 0)) * 100 / ($days * $beds);
 
         case 'kaiten':
+            // 実日数ではなく当月の日数で割る（月の途中でも 11月なら30日）
             $avg = call_calc_func("avg_days:{$arg}", $items, $vals, $from, $to, $resolving);
-            return ($avg === null || $avg == 0.0) ? null : $days / $avg * 100;
+            return ($avg === null || $avg == 0.0) ? null : period_month_days($from, $to) / $avg * 100;
 
         case 'ratio':
             [$a, $b] = array_pad(explode('/', (string)$arg, 2), 2, null);

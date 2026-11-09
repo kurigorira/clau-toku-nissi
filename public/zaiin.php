@@ -29,7 +29,8 @@ page_header('平均在院日数統計　' . $month, $user);
 <?php if ($noData) { month_period_nodata($from); } ?>
 <p class="period-line"><strong><?= h(month_period_label($from, $to)) ?></strong></p>
 <p class="note">
-  ※ 当日退院在院日数＝当日入院しその日のうちに退院した患者（実日数1日）<br>
+  ※ 算定対象延患者数＝延患者数＋当日退院在院日数＋転出在院日数（平均在院日数はこれで計算する。総括と同じ）<br>
+  ※ 当日退院在院日数＝当日入院しその日のうちに退院した患者（実日数1日）。違う日は病棟の入力画面で直せます<br>
   ※ 転入・転出は新規のみを計上し、同一患者による再転入・再転出は計上しない
 </p>
 
@@ -37,9 +38,9 @@ page_header('平均在院日数統計　' . $month, $user);
 <table class="report">
   <thead>
     <tr><th rowspan="2">日</th><th rowspan="2">曜</th>
-      <?php foreach ($wards as $lab): ?><th colspan="7"><?= h($lab) ?></th><?php endforeach; ?></tr>
+      <?php foreach ($wards as $lab): ?><th colspan="9"><?= h($lab) ?></th><?php endforeach; ?></tr>
     <tr><?php foreach ($wards as $w => $lab): ?>
-      <th>入院</th><th>転入</th><th>退院</th><th>転出</th><th>延患者数</th><th>延患者数<br>合計</th><th>平均在院<br>日数</th>
+      <th>入院</th><th>転入</th><th>退院</th><th>転出</th><th>延患者数</th><th>当日退院<br>在院日数</th><th>転出<br>在院日数</th><th>算定対象<br>延患者数</th><th>平均在院<br>日数</th>
     <?php endforeach; ?></tr>
   </thead>
   <tbody>
@@ -57,6 +58,8 @@ page_header('平均在院日数統計　' . $month, $user);
         <td class="n"><?= num($v[$k('taiin')] ?? null) ?></td>
         <td class="n"><?= num($v[$k('tenshutsu')] ?? null) ?></td>
         <td class="n"><?= num($v[$z] ?? null) ?></td>
+        <td class="n"><?= num($w === 'all' ? byoto_ward_sum($v, 'touhi') : $v["byoto{$w}_touhi"] ?? null) ?></td>
+        <td class="n"><?= num($w === 'all' ? byoto_ward_sum($v, 'tenshutsu_zaiin') : $v["byoto{$w}_tenshutsu_zaiin"] ?? null) ?></td>
         <td class="n"><?= num($v[$zt] ?? null) ?></td>
         <td class="n"><?= num($v[$ad] ?? null, 2) ?></td>
       <?php endforeach; ?>
@@ -77,6 +80,8 @@ page_header('平均在院日数統計　' . $month, $user);
         <td class="n"><?= num($mv[$k('taiin')] ?? null) ?></td>
         <td class="n"><?= num($mv[$k('tenshutsu')] ?? null) ?></td>
         <td class="n"><?= num($mv[$z] ?? null) ?></td>
+        <td class="n"><?= num($w === 'all' ? byoto_ward_sum($mv, 'touhi') : $mv["byoto{$w}_touhi"] ?? null) ?></td>
+        <td class="n"><?= num($w === 'all' ? byoto_ward_sum($mv, 'tenshutsu_zaiin') : $mv["byoto{$w}_tenshutsu_zaiin"] ?? null) ?></td>
         <td class="n"><?= num($mv[$zt] ?? null) ?></td>
         <td class="n"><?= num($mv[$ad] ?? null, 2) ?></td>
       <?php endforeach; ?>

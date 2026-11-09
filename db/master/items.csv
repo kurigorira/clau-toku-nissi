@@ -262,7 +262,7 @@ byoto3_kadou,3階 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:3,de
 byoto4_kadou,4階 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:4,decimal,%,3390,0,,,,総括!P8,,sum
 byoto5_kadou,5階 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:5,decimal,%,3400,0,,,,総括!P10,,sum
 byoto_kadou_all,合計 病床稼働率,byoto,byoto_calc,病棟 集計,func,kadou:all,decimal,%,3410,0,,,,総括!P12,,sum
-byoto3_kaiten,3階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:3,decimal,%,3420,0,,,,総括!Q6 / H!L,実日数 ÷ 平均在院日数 × 100,sum
+byoto3_kaiten,3階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:3,decimal,%,3420,0,,,,総括!Q6 / H!L,当月の日数（集計期間が掛かる月の日数の合計）÷ 平均在院日数 × 100,sum
 byoto4_kaiten,4階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:4,decimal,%,3430,0,,,,総括!Q8 / H!V,,sum
 byoto5_kaiten,5階 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:5,decimal,%,3440,0,,,,総括!Q10 / H!AF,,sum
 byoto_kaiten_all,合計 病床回転率,byoto,byoto_calc,病棟 集計,func,kaiten:all,decimal,%,3450,0,,,,総括!Q12 / H!AP,,sum

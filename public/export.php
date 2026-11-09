@@ -81,9 +81,10 @@ switch ($type) {
         $periodName = $per['range'] ? "{$from}_{$to}" : $month;
         $v    = period_values($from, $to);
         $days = period_days($from, $to);
-        $rows[] = ['各種業務量他総括', $periodName, "集計期間 {$from}〜{$to}", "実日数{$days}日"];
+        $rows[] = ['各種業務量他総括', $periodName, "集計期間 {$from}〜{$to}", "実日数{$days}日",
+                   '病床回転率は当月の日数' . period_month_days($from, $to) . '日で計算'];
         $rows[] = [];
-        $rows[] = ['病棟', '定床', '延患者数', '算定対象延患者数', '新入院', '退院', '転入', '転出',
+        $rows[] = ['病棟', '定床', '延患者数', '当日退院在院日数', '転出在院日数', '算定対象延患者数', '新入院', '退院', '転入', '転出',
                    '1日平均患者数', '平均在院日数', '病床稼働率', '病床回転率'];
         foreach (['3' => '3階', '4' => '4階', '5' => '5階', 'all' => '総合計'] as $w => $label) {
             $beds = 0;
@@ -94,6 +95,8 @@ switch ($type) {
             $rows[] = [
                 $label, $beds,
                 $v[$w === 'all' ? 'byoto_zaiin_all' : "byoto{$w}_zaiin"] ?? '',
+                ($w === 'all' ? byoto_ward_sum($v, 'touhi') : $v["byoto{$w}_touhi"] ?? null) ?? '',
+                ($w === 'all' ? byoto_ward_sum($v, 'tenshutsu_zaiin') : $v["byoto{$w}_tenshutsu_zaiin"] ?? null) ?? '',
                 $v[$w === 'all' ? 'byoto_zaiin_total_all' : "byoto{$w}_zaiin_total"] ?? '',
                 $v[$k('nyuin')] ?? '', $v[$k('taiin')] ?? '', $v[$k('tennyu')] ?? '', $v[$k('tenshutsu')] ?? '',
                 round($v[$w === 'all' ? 'byoto_zaiin_avg_all' : "byoto{$w}_zaiin_avg"] ?? 0, 2),

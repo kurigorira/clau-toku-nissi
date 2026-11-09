@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-11-05 23:47:12
+-- 生成日時: 2026-11-09 07:16:52
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -286,7 +286,7 @@ INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto4_kadou','4階 病床稼働率','byoto','byoto_calc','病棟 集計','func','kadou:4','decimal','sum','%',3390,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!P8','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto5_kadou','5階 病床稼働率','byoto','byoto_calc','病棟 集計','func','kadou:5','decimal','sum','%',3400,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!P10','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto_kadou_all','合計 病床稼働率','byoto','byoto_calc','病棟 集計','func','kadou:all','decimal','sum','%',3410,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!P12','');
-INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto3_kaiten','3階 病床回転率','byoto','byoto_calc','病棟 集計','func','kaiten:3','decimal','sum','%',3420,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!Q6 / H!L','実日数 ÷ 平均在院日数 × 100');
+INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto3_kaiten','3階 病床回転率','byoto','byoto_calc','病棟 集計','func','kaiten:3','decimal','sum','%',3420,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!Q6 / H!L','当月の日数（集計期間が掛かる月の日数の合計）÷ 平均在院日数 × 100');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto4_kaiten','4階 病床回転率','byoto','byoto_calc','病棟 集計','func','kaiten:4','decimal','sum','%',3430,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!Q8 / H!V','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto5_kaiten','5階 病床回転率','byoto','byoto_calc','病棟 集計','func','kaiten:5','decimal','sum','%',3440,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!Q10 / H!AF','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('byoto_kaiten_all','合計 病床回転率','byoto','byoto_calc','病棟 集計','func','kaiten:all','decimal','sum','%',3450,0,NULL,NULL,'2000-01-01',NULL,NULL,'総括!Q12 / H!AP','');
