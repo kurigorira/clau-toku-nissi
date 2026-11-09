@@ -1,0 +1,87 @@
+/* 印刷用（病院日誌・総括）。A4縦・左とじ。
+   左の余白を広く取り、穴あけ・とじしろにする。
+   ブラウザの印刷（Ctrl+P）で、余白は「デフォルト」、「ヘッダーとフッター」は外して印刷する。
+   院内端末の古いChromeでも崩れないよう、gap と JavaScript は使わない。
+   段組みは display: table / table-cell で作る（flex の折り返しより確実に1段に並ぶ）。
+
+   このファイルは印刷時にいつも読まれる（media="print"）。
+   「印刷用」で開いたときは画面でも読み、A4の見本として表示する。 */
+@page { size: A4 portrait; margin: 10mm 10mm 10mm 22mm; }
+
+body { background: #fff; font-size: 8.5pt; color: #000; }
+.app-header, .app-nav, .app-footer, .datebar, .noprint, .flash-ok, .flash-info { display: none !important; }
+.printonly { display: block; }
+main { padding: 0; }
+h1 { font-size: 13pt; margin: 0 0 2mm; letter-spacing: 2px; }
+h2 { font-size: 9.5pt; margin: 2.5mm 0 1mm; }
+.note { font-size: 7.5pt; margin-left: 0; color: #444; }
+a { color: #000; text-decoration: none; }
+table { page-break-inside: avoid; }
+
+/* 「印刷用」を画面で見たとき：A4の紙の幅（210mm − 左22mm − 右10mm ＝ 中身178mm）に合わせて見せる。
+   box-sizing: border-box なので、幅は中身178mm＋左右の余白で指定する（中身が紙より狭いと表題が折り返す） */
+@media screen {
+  body { background: #e9ebee; }
+  main { width: 210mm; margin: 6mm auto; padding: 10mm 10mm 10mm 22mm; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.25); }
+}
+
+/* ---- 病院日誌（紙の様式。style.css の .nf を A4 の大きさに詰める） ---- */
+h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
+.soukatsu-period { display: inline-block; vertical-align: baseline; }
+.nf { width: 100%; padding: 0; font-size: 8.8pt; }
+.nf-title { font-size: 22pt; letter-spacing: 3mm; padding: 0 0 2mm 6mm; }
+.nf-date { font-size: 10.5pt; padding: 0 0 0.8mm 1mm; }
+.nf-stampcell { width: 72mm; }
+.nf-stamp th, .nf-stamp td { border-width: 1pt; }
+.nf-stamp th { font-size: 8.5pt; padding: 0.5mm 0; }
+.nf-stamp td { height: 13mm; }
+.nf-row { border-width: 1.5pt; margin: 0 0 -1.5pt; }
+.nf-row > tbody > tr > td, .nf-row > tr > td { border-width: 1.5pt; }
+/* A4 の縦いっぱいを使う（紙の様式と同じくらいの行の高さ） */
+.nf-t th, .nf-t td { border-width: 0.5pt; padding: 0.8mm 0.8mm; line-height: 1.25; }
+.nf-t .sec { font-size: 10pt; letter-spacing: 1mm; }
+.nf-t th small { font-size: 6.8pt; }
+.nf-t td.n .u { font-size: 7pt; }
+.nf-t tr.tall > * { height: 7.6mm; }
+.nf-t .tate { padding: 0.3mm 0.2mm; }
+.nf-t .tate-sub { font-size: 7pt; }
+.nf-t .opename { font-size: 8.2pt; }
+.nf-kensa { font-size: 8pt; }
+.nf-kensa th, .nf-kensa td { padding-left: 0.5mm; padding-right: 0.5mm; }
+.nf-t .memo { height: 12mm; }
+.nf-kaigi tr.kr > td { height: 4.6mm; }
+.nf-gyoji .memo { height: 13mm; }
+.nf-note { margin: 0.5mm 0.8mm; font-size: 6.8pt; }
+.nf-tokki { height: 26mm; padding: 0.8mm 1.5mm !important; }
+.nf-tokki-h { font-size: 8.5pt; margin-bottom: 0.5mm; }
+.nf-tokki-memo { margin: 0 0 0.6mm 1em; font-size: 8.5pt; }
+.nf-tokki-l { padding-right: 1.5mm !important; }
+.nf-tokki .nf-t th, .nf-tokki .nf-t td { padding: 0.25mm 0.8mm; }
+.nissi-status { margin: 1.2mm 0 0; font-size: 7.5pt; color: #333; }
+
+/* ---- 総括 ---- */
+.soukatsu-period { font-size: 9.5pt; margin: 0 0 1.5mm; }
+.report { width: 100%; border-collapse: collapse; margin: 0 0 1mm; font-size: 8.5pt; }
+.report th, .report td { border: 0.5pt solid #555; padding: 0.4mm 1mm; line-height: 1.25; }
+.report thead th { font-size: 7.5pt; background: #e6e6e6; }
+.report tbody th { background: #f2f2f2; }
+.report td.n, .report.narrow td.n { min-width: 0; }
+.report .itemname { min-width: 0; }
+.report .block { writing-mode: horizontal-tb; width: 12mm; font-size: 7.5pt; }
+/* 総括：業務量の表（左）と達成率の順位（右）を横に並べる */
+.split { display: table; width: 100%; }
+.split-main { width: 60%; }
+.split-side { padding-left: 3mm; min-width: 0; }
+.rank-title { font-size: 8.5pt; margin: 0 0 0.5mm; }
+.rank-note { font-size: 6.5pt; }
+.rank { width: 100%; font-size: 7.5pt; }
+.rank td, .rank th { padding: 0 0.8mm; height: auto; line-height: 1.25; }
+.rank .bar { width: 38%; }
+.rank .track { height: 2.6mm; }
+.rank .fill { top: 0.4mm; height: 1.8mm; }
+/* 業務量は行が多い（入院・血管造影・外来透析・紹介患者を足した）ので、A4に収まるよう行間を詰める */
+.split .report th, .split .report td { padding: 0.1mm 1mm; line-height: 1.15; }
+.split .report thead th { line-height: 1.1; }
+.flash-warn { border: 0.5pt solid #888; background: #fff; padding: 1mm 2mm; margin: 1.5mm 0 0; font-size: 7.5pt; }
+.flash-warn ul { margin: 0.5mm 0 0 4mm; }
+.period-line { margin: 0 0 1.5mm; font-size: 9.5pt; }

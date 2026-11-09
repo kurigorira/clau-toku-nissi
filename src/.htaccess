@@ -1,0 +1,16 @@
+# このフォルダはWebに公開しない。
+# アプリが使うのは public/ だけで、ここはサーバ内部からしか読まない。
+#
+# 注意: Apacheの既定設定は AllowOverride None のため、この .htaccess は
+#       無視されることがある。確実に塞ぐには httpd.conf 側に
+#       <Directory> ディレクティブを書くこと（README参照）。
+
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
