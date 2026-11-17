@@ -185,31 +185,31 @@ reg_houyaku,訪問薬剤 登録数,zaitaku,zaitaku_svc,在宅サービス登録�
 reg_houyaku_new,訪問薬剤 新規,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2350,0,0,100,,在宅①!AB,,sum
 reg_houyaku_del,訪問薬剤 抹消,zaitaku,zaitaku_svc,在宅サービス登録件数,input,,int,件,2360,0,0,100,,在宅①!AC,,sum
 reg_total,在宅サービス登録 合計,zaitaku,zaitaku_svc,在宅サービス登録件数,sum,"reg_houkan_kaigo,reg_houkan_iryou,reg_houshin_kaigo,reg_houshin_iryou,reg_houkai,reg_hourehab_kaigo,reg_hourehab_iryou,reg_houyaku",int,件,2370,0,,,z3,在宅①!AD,病院日誌の登録件数はこの合計,last
-tsusho,通所リハ,toutyoku,kaigo,介護保険,input,,int,名,2400,1,0,100,s2,在宅②!C,Excel①の通所リハビリ列は同じ値の転記,sum
-kaigo_houkan_over30,訪問看護（介護） 30分以上,toutyoku,kaigo,介護保険,input,,int,件,2410,0,0,100,,在宅②!E,,sum
-kaigo_houkan_under30,訪問看護（介護） 30分以内,toutyoku,kaigo,介護保険,input,,int,件,2420,0,0,100,,在宅②!F,,sum
-kaigo_houkan_total,訪問看護（介護） 計,toutyoku,kaigo,介護保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30",int,件,2425,0,,,,,総括の介護「訪問看護」。事業計画の目標（介護 訪問看護）を付ける,sum
-kaigo_houkai_over30,訪問介護 30分以上,toutyoku,kaigo,介護保険,input,,int,件,2430,0,0,100,,在宅②!G,,sum
-kaigo_houkai_under30,訪問介護 30分以内,toutyoku,kaigo,介護保険,input,,int,件,2440,0,0,100,,在宅②!H,,sum
-kaigo_kyotaku,居宅指導,toutyoku,kaigo,介護保険,input,,int,件,2450,0,0,100,s5,在宅②!I,,sum
-kaigo_houeiyou,訪問栄養（介護）,toutyoku,kaigo,介護保険,input,,int,件,2460,0,0,100,,在宅②!J,,sum
-kaigo_hourehab,訪問リハ（介護）,toutyoku,kaigo,介護保険,input,,int,件,2470,0,0,100,,在宅②!K,,sum
-kaigo_houyaku,訪問薬剤（介護）,toutyoku,kaigo,介護保険,input,,int,件,2480,0,0,100,,在宅②!L,,sum
+tsusho,通所リハ,tsushoreha,kaigo,介護保険,input,,int,名,2400,1,0,100,s2,在宅②!C,Excel①の通所リハビリ列は同じ値の転記,sum
+kaigo_houkan_over30,訪問看護（介護） 30分以上,houkan,kaigo,介護保険,input,,int,件,2410,0,0,100,,在宅②!E,,sum
+kaigo_houkan_under30,訪問看護（介護） 30分以内,houkan,kaigo,介護保険,input,,int,件,2420,0,0,100,,在宅②!F,,sum
+kaigo_houkan_total,訪問看護（介護） 計,houkan,kaigo,介護保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30",int,件,2425,0,,,,,総括の介護「訪問看護」。事業計画の目標（介護 訪問看護）を付ける,sum
+kaigo_houkai_over30,訪問介護 30分以上,zaitaku,kaigo,介護保険,input,,int,件,2430,0,0,100,,在宅②!G,,sum
+kaigo_houkai_under30,訪問介護 30分以内,zaitaku,kaigo,介護保険,input,,int,件,2440,0,0,100,,在宅②!H,,sum
+kaigo_kyotaku,居宅指導,zaitaku,kaigo,介護保険,input,,int,件,2450,0,0,100,s5,在宅②!I,,sum
+kaigo_houeiyou,訪問栄養（介護）,eiyou,kaigo,介護保険,input,,int,件,2460,0,0,100,,在宅②!J,,sum
+kaigo_hourehab,訪問リハ（介護）,rehab,kaigo,介護保険,input,,int,件,2470,0,0,100,,在宅②!K,,sum
+kaigo_houyaku,訪問薬剤（介護）,yakuzai,kaigo,介護保険,input,,int,件,2480,0,0,100,,在宅②!L,,sum
 kaigo_shoukei,介護保険 小計,toutyoku,kaigo,介護保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,kaigo_houkai_over30,kaigo_houkai_under30,kaigo_kyotaku,kaigo_houeiyou,kaigo_hourehab,kaigo_houyaku",int,件,2490,0,,,,在宅②!M,,sum
 kaigo_soukatsu_total,介護合計（総括・通所リハを含む）,toutyoku,kaigo,介護保険,sum,"tsusho,kaigo_houkan_total,kaigo_kyotaku,kaigo_hourehab,houkai_total",int,件,2495,0,,,,,総括の「介護合計」。事業計画の介護「合計」と同じ＝通所リハ＋訪問看護＋居宅指導＋訪問リハ＋訪問介護（総括の介護の5行）。目標は元の項目の目標の合計,sum
-iryou_houkan,訪問看護（医療）,toutyoku,iryou,医療保険,input,,int,件,2500,0,0,100,,在宅②!O,,sum
-iryou_houshin,訪問診療,toutyoku,iryou,医療保険,input,,int,件,2510,0,0,100,s3,在宅②!P,,sum
-iryou_oushin,往診,toutyoku,iryou,医療保険,input,,int,件,2520,0,0,100,s4,在宅②!Q,,sum
-iryou_houeiyou,訪問栄養（医療）,toutyoku,iryou,医療保険,input,,int,件,2530,0,0,100,,在宅②!R,,sum
-iryou_hourehab_jin,訪問リハ（医療） 実人数,toutyoku,iryou,医療保険,input,,int,人,2540,0,0,100,,在宅②!S,,sum
-iryou_hourehab_tani,訪問リハ（医療） 単位数,toutyoku,iryou,医療保険,input,,int,単位,2550,0,0,500,,在宅②!T,,sum
-iryou_houyaku,訪問薬剤（医療）,toutyoku,iryou,医療保険,input,,int,件,2560,0,0,100,,在宅②!U,,sum
+iryou_houkan,訪問看護（医療）,houkan,iryou,医療保険,input,,int,件,2500,0,0,100,,在宅②!O,,sum
+iryou_houshin,訪問診療,houkan,iryou,医療保険,input,,int,件,2510,0,0,100,s3,在宅②!P,,sum
+iryou_oushin,往診,houkan,iryou,医療保険,input,,int,件,2520,0,0,100,s4,在宅②!Q,,sum
+iryou_houeiyou,訪問栄養（医療）,eiyou,iryou,医療保険,input,,int,件,2530,0,0,100,,在宅②!R,,sum
+iryou_hourehab_jin,訪問リハ（医療） 実人数,rehab,iryou,医療保険,input,,int,人,2540,0,0,100,,在宅②!S,,sum
+iryou_hourehab_tani,訪問リハ（医療） 単位数,rehab,iryou,医療保険,input,,int,単位,2550,0,0,500,,在宅②!T,,sum
+iryou_houyaku,訪問薬剤（医療）,yakuzai,iryou,医療保険,input,,int,件,2560,0,0,100,,在宅②!U,,sum
 iryou_shoukei,医療保険 小計,toutyoku,iryou,医療保険,sum,"iryou_houkan,iryou_houshin,iryou_oushin,iryou_houeiyou,iryou_hourehab_jin,iryou_houyaku",int,件,2570,0,,,,在宅②!V,,sum
-houkan_total,訪問看護 計,toutyoku,iryou,医療保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,iryou_houkan",int,件,2580,0,,,s6,,病院日誌の訪問看護はこの合計,sum
-houkai_total,訪問介護 計,toutyoku,iryou,医療保険,sum,"kaigo_houkai_over30,kaigo_houkai_under30",int,件,2590,0,,,s7,,,sum
-hourehab_total,訪問リハ 計,toutyoku,iryou,医療保険,sum,"kaigo_hourehab,iryou_hourehab_jin",int,件,2600,0,,,s8,,,sum
-houeiyou_total,訪問栄養 計,toutyoku,iryou,医療保険,sum,"kaigo_houeiyou,iryou_houeiyou",int,件,2610,0,,,s9,,,sum
-houyaku_total,訪問薬剤 計,toutyoku,iryou,医療保険,sum,"kaigo_houyaku,iryou_houyaku",int,件,2620,0,,,s10,,,sum
+houkan_total,訪問看護 計,houkan,iryou,医療保険,sum,"kaigo_houkan_over30,kaigo_houkan_under30,iryou_houkan",int,件,2580,0,,,s6,,病院日誌の訪問看護はこの合計,sum
+houkai_total,訪問介護 計,zaitaku,iryou,医療保険,sum,"kaigo_houkai_over30,kaigo_houkai_under30",int,件,2590,0,,,s7,,,sum
+hourehab_total,訪問リハ 計,rehab,iryou,医療保険,sum,"kaigo_hourehab,iryou_hourehab_jin",int,件,2600,0,,,s8,,,sum
+houeiyou_total,訪問栄養 計,eiyou,iryou,医療保険,sum,"kaigo_houeiyou,iryou_houeiyou",int,件,2610,0,,,s9,,,sum
+houyaku_total,訪問薬剤 計,yakuzai,iryou,医療保険,sum,"kaigo_houyaku,iryou_houyaku",int,件,2620,0,,,s10,,,sum
 touseki_nyuin,透析件数 入院,touseki,touseki,透析,input,,int,件,2700,1,0,100,,在宅②!X,,sum
 touseki_gairai,透析件数 外来,touseki,touseki,透析,input,,int,件,2710,1,0,100,,在宅②!Y,,sum
 touseki_total,透析実施数,touseki,touseki,透析,sum,"touseki_nyuin,touseki_gairai",int,件,2720,0,,,s14,在宅②!Z,,sum
@@ -244,12 +244,12 @@ yobidashi_zaitaku,呼び出し 在宅,toutyoku,toutyoku_list,当直者・呼び�
 yobidashi_kensa,呼び出し 検査,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3190,0,,,y4,,,sum
 yobidashi_housha,呼び出し 放射線,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3200,0,,,y5,,,sum
 yobidashi_yakkyoku,呼び出し 薬局,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3210,0,,,y6,,,sum
-kaigi_jikoku1,会議 時刻（左）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3220,0,,,jikoku1,,,sum
-kaigi_name1,会議・委員会名（左）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3230,0,,,kaigi1,,,sum
-kaigi_jikoku2,会議 時刻（右）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3240,0,,,jikoku2,,,sum
-kaigi_name2,会議・委員会名（右）,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3250,0,,,kaigi2,,,sum
-gyoji,行事,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3260,0,,,gyoji,,,sum
-jinji,人事,toutyoku,kaigi,会議・行事・人事,input,,multiline,,3270,0,,,jinji,,,sum
+kaigi_jikoku1,会議 時刻（左）,renkei,kaigi,会議・行事・人事,input,,multiline,,3220,0,,,jikoku1,,,sum
+kaigi_name1,会議・委員会名（左）,renkei,kaigi,会議・行事・人事,input,,multiline,,3230,0,,,kaigi1,,,sum
+kaigi_jikoku2,会議 時刻（右）,renkei,kaigi,会議・行事・人事,input,,multiline,,3240,0,,,jikoku2,,,sum
+kaigi_name2,会議・委員会名（右）,renkei,kaigi,会議・行事・人事,input,,multiline,,3250,0,,,kaigi2,,,sum
+gyoji,行事,renkei,kaigi,会議・行事・人事,input,,multiline,,3260,0,,,gyoji,,,sum
+jinji,人事,renkei,kaigi,会議・行事・人事,input,,multiline,,3270,0,,,jinji,,,sum
 byoto3_zaiin_avg,3階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:3,decimal,名,3300,0,,,,総括!N6,延患者数 ÷ 実日数,sum
 byoto4_zaiin_avg,4階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:4,decimal,名,3310,0,,,,総括!N8,,sum
 byoto5_zaiin_avg,5階 1日平均患者数,byoto,byoto_calc,病棟 集計,func,nichi_avg:5,decimal,名,3320,0,,,,総括!N10,,sum

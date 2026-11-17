@@ -67,6 +67,8 @@ $items  = read_csv("$masterDir/items.csv");
 $config = read_csv("$masterDir/config.csv");
 // 消した部署・まとめた部署にいた職員の行き先（無ければ空）
 $moves  = is_file("$masterDir/dept_moves.csv") ? read_csv("$masterDir/dept_moves.csv") : [];
+// 当直などから分けて新しく作った部署（分ける前の日の提出状況を写す。無ければ空）
+$splits = is_file("$masterDir/dept_splits.csv") ? read_csv("$masterDir/dept_splits.csv") : [];
 // 削除した項目（入力済みの値・目標値も消す。無ければ空）
 $removed = is_file("$masterDir/items_removed.csv") ? read_csv("$masterDir/items_removed.csv") : [];
 
@@ -137,6 +139,11 @@ foreach ($moves as $mv) {
         $errors[] = "dept_moves.csv: 行き先 '{$mv['to']}' が depts.csv にありません";
     }
 }
+foreach ($splits as $sp) {
+    if (!isset($deptSet[$sp['from']]) || !isset($deptSet[$sp['to']])) {
+        $errors[] = "dept_splits.csv: '{$sp['from']}' → '{$sp['to']}' のどちらかが depts.csv にありません";
+    }
+}
 foreach ($removed as $rm) {
     if (isset($itemSet[$rm['item_code']])) {
         $errors[] = "items_removed.csv: '{$rm['item_code']}' はまだ items.csv にあります（消した項目だけを書く）";
@@ -202,6 +209,18 @@ if ($moves) {
     $sql[] = '-- 消した部署の提出記録';
     $sql[] = 'DELETE FROM d_submission WHERE dept_id IN ('
            . implode(',', array_map('q', array_column($moves, 'from'))) . ');';
+}
+if ($splits) {
+    // 新しい部署には過去の提出記録が無く、入力状況ボードで過去の日が「途中」になる。分けた元の部署の提出済・確定を写す。
+    // 新しい部署に提出記録が1件も無いとき（最初に流したとき）だけ写すので、何度流しても同じ
+    $sql[] = '';
+    $sql[] = '-- 分けて作った部署へ、分ける前の日の提出状況を写す（db/master/dept_splits.csv）';
+    foreach ($splits as $sp) {
+        $sql[] = 'INSERT INTO d_submission (hizuke, dept_id, status, submitted_by, submitted_at, confirmed_by, confirmed_at)'
+            . ' SELECT s.hizuke, ' . q($sp['to']) . ', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at'
+            . ' FROM d_submission s WHERE s.dept_id = ' . q($sp['from']) . " AND s.status IN ('submitted', 'confirmed')"
+            . ' AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = ' . q($sp['to']) . ') t);';
+    }
 }
 if ($removed) {
     // 変更履歴（d_audit）は「誰がいつ何を直したか」の記録なので残す

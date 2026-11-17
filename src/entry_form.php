@@ -3,7 +3,7 @@
  * 部署の入力欄（表示）と、画面から来た値の保存。部署の入力画面（entry.php）と
  * まとめて入力（bulk_entry.php・1日分の全部署）で同じものを使う。
  *
- * 入力欄は項目マスタ（m_item）から自動で作る。当直の会議は「時刻＋会議・委員会名」の組（src/kaigi.php）、
+ * 入力欄は項目マスタ（m_item）から自動で作る。会議（総務課）は「時刻＋会議・委員会名」の組（src/kaigi.php）、
  * 病棟は定数超過報告（最大6名。src/tokki.php）も出す。
  * 項目コードは全部署で重ならないので、何部署分を1つのフォームに並べても v[項目コード] で区別できる。
  */
@@ -11,12 +11,13 @@ require_once __DIR__ . '/repository.php';
 require_once __DIR__ . '/tokki.php';
 require_once __DIR__ . '/kaigi.php';
 
-/** 画面から来た値（$post['v'] と、当直の会議の組）を、その部署の 項目コード => 値 にする。 */
+/** 画面から来た値（$post['v'] と、会議の組）を、その部署の 項目コード => 値 にする。 */
 function entry_form_values(string $deptId, array $post): array
 {
     $values = is_array($post['v'] ?? null) ? $post['v'] : [];
-    // 当直の会議は「時刻＋会議・委員会名」の組で入力し、保存は今までの4項目（左右の時刻・名前）に改行でつないで入れる
-    if ($deptId === 'toutyoku' && isset($post['kaigi']) && is_array($post['kaigi'])) {
+    // 会議は「時刻＋会議・委員会名」の組で入力し、保存は今までの4項目（左右の時刻・名前）に改行でつないで入れる。
+    // 会議の欄を持つ部署（2026-11〜 総務課。それまでは当直）だけが組を受け取る
+    if (isset($post['kaigi']) && is_array($post['kaigi']) && isset(input_items_of_dept($deptId)['kaigi_jikoku1'])) {
         foreach (kaigi_sides() as $side => [$tCode, $nCode]) {
             [$values[$tCode], $values[$nCode]] = kaigi_join(is_array($post['kaigi'][$side] ?? null) ? $post['kaigi'][$side] : []);
         }
@@ -79,7 +80,7 @@ function entry_form_fields(string $deptId, string $date, array $entries, bool $l
         <?php foreach ($g['items'] as $code => $it):
             // 会議の4項目は、左右の欄ごとに「時刻＋会議・委員会名」の組の表にまとめて出す
             $kaigiCodes = array_merge(...array_values(kaigi_sides()));
-            if ($deptId === 'toutyoku' && in_array($code, $kaigiCodes, true)):
+            if (in_array($code, $kaigiCodes, true)):
                 if ($code !== 'kaigi_jikoku1') { continue; } ?>
         <tr>
           <th>会議・勉強・委員会等</th>

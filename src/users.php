@@ -344,11 +344,13 @@ function emr_dept_guess(string $emrName, array $depts): string
     // 先に当たったものを使う（「医師事務支援課」を事務課にしないよう、医師事務は事務より先）
     $rules = [
         '医師事務' => DEPT_VIEW_ONLY, '秘書' => DEPT_VIEW_ONLY,
+        '通所' => 'tsushoreha', '訪問看護' => 'houkan',   // 2026-11 に当直から分けた部署（「リハビリ」「訪問」より先）
         '病棟' => 'byoto', '薬剤' => 'yakuzai', '栄養' => 'eiyou', 'リハビリ' => 'rehab', '放射線' => 'housha',
         '検査' => 'kensa', '臨床工学' => 'touseki', '透析' => 'touseki', '手術' => 'ope',
         '外来' => DEPT_VIEW_ONLY,   // 外来の日報転記は当直者が入力する（外来の職員は閲覧のみ）
-        '医事' => 'toutyoku', '総務' => 'toutyoku', '事務' => 'toutyoku',   // 医事課・事務課は当直に統合した
-        '施設' => DEPT_VIEW_ONLY, '地域医療連携' => 'renkei', '連携' => 'renkei',
+        '医事' => 'toutyoku', '事務' => 'toutyoku',   // 医事課・事務課は当直に統合した
+        '総務' => 'renkei', '地域医療連携' => 'renkei', '連携' => 'renkei',   // 地域医療連携室は総務課になった（2026-11。部署IDは renkei）
+        '施設' => DEPT_VIEW_ONLY,
         '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
         '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kensa',   // 感染対策室は検査科に統合（コロナ対策は検査科の画面）
     ];

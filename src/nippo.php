@@ -8,7 +8,7 @@
  * このファイルに置くもの:
  *   - 紙の並び（行＝科、列＝時間帯）と item_code の対応表
  *   - 紙の合計欄との照合
- *   - 複数部署（外来・病棟・当直）の値をまとめて下書きとして保存する処理
+ *   - 複数部署（外来・病棟・通所リハ・訪問看護・在宅部門など）の値をまとめて下書きとして保存する処理
  *
  *   - 日報のExcelから値を読む処理（外来 nippo_gairai_from_xlsx・入院 nippo_nyuin_from_xlsx）
  *
@@ -47,7 +47,7 @@ function nippo_saikei(): array
     return ['rehab' => 'リハビリ', 'dock' => 'ドック', 'kenshin' => '健診', 'houshin' => '訪問診療科'];
 }
 
-/** 訪問診療科内訳（再掲）。紙の並び順。値は当直（在宅②）の医療保険の項目に入る。 */
+/** 訪問診療科内訳（再掲）。紙の並び順。値は医療保険の訪問系の項目（訪問看護・リハビリ科・栄養科・薬剤科の欄）に入る。 */
 function nippo_houshin_uchi(): array
 {
     return [
@@ -323,15 +323,15 @@ function nippo_check(array $v, array $c, string $date): array
         $warnings[] = "健診科の新来 {$kenshinNew} が、健診科新患内訳（ドック＋健診）"
             . ($v['gkn_uchi_dock'] + $v['gkn_uchi_kenshin']) . ' と違います';
     }
-    // 当直が在宅②に入れた30分以上／以内の内訳と、日報の合計
-    foreach (['houkan' => '訪問看護（介護）', 'houkai' => '訪問介護'] as $k => $label) {
+    // 訪問看護・在宅部門が入れた30分以上／以内の内訳と、日報の合計
+    foreach (['houkan' => ['訪問看護（介護）', '訪問看護'], 'houkai' => ['訪問介護', '在宅部門']] as $k => [$label, $who]) {
         $r = db_row(
             'SELECT COUNT(*) AS n, SUM(value_num) AS s FROM d_daily_value
               WHERE hizuke = ? AND item_code IN (?, ?) AND value_num IS NOT NULL',
             [$date, "kaigo_{$k}_over30", "kaigo_{$k}_under30"]
         );
         if ($r && (int)$r['n'] > 0 && (int)$r['s'] !== $v["nippo_kaigo_{$k}"]) {
-            $warnings[] = "{$label}：当直が入力した30分以上＋30分以内 " . (int)$r['s']
+            $warnings[] = "{$label}：{$who}が入力した30分以上＋30分以内 " . (int)$r['s']
                 . " が、日報の {$v["nippo_kaigo_{$k}"]} と違います";
         }
     }
@@ -390,7 +390,7 @@ function nippo_controls_from(array $v): array
 /**
  * 日報の値を保存する。照合（nippo_check）を通ったあとに呼ぶ。
  *
- * - 外来の項目と、病棟・当直の項目を、1つのトランザクションで書く
+ * - 外来の項目と、病棟・通所リハ・訪問看護などの項目を、1つのトランザクションで書く
  * - 書いた部署は提出状態を「下書き」にする（提出はそれぞれの部署が確かめてから行う）
  * - すでに提出・確定している部署の値は上書きしない。違う値があれば返す
  *
