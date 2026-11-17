@@ -273,3 +273,23 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .bulk-actions { position: sticky; bottom: 0; background: #f3f4f6; padding: 8px 0; border-top: 1px solid #d5d9de; }
 .bulk-jump { margin: 0 0 6px; font-size: 13px; }
 .bulk-jump a { display: inline-block; margin: 0 10px 2px 0; }
+
+/* ---- 本部報告（public/honbu.php）。本部の日報の画面と同じ3列の並び。表組みだけ（古いChromeで動く） ---- */
+.hb-title { font-size: 20px; margin: 4px 0 8px; }
+.hb-title .hb-date { font-size: 13px; font-weight: normal; margin-left: 16px; color: #333; }
+.hb-cols { border-collapse: collapse; width: 100%; }
+.hb-cols > tbody > tr > td, .hb-cols > tr > td { vertical-align: top; padding: 0 8px 0 0; }
+.hb-page2 { margin-top: 12px; }
+.report.hb { width: 100%; font-size: 12px; margin: 0 0 6px; }
+.report.hb th, .report.hb td { padding: 1px 4px; }
+.report.hb thead th { white-space: nowrap; }
+.report.hb td.n { min-width: 40px; }
+.report.hb .hb-label { white-space: nowrap; }
+.report.hb .hb-sub { white-space: nowrap; font-size: 11px; text-align: center; }
+.report.hb .hb-ref { color: #555; font-size: 11px; white-space: nowrap; }
+.report.hb .hb-none { background: #f3f3f3; }
+.report.hb .hb-head th { font-weight: bold; }
+.report.hb .hb-op { text-align: center; width: 18px; }
+.hb-note { font-size: 11px; color: #555; margin: 0 0 8px; }
+.hb-h2 { font-size: 14px; margin: 0 0 4px; }
+.hb-narrow { width: 24%; }

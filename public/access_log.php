@@ -31,7 +31,7 @@ $limit = 500;
 $pages = [
     'index.php' => '入力状況', 'entry.php' => '部署別入力', 'nippo.php' => '日報転記', 'nissi.php' => '病院日誌',
     'qq_report.php' => '救急搬入', 'soukatsu.php' => '総括', 'zaiin.php' => '平均在院日数', 'toukei.php' => '患者数統計表',
-    'byoin_houkoku.php' => '病院報告', 'export.php' => 'CSV出力', 'audit.php' => '変更履歴', 'access_log.php' => '閲覧履歴',
+    'byoin_houkoku.php' => '病院報告', 'honbu.php' => '本部報告', 'export.php' => 'CSV出力', 'audit.php' => '変更履歴', 'access_log.php' => '閲覧履歴',
     'admin_master.php' => 'マスタ', 'admin_user.php' => '職員', 'elevate.php' => '権限の確認',
 ];
 

@@ -85,3 +85,16 @@ h1 { display: inline-block; margin-right: 6mm; vertical-align: baseline; }
 .flash-warn { border: 0.5pt solid #888; background: #fff; padding: 1mm 2mm; margin: 1.5mm 0 0; font-size: 7.5pt; }
 .flash-warn ul { margin: 0.5mm 0 0 4mm; }
 .period-line { margin: 0 0 1.5mm; font-size: 9.5pt; }
+
+/* ---- 本部報告（A4縦。1枚目が患者数〜営業活動、2枚目が放射線・COVID-19） ---- */
+.hb-title { font-size: 12pt; margin: 0 0 1.5mm; }
+.hb-title .hb-date { font-size: 8.5pt; }
+.report.hb { font-size: 7pt; margin: 0 0 1mm; }
+.report.hb th, .report.hb td { padding: 0.2mm 0.8mm; line-height: 1.2; }
+.report.hb thead th { font-size: 6.5pt; }
+.report.hb td.n { min-width: 0; }
+.report.hb .hb-sub, .report.hb .hb-ref { font-size: 6.5pt; }
+.hb-cols > tbody > tr > td, .hb-cols > tr > td { padding: 0 1.2mm 0 0; }
+.hb-page2 { page-break-before: always; margin-top: 0; }
+.hb-note { font-size: 6.5pt; margin: 0 0 1mm; }
+.hb-h2 { font-size: 9pt; margin: 0 0 1mm; }
