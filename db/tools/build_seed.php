@@ -69,6 +69,8 @@ $config = read_csv("$masterDir/config.csv");
 $moves  = is_file("$masterDir/dept_moves.csv") ? read_csv("$masterDir/dept_moves.csv") : [];
 // 当直などから分けて新しく作った部署（分ける前の日の提出状況を写す。無ければ空）
 $splits = is_file("$masterDir/dept_splits.csv") ? read_csv("$masterDir/dept_splits.csv") : [];
+// 入力の項目を合算にしたとき、それまでの入力値を移す先（無ければ空）
+$valMoves = is_file("$masterDir/values_moved.csv") ? read_csv("$masterDir/values_moved.csv") : [];
 // 削除した項目（入力済みの値・目標値も消す。無ければ空）
 $removed = is_file("$masterDir/items_removed.csv") ? read_csv("$masterDir/items_removed.csv") : [];
 
@@ -142,6 +144,16 @@ foreach ($moves as $mv) {
 foreach ($splits as $sp) {
     if (!isset($deptSet[$sp['from']]) || !isset($deptSet[$sp['to']])) {
         $errors[] = "dept_splits.csv: '{$sp['from']}' → '{$sp['to']}' のどちらかが depts.csv にありません";
+    }
+}
+foreach ($valMoves as $vm) {
+    if (!isset($itemSet[$vm['to']])) {
+        $errors[] = "values_moved.csv: 移す先 '{$vm['to']}' が items.csv にありません";
+    }
+    foreach ($items as $it) {
+        if ($it['item_code'] === $vm['from'] && $it['calc_type'] === 'input') {
+            $errors[] = "values_moved.csv: '{$vm['from']}' はまだ入力の項目です（合算・計算にした項目だけを書く）";
+        }
     }
 }
 foreach ($removed as $rm) {
@@ -220,6 +232,14 @@ if ($splits) {
             . ' SELECT s.hizuke, ' . q($sp['to']) . ', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at'
             . ' FROM d_submission s WHERE s.dept_id = ' . q($sp['from']) . " AND s.status IN ('submitted', 'confirmed')"
             . ' AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = ' . q($sp['to']) . ') t);';
+    }
+}
+if ($valMoves) {
+    // 合算にした項目に残っている入力値は、合算の計算を邪魔する（入力値が優先される）ので移行用の項目へ移す。何度流しても同じ
+    $sql[] = '';
+    $sql[] = '-- 合算にした項目の、それまでの入力値を移す（db/master/values_moved.csv）';
+    foreach ($valMoves as $vm) {
+        $sql[] = 'UPDATE d_daily_value SET item_code = ' . q($vm['to']) . ' WHERE item_code = ' . q($vm['from']) . ';';
     }
 }
 if ($removed) {

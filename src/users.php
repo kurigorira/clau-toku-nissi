@@ -349,7 +349,8 @@ function emr_dept_guess(string $emrName, array $depts): string
         '検査' => 'kensa', '臨床工学' => 'touseki', '透析' => 'touseki', '手術' => 'ope',
         '外来' => DEPT_VIEW_ONLY,   // 外来の日報転記は当直者が入力する（外来の職員は閲覧のみ）
         '医事' => 'toutyoku', '事務' => 'toutyoku',   // 医事課・事務課は当直に統合した
-        '総務' => 'renkei', '地域医療連携' => 'renkei', '連携' => 'renkei',   // 地域医療連携室は総務課になった（2026-11。部署IDは renkei）
+        '総務' => 'renkei',   // 総務課（部署IDは renkei。旧 地域医療連携室）
+        '地域医療連携' => 'iryorenkei', '連携' => 'iryorenkei', 'MSW' => 'iryorenkei', 'ソーシャル' => 'iryorenkei',   // 医療連携室（2026-11 新設）
         '施設' => DEPT_VIEW_ONLY,
         '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
         '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kensa',   // 感染対策室は検査科に統合（コロナ対策は検査科の画面）

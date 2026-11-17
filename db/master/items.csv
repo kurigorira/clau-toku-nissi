@@ -153,10 +153,40 @@ ope_name6,術名⑥,ope,ope_name,術名,input,,text,,1960,0,,,j6,,,sum
 shoshin,初診,toutyoku,shoshin,初診（紹介率の分母）,input,,int,名,3450,1,0,200,,⑦!P,紹介率の分母,sum
 gaikyuushin6,外休深6歳未満,toutyoku,shoshin,初診（紹介率の分母）,input,,int,名,3460,0,0,100,,⑦!R,,sum
 shoukai,紹介患者数,renkei,renkei,紹介・医療連携,input,,int,名,2020,1,0,100,,⑦!T,,sum
-renkei_byoin,病院訪問,renkei,renkei,紹介・医療連携,input,,int,件,2030,0,0,50,i1,,病院日誌の医療連携欄,sum
-renkei_other,その他訪問,renkei,renkei,紹介・医療連携,input,,int,件,2040,0,0,50,i2,,,sum
-renkei_kouza,健康講座,renkei,renkei,紹介・医療連携,input,,int,件,2050,0,0,50,i3,,,sum
-renkei_soudan,相談件数,renkei,renkei,紹介・医療連携,input,,int,件,2060,0,0,100,i4,,,sum
+renkei_byoin,病院訪問,renkei,renkei,医療連携（病院日誌）,sum,"msw_houmon_byoin,msw_houmon_shinryo,kenshin_houmon_byoin,kenshin_houmon_shinryo,soumu_houmon_byoin,soumu_houmon_shinryo,renkei_byoin_ikou",int,件,2030,0,,,,,病院日誌の医療連携欄。病院訪問＝MSW・健診センター・事務の「病院」＋「診療所」,sum
+renkei_other,その他訪問,renkei,renkei,医療連携（病院日誌）,sum,"msw_houmon_nyusho,msw_houmon_kobetsu,kenshin_houmon_nyusho,kenshin_houmon_kigyo,kenshin_houmon_dantai,kenshin_houmon_kobetsu,soumu_houmon_shoubou,soumu_houmon_nyusho,soumu_houmon_kaigo,soumu_houmon_kyotaku,soumu_houmon_kigyo,soumu_houmon_dantai,soumu_houmon_kobetsu,renkei_other_ikou",int,件,2040,0,,,,,病院日誌の医療連携欄。その他訪問＝病院・診療所以外の訪問（入所施設・介護施設・居宅支援・企業・団体・個別・消防署）,sum
+renkei_kouza,健康講座,renkei,renkei,医療連携（病院日誌）,sum,"kouza_innai,kouza_ingai,renkei_kouza_ikou",int,件,2050,0,,,,,病院日誌の医療連携欄。健康講座＝院内＋院外,sum
+renkei_soudan,相談件数,renkei,renkei,医療連携（病院日誌）,sum,"msw_soudan_nyuin,msw_soudan_gairai,msw_soudan_other,renkei_soudan_ikou",int,件,2060,0,,,,,病院日誌の医療連携欄。相談件数＝MSW の相談（入院＋外来＋その他）,sum
+renkei_byoin_ikou,病院訪問（2026-11 までの入力）,sonota,renkei_ikou,移行（入力欄なし）,input,,int,件,2035,0,0,200,i1,,項目を分ける前に入力した値。病院日誌の欄に足す,sum
+renkei_other_ikou,その他訪問（2026-11 までの入力）,sonota,renkei_ikou,移行（入力欄なし）,input,,int,件,2045,0,0,200,i2,,項目を分ける前に入力した値。病院日誌の欄に足す,sum
+renkei_kouza_ikou,健康講座（2026-11 までの入力）,sonota,renkei_ikou,移行（入力欄なし）,input,,int,件,2055,0,0,200,i3,,項目を分ける前に入力した値。病院日誌の欄に足す,sum
+renkei_soudan_ikou,相談件数（2026-11 までの入力）,sonota,renkei_ikou,移行（入力欄なし）,input,,int,件,2065,0,0,200,i4,,項目を分ける前に入力した値。病院日誌の欄に足す,sum
+msw_houmon_byoin,MSW 訪問 病院,iryorenkei,msw_houmon,MSW 訪問件数,input,,int,件,2100,0,0,50,,,,sum
+msw_houmon_shinryo,MSW 訪問 診療所,iryorenkei,msw_houmon,MSW 訪問件数,input,,int,件,2110,0,0,50,,,,sum
+msw_houmon_nyusho,MSW 訪問 入所施設,iryorenkei,msw_houmon,MSW 訪問件数,input,,int,件,2120,0,0,50,,,,sum
+msw_houmon_kobetsu,MSW 訪問 個別,iryorenkei,msw_houmon,MSW 訪問件数,input,,int,件,2130,0,0,50,,,,sum
+msw_soudan_nyuin,MSW 相談 入院,iryorenkei,msw_soudan,MSW 相談件数,input,,int,件,2140,0,0,200,,,,sum
+msw_soudan_gairai,MSW 相談 外来,iryorenkei,msw_soudan,MSW 相談件数,input,,int,件,2150,0,0,200,,,,sum
+msw_soudan_other,MSW 相談 その他,iryorenkei,msw_soudan,MSW 相談件数,input,,int,件,2160,0,0,200,,,,sum
+kenshin_houmon_byoin,健診センター訪問 病院,dock,kenshin_houmon,健診センター訪問件数,input,,int,件,740,0,0,50,,,,sum
+kenshin_houmon_shinryo,健診センター訪問 診療所,dock,kenshin_houmon,健診センター訪問件数,input,,int,件,750,0,0,50,,,,sum
+kenshin_houmon_nyusho,健診センター訪問 入所施設,dock,kenshin_houmon,健診センター訪問件数,input,,int,件,760,0,0,50,,,,sum
+kenshin_houmon_kigyo,健診センター訪問 企業,dock,kenshin_houmon,健診センター訪問件数,input,,int,件,770,0,0,50,,,,sum
+kenshin_houmon_dantai,健診センター訪問 団体,dock,kenshin_houmon,健診センター訪問件数,input,,int,件,780,0,0,50,,,,sum
+kenshin_houmon_kobetsu,健診センター訪問 個別,dock,kenshin_houmon,健診センター訪問件数,input,,int,件,790,0,0,50,,,,sum
+soumu_houmon_shoubou,事務・医療連携・介護センター訪問 消防署,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2200,0,0,50,,,,sum
+soumu_houmon_byoin,事務・医療連携・介護センター訪問 病院,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2210,0,0,50,,,,sum
+soumu_houmon_shinryo,事務・医療連携・介護センター訪問 診療所,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2220,0,0,50,,,,sum
+soumu_houmon_nyusho,事務・医療連携・介護センター訪問 入所施設,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2230,0,0,50,,,,sum
+soumu_houmon_kaigo,事務・医療連携・介護センター訪問 介護施設,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2240,0,0,50,,,,sum
+soumu_houmon_kyotaku,事務・医療連携・介護センター訪問 居宅支援,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2250,0,0,50,,,,sum
+soumu_houmon_kigyo,事務・医療連携・介護センター訪問 企業,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2260,0,0,50,,,,sum
+soumu_houmon_dantai,事務・医療連携・介護センター訪問 団体,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2270,0,0,50,,,,sum
+soumu_houmon_kobetsu,事務・医療連携・介護センター訪問 個別,renkei,soumu_houmon,事務・医療連携・介護センター 訪問件数,input,,int,件,2280,0,0,50,,,,sum
+kouza_innai,健康講座 院内,renkei,kouza,健康講座,input,,int,件,2300,0,0,20,,,,sum
+kouza_ingai,健康講座 院外,renkei,kouza,健康講座,input,,int,件,2310,0,0,20,,,,sum
+kouza_ninzu,健康講座 人数,renkei,kouza,健康講座,input,,int,人,2320,0,0,500,,,病院日誌には出さない,sum
+kouza_tantou,健康講座 担当,renkei,kouza,健康講座,input,,text,,2330,0,,,,,病院日誌には出さない,sum
 zaitaku_ninzu,在宅登録人数,zaitaku,zaitaku_reg,在宅登録,input,,int,人,2100,1,0,500,z1,在宅①!C,,last
 zaitaku_shinki,在宅登録 新規人数,zaitaku,zaitaku_reg,在宅登録,input,,int,人,2110,0,0,100,z2,在宅①!D,,sum
 zaitaku_masshou,在宅登録 抹消人数,zaitaku,zaitaku_reg,在宅登録,input,,int,人,2120,0,0,100,,在宅①!E,,sum
