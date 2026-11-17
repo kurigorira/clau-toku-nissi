@@ -131,7 +131,7 @@ ot_total,作業療法 入＋外,rehab,rehab,リハビリ単位数,sum,"ot_nyuin,
 st_nyuin,言語療法 入院,rehab,rehab,リハビリ単位数,input,,int,単位,1760,1,0,1000,,⑥!W,,sum
 st_gairai,言語療法 外来,rehab,rehab,リハビリ単位数,input,,int,単位,1770,1,0,1000,,⑥!X,,sum
 st_total,言語療法 入＋外,rehab,rehab,リハビリ単位数,sum,"st_nyuin,st_gairai",int,単位,1780,0,,,k23,⑥!Y,,sum
-shidou_other,指導 その他,rehab,rehab,リハビリ単位数,input,,int,件,1795,0,0,500,k24,,病院日誌の特殊検査欄「そ の 他」。Excelに対応列がなく、入力する部署も要確認,sum
+shidou_other,指導 その他,toutyoku,shidou,指導 その他（病院日誌の特殊検査・他）,input,,int,件,3440,0,0,500,k24,,病院日誌の特殊検査欄「その他」。当直者が入力（2026-11〜）,sum
 rehab_gairai_kensu,リハビリ（外来再掲）,rehab,rehab,リハビリ単位数,sum,"gr_rehab_s0008,gr_rehab_am,gr_rehab_pm,gr_rehab_night,gr_rehab_s2024,gr_rehab_ikou",int,件,1790,0,,,,,電子カルテ日報のリハビリ行の合計（病院日誌の外来再掲リハビリ）,sum
 ope_geka,手術 外科,ope,ope,手術室,input,,int,件,1800,1,0,50,op1,⑦!C,,sum
 ope_seikei,手術 整形,ope,ope,手術室,input,,int,件,1810,1,0,50,op2,⑦!E,,sum
@@ -150,8 +150,8 @@ ope_name3,術名③,ope,ope_name,術名,input,,text,,1930,0,,,j3,,,sum
 ope_name4,術名④,ope,ope_name,術名,input,,text,,1940,0,,,j4,,,sum
 ope_name5,術名⑤,ope,ope_name,術名,input,,text,,1950,0,,,j5,,,sum
 ope_name6,術名⑥,ope,ope_name,術名,input,,text,,1960,0,,,j6,,,sum
-shoshin,初診,renkei,renkei,紹介・医療連携,input,,int,名,2000,1,0,200,,⑦!P,紹介率の分母,sum
-gaikyuushin6,外休深6歳未満,renkei,renkei,紹介・医療連携,input,,int,名,2010,0,0,100,,⑦!R,,sum
+shoshin,初診,toutyoku,shoshin,初診（紹介率の分母）,input,,int,名,3450,1,0,200,,⑦!P,紹介率の分母,sum
+gaikyuushin6,外休深6歳未満,toutyoku,shoshin,初診（紹介率の分母）,input,,int,名,3460,0,0,100,,⑦!R,,sum
 shoukai,紹介患者数,renkei,renkei,紹介・医療連携,input,,int,名,2020,1,0,100,,⑦!T,,sum
 renkei_byoin,病院訪問,renkei,renkei,紹介・医療連携,input,,int,件,2030,0,0,50,i1,,病院日誌の医療連携欄,sum
 renkei_other,その他訪問,renkei,renkei,紹介・医療連携,input,,int,件,2040,0,0,50,i2,,,sum
@@ -216,22 +216,22 @@ touseki_total,透析実施数,touseki,touseki,透析,sum,"touseki_nyuin,touseki_
 touseki_touroku,透析登録人数,touseki,touseki,透析,input,,int,人,2730,1,0,100,s13,在宅②!AB,,last
 touseki_shinki,透析登録 新規,touseki,touseki,透析,input,,int,人,2740,0,0,50,,在宅②!AC,,sum
 touseki_masshou,透析登録 抹消,touseki,touseki,透析,input,,int,人,2750,0,0,50,,在宅②!AD,,sum
-corona_hatsunetsu,発熱外来患者数,kensa,corona,コロナ対策,input,,int,名,2800,0,0,200,,⑧!C,,sum
-corona_pcr_gairai_in,外来PCR検査依頼数 院内,kensa,corona,コロナ対策,input,,int,件,2810,0,0,200,,⑧!D,,sum
-corona_pcr_gairai_out,外来PCR検査依頼数 院外,kensa,corona,コロナ対策,input,,int,件,2820,0,0,200,,⑧!E,,sum
-corona_pcr_nyuin_in,入院PCR検査依頼数 院内,kensa,corona,コロナ対策,input,,int,件,2830,0,0,200,,⑧!F,,sum
-corona_pcr_nyuin_out,入院PCR検査依頼数 院外,kensa,corona,コロナ対策,input,,int,件,2840,0,0,200,,⑧!G,,sum
-corona_kougen_gairai,抗原検査依頼数 外来,kensa,corona,コロナ対策,input,,int,件,2850,0,0,200,,⑧!H,,sum
-corona_kougen_nyuin,抗原検査依頼数 入院,kensa,corona,コロナ対策,input,,int,件,2860,0,0,200,,⑧!I,,sum
-corona_yousei_new,新規陽性患者,kensa,corona,コロナ対策,input,,int,名,2870,0,0,100,,⑧!J,,sum
-corona_giji_nyuin,疑似症入院数,kensa,corona,コロナ対策,input,,int,名,2880,0,0,100,,⑧!K,,sum
-corona_yousei_nyuin,陽性者入院数,kensa,corona,コロナ対策,input,,int,名,2890,0,0,100,,⑧!L,,sum
-corona_ecmo,ECMO使用者,kensa,corona,コロナ対策,input,,int,名,2900,0,0,20,,⑧!M,,sum
-corona_ventilator,人工呼吸器使用者,kensa,corona,コロナ対策,input,,int,名,2910,0,0,20,,⑧!N,,sum
-corona_yousei_shin_nyuin,陽性者新入院,kensa,corona,コロナ対策,input,,int,名,2920,0,0,50,,⑧!O,,sum
-corona_taiin_keikai,陽性者退院 軽快,kensa,corona,コロナ対策,input,,int,名,2930,0,0,50,,⑧!P,,sum
-corona_taiin_tenin,陽性者退院 転院,kensa,corona,コロナ対策,input,,int,名,2940,0,0,50,,⑧!Q,,sum
-corona_taiin_shibou,陽性者退院 死亡,kensa,corona,コロナ対策,input,,int,名,2950,0,0,50,,⑧!R,,sum
+corona_hatsunetsu,発熱外来患者数,toutyoku,corona,コロナ対策,input,,int,名,3280,0,0,200,,⑧!C,,sum
+corona_pcr_gairai_in,外来PCR検査依頼数 院内,toutyoku,corona,コロナ対策,input,,int,件,3290,0,0,200,,⑧!D,,sum
+corona_pcr_gairai_out,外来PCR検査依頼数 院外,toutyoku,corona,コロナ対策,input,,int,件,3300,0,0,200,,⑧!E,,sum
+corona_pcr_nyuin_in,入院PCR検査依頼数 院内,toutyoku,corona,コロナ対策,input,,int,件,3310,0,0,200,,⑧!F,,sum
+corona_pcr_nyuin_out,入院PCR検査依頼数 院外,toutyoku,corona,コロナ対策,input,,int,件,3320,0,0,200,,⑧!G,,sum
+corona_kougen_gairai,抗原検査依頼数 外来,toutyoku,corona,コロナ対策,input,,int,件,3330,0,0,200,,⑧!H,,sum
+corona_kougen_nyuin,抗原検査依頼数 入院,toutyoku,corona,コロナ対策,input,,int,件,3340,0,0,200,,⑧!I,,sum
+corona_yousei_new,新規陽性患者,toutyoku,corona,コロナ対策,input,,int,名,3350,0,0,100,,⑧!J,,sum
+corona_giji_nyuin,疑似症入院数,toutyoku,corona,コロナ対策,input,,int,名,3360,0,0,100,,⑧!K,,sum
+corona_yousei_nyuin,陽性者入院数,toutyoku,corona,コロナ対策,input,,int,名,3370,0,0,100,,⑧!L,,sum
+corona_ecmo,ECMO使用者,toutyoku,corona,コロナ対策,input,,int,名,3380,0,0,20,,⑧!M,,sum
+corona_ventilator,人工呼吸器使用者,toutyoku,corona,コロナ対策,input,,int,名,3390,0,0,20,,⑧!N,,sum
+corona_yousei_shin_nyuin,陽性者新入院,toutyoku,corona,コロナ対策,input,,int,名,3400,0,0,50,,⑧!O,,sum
+corona_taiin_keikai,陽性者退院 軽快,toutyoku,corona,コロナ対策,input,,int,名,3410,0,0,50,,⑧!P,,sum
+corona_taiin_tenin,陽性者退院 転院,toutyoku,corona,コロナ対策,input,,int,名,3420,0,0,50,,⑧!Q,,sum
+corona_taiin_shibou,陽性者退院 死亡,toutyoku,corona,コロナ対策,input,,int,名,3430,0,0,50,,⑧!R,,sum
 tenkou,天候,toutyoku,tenkou,天候,input,,text,,3100,1,,,tenkou,,,sum
 toutyoku_ishi1,当直者 医師１,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3110,1,,,t1,,,sum
 toutyoku_ishi2,当直者 医師２,toutyoku,toutyoku_list,当直者・呼び出し,input,,text,,3120,0,,,t2,,,sum

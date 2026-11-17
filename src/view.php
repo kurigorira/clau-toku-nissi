@@ -145,6 +145,8 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <?php endif; ?>
     <?php if ($user && function_exists('does_toutyoku') && does_toutyoku($user)): ?>
       <a href="entry.php?dept=toutyoku">当直入力</a>
+      <a href="entry.php?dept=byoto">病棟入力</a>
+      <a href="entry.php?dept=kyukyu">救急入力</a>
     <?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
       <a href="zaiin.php">平均在院日数</a>
