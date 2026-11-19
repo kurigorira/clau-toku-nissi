@@ -150,9 +150,9 @@ ope_name3,術名③,ope,ope_name,術名,input,,text,,1930,0,,,j3,,,sum
 ope_name4,術名④,ope,ope_name,術名,input,,text,,1940,0,,,j4,,,sum
 ope_name5,術名⑤,ope,ope_name,術名,input,,text,,1950,0,,,j5,,,sum
 ope_name6,術名⑥,ope,ope_name,術名,input,,text,,1960,0,,,j6,,,sum
-shoshin,初診,toutyoku,shoshin,初診（紹介率の分母）,input,,int,名,3450,1,0,200,,⑦!P,紹介率の分母,sum
-gaikyuushin6,外休深6歳未満,toutyoku,shoshin,初診（紹介率の分母）,input,,int,名,3460,0,0,100,,⑦!R,,sum
-shoukai,紹介患者数,renkei,renkei,紹介・医療連携,input,,int,名,2020,1,0,100,,⑦!T,,sum
+shoshin,初診,toutyoku,shoshin,紹介・初診（紹介率）,input,,int,名,3450,1,0,200,,⑦!P,紹介率の分母,sum
+gaikyuushin6,外休深6歳未満,toutyoku,shoshin,紹介・初診（紹介率）,input,,int,名,3460,0,0,100,,⑦!R,,sum
+shoukai,紹介患者数,toutyoku,shoshin,紹介・初診（紹介率）,input,,int,名,3445,1,0,100,,⑦!T,紹介率の分子。当直者が入力（2026-11〜。それまでは総務課・連携室）,sum
 renkei_byoin,病院訪問,renkei,renkei,医療連携（病院日誌）,sum,"msw_houmon_byoin,msw_houmon_shinryo,kenshin_houmon_byoin,kenshin_houmon_shinryo,soumu_houmon_byoin,soumu_houmon_shinryo,renkei_byoin_ikou",int,件,2030,0,,,,,病院日誌の医療連携欄。病院訪問＝MSW・健診センター・事務の「病院」＋「診療所」,sum
 renkei_other,その他訪問,renkei,renkei,医療連携（病院日誌）,sum,"msw_houmon_nyusho,msw_houmon_kobetsu,kenshin_houmon_nyusho,kenshin_houmon_kigyo,kenshin_houmon_dantai,kenshin_houmon_kobetsu,soumu_houmon_shoubou,soumu_houmon_nyusho,soumu_houmon_kaigo,soumu_houmon_kyotaku,soumu_houmon_kigyo,soumu_houmon_dantai,soumu_houmon_kobetsu,renkei_other_ikou",int,件,2040,0,,,,,病院日誌の医療連携欄。その他訪問＝病院・診療所以外の訪問（入所施設・介護施設・居宅支援・企業・団体・個別・消防署）,sum
 renkei_kouza,健康講座,renkei,renkei,医療連携（病院日誌）,sum,"kouza_innai,kouza_ingai,renkei_kouza_ikou",int,件,2050,0,,,,,病院日誌の医療連携欄。健康講座＝院内＋院外,sum
