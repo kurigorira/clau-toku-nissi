@@ -239,6 +239,51 @@ if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
     }
 }
 
+// ---- 医事システムの職員テーブル ----
+// 職員画面の「医事システムから読み込む」（src/staff_db.php）。テーブル名・列名を決めるために候補を出す（中身は出さない）
+echo $nl . "医事システムの職員テーブル" . $nl;
+if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
+    if (!function_exists('cfg')) {
+        function cfg($key) { global $conf; return isset($conf) && is_array($conf) && isset($conf[$key]) ? $conf[$key] : null; }
+    }
+    require_once dirname(dirname(__FILE__)) . '/src/staff_db.php';
+    $sdc = staff_db_conf();
+    if ($sdc === null) {
+        line('情報', '接続先（staff_db）', '未設定 … 使うときは config.php の staff_db に医事システムの接続先を書く');
+    } else {
+        try {
+            $sdp = staff_db_connect($sdc);
+            line('OK', '医事システムへの接続', '成功');
+            $cand = staff_db_candidates($sdp);
+            if (!$cand) {
+                line('注意', '職員テーブルの候補', '名前に syoku・staff などを含むテーブルが見つかりません');
+            }
+            foreach ($cand as $c) {
+                line('情報', '候補 ' . $c['table'], ($c['count'] === null ? '件数不明' : $c['count'] . '件') . ' … 列: '
+                    . implode(', ', array_slice($c['columns'], 0, 25)) . (count($c['columns']) > 25 ? ' ほか' : ''));
+            }
+            if (trim((string)(isset($sdc['sql']) ? $sdc['sql'] : '')) === '') {
+                line('注意', '職員を読む SELECT 文', '未設定 … 上の候補から ID・氏名・部署名の列を選び、config.php の staff_db.sql に書く');
+            } else {
+                $sdf = staff_db_fetch($sdc);
+                if ($sdf['error'] !== null) {
+                    line('NG', '職員を読む SELECT 文', $sdf['error']);
+                } else {
+                    $digits = 0; $depts = array();
+                    foreach ($sdf['rows'] as $r) {
+                        if (preg_match('/^\d+$/', trim(mb_convert_kana((string)$r[0], 'as', 'UTF-8')))) { $digits++; }
+                        $depts[trim((string)$r[2])] = true;
+                    }
+                    line(count($sdf['rows']) > 0 && $digits > 0 ? 'OK' : '注意', '職員を読む SELECT 文',
+                        count($sdf['rows']) . '件（IDが数字の人 ' . $digits . '件・部署名 ' . count($depts) . '種類）');
+                }
+            }
+        } catch (Throwable $e) {
+            line('NG', '医事システムへの接続', '失敗: ' . $e->getMessage());
+        }
+    }
+}
+
 echo $nl . "バックアップ" . $nl;
 $bk = isset($conf) && isset($conf['backup']) ? $conf['backup'] : array();
 $bkDir = isset($bk['dir']) ? $bk['dir'] : '';

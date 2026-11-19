@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/repository.php';
 require_once __DIR__ . '/../src/users.php';
+require_once __DIR__ . '/../src/staff_db.php';
 
 $user = require_login();
 if (!has_role($user, 'admin')) {
@@ -55,6 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $preview = csv_build_preview($csv['rows'], !empty($_POST['deactivate_missing']), $user['user_id']);
             }
         }
+    }
+
+    // 医事システム（NEWTON の SQL Server）の職員テーブルから直接読む。CSV と同じ確認画面へ回す（src/staff_db.php）
+    if ($action === 'db_preview') {
+        unset($_SESSION['csv_emr'], $_SESSION['csv_import']);
+        $preview = csv_emr_start(staff_db_read(), !empty($_POST['deactivate_missing']), $user['user_id'], $messages);
     }
 
     // 電子カルテの部署名の対応を変えて、確認画面を作り直す（ファイルは選び直さない）
@@ -411,6 +418,23 @@ foreach ($messages as [$m, $k]) { flash($m, $k); }
 page_footer();
 exit;
 endif; ?>
+
+<h2>医事システムから読み込む</h2>
+<?php if (staff_db_conf() !== null): ?>
+<form method="post">
+  <?= csrf_field() ?>
+  <input type="hidden" name="action" value="db_preview">
+  <p>
+    <button type="submit">医事システムから読み込む</button>
+    <label><input type="checkbox" name="deactivate_missing" value="1"> 医事システムに無い職員を無効にする（退職者の整理）</label>
+  </p>
+  <p class="note">医事システム（NEWTON）の職員テーブルから、電子カルテID・氏名・部署名を読みます。CSV と同じ確認画面が出て、
+    部署名の対応を確かめてから「登録」で入ります（入力する画面・役割は、登録済みの人は今のまま）。</p>
+</form>
+<?php else: ?>
+<p class="note">config.php の <code>staff_db</code>（医事システムの接続先と、職員を読む SELECT 文）を設定すると、
+  ここから職員を直接読み込めます。職員テーブルの候補は <code>php tools\check_env.php</code> で見られます。</p>
+<?php endif; ?>
 
 <h2>CSVで一括登録</h2>
 <form method="post" enctype="multipart/form-data">

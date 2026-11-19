@@ -237,6 +237,21 @@ function users_read_csv(string $path): array
 const DEPT_VIEW_ONLY = 'sonota';
 
 /**
+ * 電子カルテの職員一覧の1人ぶん（ID・氏名・部署名）を整える。IDが数字でなければ null。
+ * CSV（syokuinID.csv）と医事システムからの読み込み（src/staff_db.php）で同じ整え方にする。
+ *
+ * @return array|null [ID, 氏名, 電子カルテの部署名]
+ */
+function users_emr_row($id, $name, $dept): ?array
+{
+    $id = trim(mb_convert_kana((string)$id, 'as', 'UTF-8'));
+    if (!preg_match('/^\d+$/', $id)) {
+        return null;
+    }
+    return [$id, trim(preg_replace('/[\s\x{3000}]+/u', ' ', (string)$name)), trim(preg_replace('/[\s\x{3000}]+/u', '', (string)$dept))];
+}
+
+/**
  * 電子カルテの職員一覧なら読む。そうでなければ null（見出し付きCSVとして読む）。
  *
  * @return array|null ['issued' => '発行日 …', 'rows' => [[行番号, ID, 氏名, 電子カルテの部署名], ...], 'error' => 文|null]
@@ -260,13 +275,11 @@ function users_read_emr_csv(string $path): ?array
     $line = 1;
     while (($r = fgetcsv($fp)) !== false) {
         $line++;
-        $id = trim(mb_convert_kana((string)($r[0] ?? ''), 'as', 'UTF-8'));
-        if (!preg_match('/^\d+$/', $id)) {
+        $row = users_emr_row($r[0] ?? '', $r[4] ?? '', $r[5] ?? '');
+        if ($row === null) {
             continue;   // 空行や、番号でない行（途中の見出しなど）は読まない
         }
-        $name = trim(preg_replace('/[\s\x{3000}]+/u', ' ', (string)($r[4] ?? '')));
-        $dept = trim(preg_replace('/[\s\x{3000}]+/u', '', (string)($r[5] ?? '')));
-        $rows[] = [$line, $id, $name, $dept];
+        $rows[] = array_merge([$line], $row);
     }
     fclose($fp);
     if (!$rows) {
@@ -350,7 +363,7 @@ function emr_dept_guess(string $emrName, array $depts): string
         '外来' => DEPT_VIEW_ONLY,   // 外来の日報転記は当直者が入力する（外来の職員は閲覧のみ）
         '医事' => 'toutyoku', '事務' => 'toutyoku',   // 医事課・事務課は当直に統合した
         '総務' => 'renkei',   // 総務課（部署IDは renkei。旧 地域医療連携室）
-        '地域医療連携' => 'iryorenkei', '連携' => 'iryorenkei', 'MSW' => 'iryorenkei', 'ソーシャル' => 'iryorenkei',   // 医療連携室（2026-11 新設）
+        '地域医療連携' => 'iryorenkei', '連携' => 'iryorenkei', '医療福祉相談' => 'iryorenkei', 'MSW' => 'iryorenkei', 'ソーシャル' => 'iryorenkei',   // 医療連携室（2026-11 新設）
         '施設' => DEPT_VIEW_ONLY,
         '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
         '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kensa',   // 感染対策室は検査科に統合（コロナ対策は検査科の画面）
