@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-11-19 05:05:56
+-- 生成日時: 2026-11-19 05:15:47
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -559,6 +559,9 @@ UPDATE m_user SET dept_id = 'sonota' WHERE dept_id NOT IN (SELECT dept_id FROM m
 UPDATE m_config SET config_value = 'sonota' WHERE config_key LIKE 'emr_dept:%' AND config_value NOT IN (SELECT dept_id FROM m_dept);
 -- 消した部署の提出記録
 DELETE FROM d_submission WHERE dept_id IN ('jimu','ijika','shisetsu','kansen');
+
+-- 部署ごとの役割の「管理者」を「決めない」に（管理者は職員画面で一人ずつ）
+UPDATE m_config SET config_value = 'keep' WHERE config_key LIKE 'emr_role:%' AND config_value = 'admin';
 
 -- 分けて作った部署へ、分ける前の日の提出状況を写す（db/master/dept_splits.csv）
 INSERT INTO d_submission (hizuke, dept_id, status, submitted_by, submitted_at, confirmed_by, confirmed_at) SELECT s.hizuke, 'tsushoreha', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at FROM d_submission s WHERE s.dept_id = 'toutyoku' AND s.status IN ('submitted', 'confirmed') AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = 'tsushoreha') t);

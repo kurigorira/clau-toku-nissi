@@ -222,6 +222,11 @@ if ($moves) {
     $sql[] = 'DELETE FROM d_submission WHERE dept_id IN ('
            . implode(',', array_map('q', array_column($moves, 'from'))) . ');';
 }
+// 2026-11：管理者は総務課・医事課・事務部の中の数名だけ（一人ずつ付ける）。
+// 部署ごとの役割に「管理者」が残っていると、職員の取り込みでその部署の全員が管理者になるので「決めない」にする
+$sql[] = '';
+$sql[] = '-- 部署ごとの役割の「管理者」を「決めない」に（管理者は職員画面で一人ずつ）';
+$sql[] = "UPDATE m_config SET config_value = 'keep' WHERE config_key LIKE 'emr_role:%' AND config_value = 'admin';";
 if ($splits) {
     // 新しい部署には過去の提出記録が無く、入力状況ボードで過去の日が「途中」になる。分けた元の部署の提出済・確定を写す。
     // 新しい部署に提出記録が1件も無いとき（最初に流したとき）だけ写すので、何度流しても同じ

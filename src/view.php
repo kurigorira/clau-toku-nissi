@@ -140,15 +140,8 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <a href="toukei.php">患者数統計表</a>
     <a href="byoin_houkoku.php">病院報告</a>
     <a href="honbu.php">本部報告</a>
-    <?php if ($user && function_exists('can_edit_dept') && can_edit_dept($user, 'gairai')): ?>
-      <a href="nippo.php">日報転記</a>
-      <?php if (in_array($user['role'], ['ijika', 'admin'], true)): ?><a href="bulk_entry.php">まとめて入力</a><?php endif; ?>
-    <?php endif; ?>
-    <?php if ($user && function_exists('does_toutyoku') && does_toutyoku($user)): ?>
-      <a href="entry.php?dept=toutyoku">当直入力</a>
-      <a href="entry.php?dept=byoto">病棟入力</a>
-      <a href="entry.php?dept=kyukyu">救急入力</a>
-    <?php endif; ?>
+    <?php /* 日報転記・当直・病棟・救急の入力は、入力状況の部署名から開く（ヘッダには出さない） */ ?>
+    <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?><a href="bulk_entry.php">まとめて入力</a><?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>
       <a href="zaiin.php">平均在院日数</a>
       <a href="audit.php">変更履歴</a>

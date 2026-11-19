@@ -403,8 +403,10 @@ function emr_role_map_save(array $map): void
     }
 }
 
-/** 初めて見る部署名の役割の候補。総務課の職員は管理者（栗原様の指定）。それ以外は決めない。 */
+/** 初めて見る部署名の役割の候補。部署ごとには決めない（管理者は職員画面で一人ずつ。2026-11〜）。 */
 function emr_role_guess(string $emrName): string
 {
-    return mb_strpos(user_norm($emrName), '総務') !== false ? 'admin' : 'keep';
+    // 総務課・医事課・事務部の職員は役割を付けなくても当直者（src/auth.php toutyoku_emr_dept()）。
+    // 管理者は数名だけなので、部署ごとには決めず職員画面で一人ずつ付ける
+    return 'keep';
 }

@@ -280,10 +280,9 @@ const TOUTYOKU_DEPTS = ['gairai', 'byoto', 'kyukyu', 'toutyoku'];
  * その部署の入力ができるか。
  * 自部署のみ入力可。医事課と管理者は全部署を代行入力できる（パスワード確認後）。
  *
- * 当直（在宅②の訪問系・通所リハ、病院日誌の天候・当直者・会議など）の欄は医事課の職員が入力する運用。
- * 医事課・事務課は当直に統合したので、入力する画面が当直の職員はパスワード確認なしで入力できる。
- * 役割が当直者の人も入力できる。
- * 外来（電子カルテ日報の転記 nippo.php）・病棟・救急も当直と同じ人が入力する（当直者・医事課・管理者）。
+ * 当直者＝職員マスタで電子カルテの部署が総務課・医事課・事務部の職員すべて（toutyoku_emr_dept()）。
+ * それに加えて、入力する画面が当直の職員と、役割が当直者の職員。パスワード確認なしで入力できる。
+ * 外来（電子カルテ日報の転記 nippo.php）・病棟・救急・当直は当直者が入力する（と医事課・管理者）。
  */
 function can_edit_dept(array $user, string $deptId): bool
 {
@@ -294,13 +293,31 @@ function can_edit_dept(array $user, string $deptId): bool
     // 医事課・事務課は 2026-10 に当直へ統合した（職員の入力する画面は当直）。残っていた ijika は念のため当直と同じに扱う
     return is_ijika($user)
         || $user['dept_id'] === $deptId
-        || ($deptId === 'toutyoku' && ($user['dept_id'] === 'ijika' || $user['role'] === 'toutyoku'));
+        || ($deptId === 'toutyoku' && ($user['dept_id'] === 'ijika' || $user['role'] === 'toutyoku'
+                                      || toutyoku_emr_dept((string)($user['emr_dept'] ?? ''))));
 }
 
-/** 当直の欄を入力する人か（ヘッダに「当直入力」を出すかに使う）。 */
+/**
+ * 電子カルテの部署名が当直者の部署か（総務課・医事課・事務部。2026-11〜）。
+ * 医師事務（医師事務作業補助）・秘書は事務の職員でも当直者ではない。
+ */
+function toutyoku_emr_dept(string $emrDept): bool
+{
+    $n = preg_replace('/\s+/u', '', mb_convert_kana($emrDept, 'asKV', 'UTF-8'));
+    if ($n === '' || mb_strpos($n, '医師事務') !== false || mb_strpos($n, '秘書') !== false) {
+        return false;
+    }
+    foreach (['総務', '医事', '事務'] as $w) {
+        if (mb_strpos($n, $w) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/** 当直者か（当直・外来の日報転記・病棟・救急を入力する人）。 */
 function does_toutyoku(array $user): bool
 {
-    // 入力する画面が当直の職員（医事課・事務課から統合した人）にも出す
     return can_edit_dept($user, 'toutyoku');
 }
 
