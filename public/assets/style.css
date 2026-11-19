@@ -293,3 +293,4 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .hb-note { font-size: 11px; color: #555; margin: 0 0 8px; }
 .hb-h2 { font-size: 14px; margin: 0 0 4px; }
 .hb-narrow { width: 24%; }
+.board .by-toutyoku { margin-left: 6px; padding: 0 5px; font-size: 11px; color: #2c4a6b; background: #dde7f2; border-radius: 3px; }
