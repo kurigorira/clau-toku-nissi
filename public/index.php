@@ -79,7 +79,8 @@ page_header('入力状況', $user);
   <?php foreach ($depts as $id => $dept): ?>
     <tr>
       <th class="dept-col"><a href="entry.php?dept=<?= h($id) ?>&amp;hizuke=<?= h($focus) ?>"><?= h($dept['dept_name']) ?></a>
-        <?php if (in_array($id, TOUTYOKU_DEPTS, true)): ?><span class="by-toutyoku">当直者が記載</span><?php endif; ?></th>
+        <?php if (in_array($id, TOUTYOKU_DEPTS, true)): ?><span class="by-toutyoku">当直者が記載</span><?php endif; ?>
+        <?php if ($id === 'naishikyo'): ?><span class="by-toutyoku">外来も記載</span><?php endif; ?></th>
       <?php for ($d = $from; $d <= $to; $d = date('Y-m-d', strtotime("$d +1 day"))):
           $cell = $board[$d][$id] ?? ['status' => 'none', 'missing' => []];
           [$lab, $cls] = $labels[$cell['status']];
@@ -101,5 +102,5 @@ page_header('入力状況', $user);
   <span class="badge st-submitted">提出済</span>
   <span class="badge st-confirmed">医事課確定</span>
 </p>
-<p class="note">外来（日報転記）・病棟・救急・当直は、当直者が記載します。</p>
+<p class="note">外来（日報転記）・病棟・救急・当直は、当直者が記載します。内視鏡室は外来の職員も記載します。</p>
 <?php page_footer();

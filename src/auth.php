@@ -283,6 +283,7 @@ const TOUTYOKU_DEPTS = ['gairai', 'byoto', 'kyukyu', 'toutyoku'];
  * 当直者＝職員マスタで電子カルテの部署が総務課・医事課・事務部の職員すべて（toutyoku_emr_dept()）。
  * それに加えて、入力する画面が当直の職員と、役割が当直者の職員。パスワード確認なしで入力できる。
  * 外来（電子カルテ日報の転記 nippo.php）・病棟・救急・当直は当直者が入力する（と医事課・管理者）。
+ * 内視鏡室は外来の職員も入力する（gairai_staff()。2026-11〜）。
  */
 function can_edit_dept(array $user, string $deptId): bool
 {
@@ -293,6 +294,7 @@ function can_edit_dept(array $user, string $deptId): bool
     // 医事課・事務課は 2026-10 に当直へ統合した（職員の入力する画面は当直）。残っていた ijika は念のため当直と同じに扱う
     return is_ijika($user)
         || $user['dept_id'] === $deptId
+        || ($deptId === 'naishikyo' && gairai_staff($user))
         || ($deptId === 'toutyoku' && ($user['dept_id'] === 'ijika' || $user['role'] === 'toutyoku'
                                       || toutyoku_emr_dept((string)($user['emr_dept'] ?? ''))));
 }
@@ -313,6 +315,19 @@ function toutyoku_emr_dept(string $emrDept): bool
         }
     }
     return false;
+}
+
+/**
+ * 外来の職員か（内視鏡室を入力する。2026-11〜）。入力する画面が外来か、電子カルテの部署名に「外来」を含む職員。
+ * 外来の日報転記は当直者が入力するので、外来の職員は「その他（閲覧のみ）」になっていることが多い。
+ */
+function gairai_staff(array $user): bool
+{
+    if ($user['dept_id'] === 'gairai') {
+        return true;
+    }
+    $n = preg_replace('/\s+/u', '', mb_convert_kana((string)($user['emr_dept'] ?? ''), 'asKV', 'UTF-8'));
+    return $n !== '' && mb_strpos($n, '外来') !== false;
 }
 
 /** 当直者か（当直・外来の日報転記・病棟・救急を入力する人）。 */
