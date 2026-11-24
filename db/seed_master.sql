@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-11-24 05:00:59
+-- 生成日時: 2026-11-24 05:48:28
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -23,6 +23,7 @@ INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('tsushoreha','通所リハ',132,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('houkan','訪問看護',134,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('touseki','透析室',140,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('shinjo','診療情報管理室',142,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('toutyoku','当直',150,'09:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('sonota','その他（閲覧のみ）',999,'18:00','',0);
 
@@ -127,7 +128,7 @@ INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('ippan_nyuin','一般単純撮影 入院','housha','housha','放射線科','input',NULL,'int','sum','件',1190,1,0,500,'2000-01-01',NULL,NULL,'⑤!G','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('ippan_gairai','一般単純撮影 外来','housha','housha','放射線科','input',NULL,'int','sum','件',1200,1,0,500,'2000-01-01',NULL,NULL,'⑤!H','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('ippan_total','一般単純撮影 入＋外','housha','housha','放射線科','sum','ippan_nyuin,ippan_gairai','int','sum','件',1210,0,NULL,NULL,'2000-01-01',NULL,'k4','⑤!I','');
-INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('gan_touroku','癌新登録数','kensa','kensa','検査科','input',NULL,'int','sum','件',1300,0,0,50,'2000-01-01',NULL,'k25','⑤!K','');
+INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('gan_touroku','癌新登録数','shinjo','gan','がん登録','input',NULL,'int','sum','件',1300,0,0,50,'2000-01-01',NULL,'k25','⑤!K','診療情報管理室が入力（2026-11〜。それまでは検査科）');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('shin_echo_nyuin','心エコー 入院','kensa','kensa','検査科','input',NULL,'int','sum','件',1310,1,0,100,'2000-01-01',NULL,NULL,'⑤!M','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('shin_echo_gairai','心エコー 外来','kensa','kensa','検査科','input',NULL,'int','sum','件',1320,1,0,100,'2000-01-01',NULL,NULL,'⑤!N','');
 INSERT INTO m_item (item_code,item_name,dept_id,group_code,group_name,calc_type,calc_source,value_type,agg_type,unit,sort_no,required,min_value,max_value,valid_from,valid_to,legacy_column,excel_ref,note) VALUES ('shin_echo_total','心エコー 入＋外','kensa','kensa','検査科','sum','shin_echo_nyuin,shin_echo_gairai','int','sum','件',1330,0,NULL,NULL,'2000-01-01',NULL,'k9','⑤!O','');
@@ -567,6 +568,7 @@ UPDATE m_config SET config_value = 'keep' WHERE config_key LIKE 'emr_role:%' AND
 INSERT INTO d_submission (hizuke, dept_id, status, submitted_by, submitted_at, confirmed_by, confirmed_at) SELECT s.hizuke, 'tsushoreha', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at FROM d_submission s WHERE s.dept_id = 'toutyoku' AND s.status IN ('submitted', 'confirmed') AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = 'tsushoreha') t);
 INSERT INTO d_submission (hizuke, dept_id, status, submitted_by, submitted_at, confirmed_by, confirmed_at) SELECT s.hizuke, 'houkan', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at FROM d_submission s WHERE s.dept_id = 'toutyoku' AND s.status IN ('submitted', 'confirmed') AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = 'houkan') t);
 INSERT INTO d_submission (hizuke, dept_id, status, submitted_by, submitted_at, confirmed_by, confirmed_at) SELECT s.hizuke, 'iryorenkei', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at FROM d_submission s WHERE s.dept_id = 'renkei' AND s.status IN ('submitted', 'confirmed') AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = 'iryorenkei') t);
+INSERT INTO d_submission (hizuke, dept_id, status, submitted_by, submitted_at, confirmed_by, confirmed_at) SELECT s.hizuke, 'shinjo', s.status, s.submitted_by, s.submitted_at, s.confirmed_by, s.confirmed_at FROM d_submission s WHERE s.dept_id = 'kensa' AND s.status IN ('submitted', 'confirmed') AND NOT EXISTS (SELECT 1 FROM (SELECT dept_id FROM d_submission WHERE dept_id = 'shinjo') t);
 
 -- 合算にした項目の、それまでの入力値を移す（db/master/values_moved.csv）
 UPDATE d_daily_value SET item_code = 'renkei_byoin_ikou' WHERE item_code = 'renkei_byoin';

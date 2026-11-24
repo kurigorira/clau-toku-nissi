@@ -100,7 +100,7 @@ mammo_total,マンモグラフィ 入＋外,housha,housha,放射線科,sum,"mamm
 ippan_nyuin,一般単純撮影 入院,housha,housha,放射線科,input,,int,件,1190,1,0,500,,⑤!G,,sum
 ippan_gairai,一般単純撮影 外来,housha,housha,放射線科,input,,int,件,1200,1,0,500,,⑤!H,,sum
 ippan_total,一般単純撮影 入＋外,housha,housha,放射線科,sum,"ippan_nyuin,ippan_gairai",int,件,1210,0,,,k4,⑤!I,,sum
-gan_touroku,癌新登録数,kensa,kensa,検査科,input,,int,件,1300,0,0,50,k25,⑤!K,,sum
+gan_touroku,癌新登録数,shinjo,gan,がん登録,input,,int,件,1300,0,0,50,k25,⑤!K,診療情報管理室が入力（2026-11〜。それまでは検査科）,sum
 shin_echo_nyuin,心エコー 入院,kensa,kensa,検査科,input,,int,件,1310,1,0,100,,⑤!M,,sum
 shin_echo_gairai,心エコー 外来,kensa,kensa,検査科,input,,int,件,1320,1,0,100,,⑤!N,,sum
 shin_echo_total,心エコー 入＋外,kensa,kensa,検査科,sum,"shin_echo_nyuin,shin_echo_gairai",int,件,1330,0,,,k9,⑤!O,,sum
