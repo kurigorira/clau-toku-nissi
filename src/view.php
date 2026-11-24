@@ -141,6 +141,7 @@ function page_header(string $title, ?array $user = null, bool $showTitle = true)
     <a href="byoin_houkoku.php">病院報告</a>
     <a href="honbu.php">本部報告</a>
     <a href="zaiin.php">平均在院日数</a>
+    <a href="manual.php">マニュアル</a>
     <?php /* 日報転記・当直・病棟・救急の入力は、入力状況の部署名から開く（ヘッダには出さない） */ ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?><a href="bulk_entry.php">まとめて入力</a><?php endif; ?>
     <?php if ($user && in_array($user['role'], ['ijika', 'admin'], true)): ?>

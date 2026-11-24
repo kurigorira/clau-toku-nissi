@@ -301,3 +301,20 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .board tfoot button { display: block; width: 100%; margin: 1px 0; padding: 1px 0; font-size: 10px; white-space: nowrap; }
 .board tfoot button.undo { color: #7a2a2a; }
 .board tfoot th { font-size: 12px; }
+
+/* マニュアル（public/manual.php）。左に目次、右に本文。狭い画面では目次が上に来る */
+.manual { display: flex; align-items: flex-start; }
+.manual-toc { flex: 0 0 210px; margin-right: 20px; padding: 8px 10px; background: #fff; border: 1px solid #d5dbe2; border-radius: 4px; font-size: 14px; }
+.manual-toc-head { margin: 0 0 4px; font-weight: bold; color: #2c5578; }
+.manual-toc ul { list-style: none; margin: 0; padding: 0; }
+.manual-toc li { padding: 3px 0 3px 16px; position: relative; }
+.manual-toc li .mine { position: absolute; left: 0; color: #c98a00; }
+.manual-toc li.current a { font-weight: bold; color: #111; text-decoration: none; }
+.manual-toc li.toc-sep { margin-top: 6px; padding-left: 0; font-size: 12px; color: #666; border-top: 1px solid #e3e7ec; }
+.manual-main { flex: 1 1 auto; min-width: 0; max-width: 960px; }
+.manual-title { margin: 0 0 4px; font-size: 20px; color: #1f4e79; }
+.manual-actions a { margin-right: 14px; }
+@media (max-width: 760px) {
+  .manual { display: block; }
+  .manual-toc { margin: 0 0 14px; }
+}
