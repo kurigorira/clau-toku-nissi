@@ -294,3 +294,10 @@ button.primary { background: #2c5578; color: #fff; border: 1px solid #234763; fo
 .hb-h2 { font-size: 14px; margin: 0 0 4px; }
 .hb-narrow { width: 24%; }
 .board .by-toutyoku { margin-left: 6px; padding: 0 5px; font-size: 11px; color: #2c4a6b; background: #dde7f2; border-radius: 3px; }
+
+/* 入力状況ボードの「医事課の確定」行。ボタンは小さく、上下に並べる */
+.board tfoot td.confirm-cell { width: auto; height: auto; padding: 2px 1px; text-align: center; vertical-align: top; background: #f7f9fb; }
+.board tfoot form { margin: 0; }
+.board tfoot button { display: block; width: 100%; margin: 1px 0; padding: 1px 0; font-size: 10px; white-space: nowrap; }
+.board tfoot button.undo { color: #7a2a2a; }
+.board tfoot th { font-size: 12px; }

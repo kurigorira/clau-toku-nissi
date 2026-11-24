@@ -8,7 +8,7 @@
  * このファイルに置くもの:
  *   - 紙の並び（行＝科、列＝時間帯）と item_code の対応表
  *   - 紙の合計欄との照合
- *   - 複数部署（外来・病棟・通所リハ・訪問看護・在宅部門など）の値をまとめて下書きとして保存する処理
+ *   - 複数部署（外来・病棟・通所リハ・訪問看護・地域支援など）の値をまとめて下書きとして保存する処理
  *
  *   - 日報のExcelから値を読む処理（外来 nippo_gairai_from_xlsx・入院 nippo_nyuin_from_xlsx）
  *
@@ -323,8 +323,8 @@ function nippo_check(array $v, array $c, string $date): array
         $warnings[] = "健診科の新来 {$kenshinNew} が、健診科新患内訳（ドック＋健診）"
             . ($v['gkn_uchi_dock'] + $v['gkn_uchi_kenshin']) . ' と違います';
     }
-    // 訪問看護・在宅部門が入れた30分以上／以内の内訳と、日報の合計
-    foreach (['houkan' => ['訪問看護（介護）', '訪問看護'], 'houkai' => ['訪問介護', '在宅部門']] as $k => [$label, $who]) {
+    // 訪問看護・地域支援が入れた30分以上／以内の内訳と、日報の合計
+    foreach (['houkan' => ['訪問看護（介護）', '訪問看護'], 'houkai' => ['訪問介護', '地域支援']] as $k => [$label, $who]) {
         $r = db_row(
             'SELECT COUNT(*) AS n, SUM(value_num) AS s FROM d_daily_value
               WHERE hizuke = ? AND item_code IN (?, ?) AND value_num IS NOT NULL',

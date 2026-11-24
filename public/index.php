@@ -10,7 +10,31 @@ require_once __DIR__ . '/../src/repository.php';
 
 $user = require_login();
 
-$to    = valid_date($_GET['to'] ?? null) ?? date('Y-m-d');
+$to    = valid_date($_REQUEST['to'] ?? null) ?? date('Y-m-d');
+
+// 医事課の確定・確定解除（日付の列の下のボタン）。確定すると、その日の部署の画面は編集できなくなる
+$messages = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
+    $day = valid_date($_POST['hizuke'] ?? null);
+    if (!is_ijika($user)) {
+        $messages[] = ['確定は医事課・管理者が行います。', 'error'];
+    } elseif ($day === null || $day > date('Y-m-d')) {
+        $messages[] = ['日付が正しくありません。', 'error'];
+    } elseif (($_POST['action'] ?? '') === 'confirm') {
+        $r = confirm_date($day, $user['user_id']);
+        $messages[] = [$r['done']
+            ? sprintf('%s（%s）：%d部署を確定しました。', $day, youbi($day), count($r['done']))
+            : sprintf('%s（%s）：確定できる提出済みの部署がありません。', $day, youbi($day)), $r['done'] ? 'ok' : 'warn'];
+        if ($r['left']) {
+            $messages[] = ['未提出・欠測ありのため確定していない部署：' . implode('、', $r['left']), 'warn'];
+        }
+    } elseif (($_POST['action'] ?? '') === 'unconfirm') {
+        $n = unconfirm_date($day);
+        $messages[] = [sprintf('%s（%s）：%d部署の確定を外し、提出済みに戻しました。', $day, youbi($day), $n), 'ok'];
+    }
+}
+
 $days  = 14;
 $from  = date('Y-m-d', strtotime("$to -" . ($days - 1) . ' day'));
 $depts = all_depts();
@@ -36,6 +60,9 @@ foreach ($depts as $id => $d) {
 }
 
 page_header('入力状況', $user);
+foreach ($messages as [$m, $k]) {
+    flash($m, $k);
+}
 ?>
 <form method="get" class="datebar">
   <label>表示終了日 <input type="date" name="to" value="<?= h($to) ?>"></label>
@@ -93,6 +120,30 @@ page_header('入力状況', $user);
     </tr>
   <?php endforeach; ?>
   </tbody>
+  <?php if (is_ijika($user)): ?>
+  <tfoot>
+    <tr>
+      <th class="dept-col">医事課の確定</th>
+      <?php for ($d = $from; $d <= $to; $d = date('Y-m-d', strtotime("$d +1 day"))):
+          $sts = array_column($board[$d] ?? [], 'status');
+          $canConfirm = in_array('submitted', $sts, true);
+          $canUndo    = in_array('confirmed', $sts, true);
+      ?>
+        <td class="confirm-cell">
+          <?php if ($canConfirm || $canUndo): ?>
+          <form method="post">
+            <?= csrf_field() ?>
+            <input type="hidden" name="hizuke" value="<?= h($d) ?>">
+            <input type="hidden" name="to" value="<?= h($to) ?>">
+            <?php if ($canConfirm): ?><button type="submit" name="action" value="confirm" title="<?= h($d) ?> の提出済みの部署を確定">確定</button><?php endif; ?>
+            <?php if ($canUndo): ?><button type="submit" name="action" value="unconfirm" class="undo" title="<?= h($d) ?> の確定を外して提出済みに戻す">外す</button><?php endif; ?>
+          </form>
+          <?php endif; ?>
+        </td>
+      <?php endfor; ?>
+    </tr>
+  </tfoot>
+  <?php endif; ?>
 </table>
 </div>
 
@@ -103,4 +154,8 @@ page_header('入力状況', $user);
   <span class="badge st-confirmed">医事課確定</span>
 </p>
 <p class="note">外来（日報転記）・病棟・救急・当直は、当直者が記載します。内視鏡室は外来の職員も記載します。</p>
+<?php if (is_ijika($user)): ?>
+<p class="note">表のいちばん下の「確定」で、その日の提出済み（緑）の部署をまとめて確定します（濃い緑になり、部署は直せなくなります）。
+  未入力・途中・欠測ありの部署は確定しません。「外す」で確定を外すと、部署がまた直せます。確定後の医事課の訂正は変更履歴に残ります。</p>
+<?php endif; ?>
 <?php page_footer();

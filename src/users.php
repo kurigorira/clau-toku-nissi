@@ -365,7 +365,7 @@ function emr_dept_guess(string $emrName, array $depts): string
         '総務' => 'renkei',   // 総務課（部署IDは renkei。旧 地域医療連携室）
         '地域医療連携' => 'iryorenkei', '連携' => 'iryorenkei', '医療福祉相談' => 'iryorenkei', 'MSW' => 'iryorenkei', 'ソーシャル' => 'iryorenkei',   // 医療連携室（2026-11 新設）
         '施設' => DEPT_VIEW_ONLY,
-        '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku',
+        '健康管理' => 'dock', '健診' => 'dock', 'ドック' => 'dock', '訪問' => 'zaitaku', '地域支援' => 'zaitaku',   // 地域支援（旧 在宅部門）
         '診療情報' => 'shinjo', '内視鏡' => 'naishikyo', '救急' => 'kyukyu', '感染' => 'kensa',   // 感染対策室は検査科に統合（コロナ対策は検査科の画面）
     ];
     foreach ($rules as $word => $id) {

@@ -1,6 +1,6 @@
 -- 自動生成ファイル。直接編集しないこと。
 -- db/master/*.csv を編集し、php db/tools/build_seed.php で再生成する。
--- 生成日時: 2026-11-24 05:48:28
+-- 生成日時: 2026-11-24 05:59:07
 
 DELETE FROM m_item;
 DELETE FROM m_config WHERE config_key NOT LIKE 'emr_dept:%' AND config_key NOT LIKE 'emr_role:%';
@@ -19,7 +19,7 @@ INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('ope','手術室',110,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('iryorenkei','医療連携室',120,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('renkei','総務課',145,'18:00','1234567',1);
-INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('zaitaku','在宅部門',130,'18:00','1234567',1);
+INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('zaitaku','地域支援',130,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('tsushoreha','通所リハ',132,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('houkan','訪問看護',134,'18:00','1234567',1);
 INSERT INTO m_dept (dept_id,dept_name,sort_no,deadline_time,entry_days,is_active) VALUES ('touseki','透析室',140,'18:00','1234567',1);

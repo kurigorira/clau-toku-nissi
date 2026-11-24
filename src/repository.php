@@ -175,6 +175,38 @@ function touch_submission(string $date, string $deptId, string $status, string $
 }
 
 /**
+ * ある日の、提出済み（欠けている必須項目が無い）部署をまとめて医事課確定にする。入力状況ボードの「確定」。
+ * 未入力・途中・欠測ありの部署は確定しない（そのまま督促の対象に残す）。
+ *
+ * @return array ['done' => 確定した部署名[], 'left' => 確定しなかった部署名[]]
+ */
+function confirm_date(string $date, string $userId): array
+{
+    $depts = all_depts();
+    $board = entry_status($date, $date)[$date] ?? [];
+    $done  = $left = [];
+    foreach ($depts as $id => $d) {
+        $st = $board[$id]['status'] ?? 'none';
+        if ($st === 'submitted') {
+            touch_submission($date, $id, 'confirmed', $userId);
+            $done[] = $d['dept_name'];
+        } elseif ($st !== 'confirmed') {
+            $left[] = $d['dept_name'];
+        }
+    }
+    return ['done' => $done, 'left' => $left];
+}
+
+/**
+ * ある日の医事課確定を外し、提出済みに戻す（部署がまた直せるようになる）。戻した部署の数を返す。
+ */
+function unconfirm_date(string $date): int
+{
+    return db_exec("UPDATE d_submission SET status = 'submitted', confirmed_by = '', confirmed_at = NULL
+                    WHERE hizuke = ? AND status = 'confirmed'", [$date]);
+}
+
+/**
  * 入力状況を返す。入力漏れ判定の中核。全部署・毎日が入力の対象（曜日による対象外は無い）。
  *
  * 戻り値の status:
