@@ -239,9 +239,9 @@ if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
     }
 }
 
-// ---- 医事システムの職員テーブル ----
-// 職員画面の「医事システムから読み込む」（src/staff_db.php）。テーブル名・列名を決めるために候補を出す（中身は出さない）
-echo $nl . "医事システムの職員テーブル" . $nl;
+// ---- 電子カルテシステムの職員テーブル ----
+// 職員画面の「電子カルテシステムから読み込む」（src/staff_db.php）。テーブル名・列名を決めるために候補を出す（中身は出さない）
+echo $nl . "電子カルテシステムの職員テーブル" . $nl;
 if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
     if (!function_exists('cfg')) {
         function cfg($key) { global $conf; return isset($conf) && is_array($conf) && isset($conf[$key]) ? $conf[$key] : null; }
@@ -249,11 +249,11 @@ if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
     require_once dirname(dirname(__FILE__)) . '/src/staff_db.php';
     $sdc = staff_db_conf();
     if ($sdc === null) {
-        line('情報', '接続先（staff_db）', '未設定 … 使うときは config.php の staff_db に医事システムの接続先を書く');
+        line('情報', '接続先（staff_db）', '未設定 … 使うときは config.php の staff_db に電子カルテシステムの接続先を書く');
     } else {
         try {
             $sdp = staff_db_connect($sdc);
-            line('OK', '医事システムへの接続', '成功');
+            line('OK', '電子カルテシステムへの接続', '成功');
             $cand = staff_db_candidates($sdp);
             if (!$cand) {
                 line('注意', '職員テーブルの候補', '名前に syoku・staff などを含むテーブルが見つかりません');
@@ -279,7 +279,7 @@ if (version_compare(PHP_VERSION, '7.4.0', '>=')) {
                 }
             }
         } catch (Throwable $e) {
-            line('NG', '医事システムへの接続', '失敗: ' . $e->getMessage());
+            line('NG', '電子カルテシステムへの接続', '失敗: ' . $e->getMessage());
         }
     }
 }

@@ -238,7 +238,7 @@ const DEPT_VIEW_ONLY = 'sonota';
 
 /**
  * 電子カルテの職員一覧の1人ぶん（ID・氏名・部署名）を整える。IDが数字でなければ null。
- * CSV（syokuinID.csv）と医事システムからの読み込み（src/staff_db.php）で同じ整え方にする。
+ * CSV（syokuinID.csv）と電子カルテシステムからの読み込み（src/staff_db.php）で同じ整え方にする。
  *
  * @return array|null [ID, 氏名, 電子カルテの部署名]
  */

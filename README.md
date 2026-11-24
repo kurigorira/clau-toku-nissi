@@ -363,10 +363,10 @@ http://10.20.103.125/nissi/public/index.php?staffId=＜電子カルテID＞
   （削除はしない。過去の入力者の記録は残る）
 - コマンドでも同じCSVを入れられる：`php db\tools\add_user.php --csv=職員.csv`
 
-**医事システム（NEWTON）から直接読み込む（2026-11〜）**
+**電子カルテシステム（NEWTONS2.0）から直接読み込む（2026-11〜）**
 
-職員画面の「**医事システムから読み込む**」で、医事システムの SQL Server の職員テーブルから電子カルテID・氏名・部署名を読む。
-CSV（syokuinID.csv）と同じ確認画面（部署名の対応表・新規／更新・医事システムに無い職員の無効化）が出て、「この内容で登録する」で入る。
+職員画面の「**電子カルテシステムから読み込む**」で、電子カルテシステムの SQL Server の職員テーブルから電子カルテID・氏名・部署名を読む。
+CSV（syokuinID.csv）と同じ確認画面（部署名の対応表・新規／更新・電子カルテシステムに無い職員の無効化）が出て、「この内容で登録する」で入る。
 
 1. `config\config.php` に `staff_db` を書く（`config.sample.php` に例）。読み取り専用のユーザにする
    ```php
@@ -376,7 +376,7 @@ CSV（syokuinID.csv）と同じ確認画面（部署名の対応表・新規／�
        'sql'  => '',   // 2. で決める
    ],
    ```
-2. `php tools\check_env.php` の「医事システムの職員テーブル」に、名前に syoku・staff などを含むテーブルと列の候補・件数が出る（中身は出さない）。
+2. `php tools\check_env.php` の「電子カルテシステムの職員テーブル」に、名前に syoku・staff などを含むテーブルと列の候補・件数が出る（中身は出さない）。
    その中から職員ID・氏名・部署名の列を選び、`sql` に **emr_id・name・dept の別名で返す SELECT 文** を書く
    （例 `SELECT SyokuinCd AS emr_id, SyokuinNm AS name, BusyoNm AS dept FROM dbo.massyokuin WHERE SsiCd = '05012000'`。退職者を除く条件があれば足す）
 3. もう一度 `check_env.php` で「職員を読む SELECT 文　○件（IDが数字の人 ○件・部署名 ○種類）」が出れば、職員画面のボタンが使える

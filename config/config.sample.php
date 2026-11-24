@@ -48,11 +48,11 @@ return [
         'browser' => '',
     ],
 
-    // ---- 職員マスタを医事システムから読む ------------------------------------
-    // 職員画面の「医事システムから読み込む」が使う（src/staff_db.php）。dsn が空なら使わない。
-    // 医事システム（NEWTON）の SQL Server。読み取り専用のユーザにする（SELECT しかしない）。
+    // ---- 職員マスタを電子カルテシステムから読む ------------------------------------
+    // 職員画面の「電子カルテシステムから読み込む」が使う（src/staff_db.php）。dsn が空なら使わない。
+    // 電子カルテシステム（NEWTONS2.0）の SQL Server。読み取り専用のユーザにする（SELECT しかしない）。
     // sql は、職員ID・氏名・部署名を emr_id・name・dept という別名で返す SELECT 文。
-    // テーブル名・列名は  php tools\check_env.php  の「医事システムの職員テーブル」で候補を見て書く。
+    // テーブル名・列名は  php tools\check_env.php  の「電子カルテシステムの職員テーブル」で候補を見て書く。
     //   例 'SELECT SyokuinCd AS emr_id, SyokuinNm AS name, BusyoNm AS dept FROM dbo.massyokuin WHERE SsiCd = \'05012000\''
     'staff_db' => [
         'dsn'  => '',   // 例 'sqlsrv:Server=nagasakisrv11;Database=nagasakidb'

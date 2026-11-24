@@ -1,6 +1,6 @@
 <?php
 /**
- * 職員マスタを医事システム（NEWTON の SQL Server）から直接読む。
+ * 職員マスタを電子カルテシステム（NEWTONS2.0 の SQL Server）から直接読む。
  *
  * 接続先と SELECT 文は config.php の staff_db に書く（テーブル名・列名は病院ごとに違うため）。
  * 読んだ結果は電子カルテの職員一覧（syokuinID.csv）と同じ形にして、職員画面の同じ確認画面へ回す
@@ -41,7 +41,7 @@ function staff_db_fetch(?array $c = null): array
 {
     $c = $c ?? staff_db_conf();
     if ($c === null) {
-        return ['rows' => [], 'error' => 'config.php の staff_db（医事システムの接続先）が設定されていません。'];
+        return ['rows' => [], 'error' => 'config.php の staff_db（電子カルテシステムの接続先）が設定されていません。'];
     }
     $sql = trim((string)($c['sql'] ?? ''));
     if ($sql === '') {
@@ -63,20 +63,20 @@ function staff_db_fetch(?array $c = null): array
         }
         return ['rows' => $rows, 'error' => null];
     } catch (Throwable $e) {
-        error_log('医事システムの職員の読み込みに失敗: ' . $e->getMessage());
-        return ['rows' => [], 'error' => '医事システムから読めませんでした：' . $e->getMessage()];
+        error_log('電子カルテシステムの職員の読み込みに失敗: ' . $e->getMessage());
+        return ['rows' => [], 'error' => '電子カルテシステムから読めませんでした：' . $e->getMessage()];
     }
 }
 
 /**
  * 職員画面の確認画面へ回す形（users_read_emr_csv() と同じ）にする。src/users.php の users_emr_row() を使う。
  *
- * @return array ['issued' => '医事システム …', 'rows' => [[番号, ID, 氏名, 部署名], ...], 'error' => 文|null]
+ * @return array ['issued' => '電子カルテシステム …', 'rows' => [[番号, ID, 氏名, 部署名], ...], 'error' => 文|null]
  */
 function staff_db_read(): array
 {
     $f = staff_db_fetch();
-    $issued = '医事システムから読み込み ' . date('Y-m-d H:i');
+    $issued = '電子カルテシステムから読み込み ' . date('Y-m-d H:i');
     if ($f['error'] !== null) {
         return ['issued' => $issued, 'rows' => [], 'error' => $f['error']];
     }
@@ -90,7 +90,7 @@ function staff_db_read(): array
         }
     }
     if (!$rows) {
-        return ['issued' => $issued, 'rows' => [], 'error' => '医事システムから職員の行が1件も読めませんでした（emr_id が数字の行がありません）。'];
+        return ['issued' => $issued, 'rows' => [], 'error' => '電子カルテシステムから職員の行が1件も読めませんでした（emr_id が数字の行がありません）。'];
     }
     return ['issued' => $issued, 'rows' => $rows, 'error' => null];
 }
