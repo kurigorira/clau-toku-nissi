@@ -1,0 +1,5 @@
+from,to,note
+renkei_byoin,renkei_byoin_ikou,病院訪問を MSW・健診センター・事務の訪問件数の合算にした（2026-11）。それまでの入力値は移行用の項目へ
+renkei_other,renkei_other_ikou,その他訪問（同上）
+renkei_kouza,renkei_kouza_ikou,健康講座を院内＋院外の合算にした（同上）
+renkei_soudan,renkei_soudan_ikou,相談件数を MSW の相談（入院＋外来＋その他）の合算にした（同上）
