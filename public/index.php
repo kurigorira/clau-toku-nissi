@@ -2,7 +2,7 @@
 /**
  * 入力状況ボード。このシステムのトップ画面。
  *
- * 縦＝部署、横＝直近14日。医事課は赤いセルだけ見れば督促でき、
+ * 縦＝部署、横＝表示日までの14日。医事課は赤いセルだけ見れば督促でき、
  * 部署を1つずつ電話で確認する作業がなくなる。
  */
 require_once __DIR__ . '/../src/auth.php';
@@ -10,7 +10,8 @@ require_once __DIR__ . '/../src/repository.php';
 
 $user = require_login();
 
-$to    = valid_date($_REQUEST['to'] ?? null) ?? date('Y-m-d');
+// 表示日。開いたときは前日（当日は入力途中なので）。未提出の一覧と、表の右端の列はこの日
+$to    = valid_date($_REQUEST['to'] ?? null) ?? date('Y-m-d', strtotime('-1 day'));
 
 // 医事課の確定・確定解除（日付の列の下のボタン）。確定すると、その日の部署の画面は編集できなくなる
 $messages = [];
@@ -40,8 +41,8 @@ $from  = date('Y-m-d', strtotime("$to -" . ($days - 1) . ' day'));
 $depts = all_depts();
 $board = entry_status($from, $to);
 
-// 直近の入力対象日（＝集計の基準日）。当日は入力途中なので前日を既定にする
-$focus = date('Y-m-d', strtotime("$to -1 day"));
+// 未提出をまとめる日＝表示日
+$focus = $to;
 
 $labels = [
     'none'      => ['未入力', 'st-none'],
@@ -65,7 +66,7 @@ foreach ($messages as [$m, $k]) {
 }
 ?>
 <form method="get" class="datebar">
-  <label>表示終了日 <input type="date" name="to" value="<?= h($to) ?>"></label>
+  <label>表示日 <input type="date" name="to" value="<?= h($to) ?>"></label>
   <button type="submit">表示</button>
   <?php if (is_ijika($user)): ?><a href="bulk_entry.php">過去の日をまとめて入力（1日分・全部署）</a><?php endif; ?>
 </form>
